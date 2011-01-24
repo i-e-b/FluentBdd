@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentBddNUnitExtension", "FluentBddNUnitExtension\FluentBddNUnitExtension.csproj", "{59009D6D-7CA2-4931-85E9-5CC697B7FF4C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentBDD", "FluentBDD\FluentBDD.csproj", "{66FF01DA-561A-459B-9CD7-DE3016744971}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsageExample", "UsageExample\UsageExample.csproj", "{824B804A-66BD-4492-A035-FE59B83A0469}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{59009D6D-7CA2-4931-85E9-5CC697B7FF4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59009D6D-7CA2-4931-85E9-5CC697B7FF4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59009D6D-7CA2-4931-85E9-5CC697B7FF4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59009D6D-7CA2-4931-85E9-5CC697B7FF4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66FF01DA-561A-459B-9CD7-DE3016744971}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66FF01DA-561A-459B-9CD7-DE3016744971}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66FF01DA-561A-459B-9CD7-DE3016744971}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66FF01DA-561A-459B-9CD7-DE3016744971}.Release|Any CPU.Build.0 = Release|Any CPU
+		{824B804A-66BD-4492-A035-FE59B83A0469}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{824B804A-66BD-4492-A035-FE59B83A0469}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{824B804A-66BD-4492-A035-FE59B83A0469}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{824B804A-66BD-4492-A035-FE59B83A0469}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

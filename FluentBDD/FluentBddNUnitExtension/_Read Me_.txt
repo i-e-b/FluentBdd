@@ -1,0 +1,28 @@
+﻿FluentBDD NUnit Extension
+=========================
+
+This extension library *MUST* be build with the "nunit.core.dll" and 
+"nunit.core.interfaces.dll" libraries from the version of NUnit you
+are using.
+
+
+To install:
+-----------
+ - Build the solution
+ - Copy "FluentBDD.dll" and "FluentBddNUnitExtension.dll"
+   to "C:\Program Files (x86)\NUnit 2.x.x\bin\net-2.0\addins"
+   (or wherever your version of NUnit is installed)
+   
+If you user TestRunner.Net, remember to update it's own copy of NUnit
+(usually at C:\Program Files (x86)\TestDriven.NET 3\NUnit\2.5  or similar)
+   
+To use:
+-------
+Include "FluentBDD.dll" into your test project, and start writing
+behaviours. NUnit will find and runs these as unit tests.
+
+
+Notes and known bugs:
+---------------------
+ReSharper does not find tests to run, even with the extensions
+installed. This has been reported to JetBrains.
