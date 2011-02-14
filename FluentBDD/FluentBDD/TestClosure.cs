@@ -1,11 +1,52 @@
 ﻿using System;
 
 namespace FluentBDD {
-	internal class TestClosure {
-		public string Cause;
-		public string Effect;
+	public class TestClosure {
+		public TestClosure (string given, string when, string then, Action testMethod) {
+			Given = given;
+			When = when;
+			Then = then;
+			TestMethod = testMethod;
+			ExpectedExceptionType = null;
+			ExpectedExceptionMessage = null;
+		}
+
+		public TestClosure (string given, string when, string then, string with, Action testMethod) {
+			Given = given;
+			When = when;
+			Then = then;
+			With = with;
+			TestMethod = testMethod;
+			ExpectedExceptionType = null;
+			ExpectedExceptionMessage = null;
+		}
+
+
+		public TestClosure (string given, string when, string then, Action testMethod, Type exception, string exceptionMessage) {
+			Given = given;
+			When = when;
+			Then = then;
+			TestMethod = testMethod;
+			ExpectedExceptionType = exception;
+			ExpectedExceptionMessage = exceptionMessage;
+		}
+
+		public TestClosure (string given, string when, string then, string with, Action testMethod, Type exception, string exceptionMessage) {
+			Given = given;
+			When = when;
+			Then = then;
+			With = with;
+			TestMethod = testMethod;
+			ExpectedExceptionType = exception;
+			ExpectedExceptionMessage = exceptionMessage;
+		}
+
+		public string Given;
+		public string When;
+		public string Then;
+		public string With;
 		public Action TestMethod;
-		public Type ExpectedExceptionType = null;
-		public string ExpectedExceptionMessage = null;
+		public Type ExpectedExceptionType;
+		public string ExpectedExceptionMessage;
 	}
 }

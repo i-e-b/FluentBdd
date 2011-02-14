@@ -1,5 +1,4 @@
 ﻿using System;
-using BddAddinAttributes;
 using FluentBDD;
 using UsageExample;
 using Moq;
@@ -19,108 +18,101 @@ namespace CalculatorConcerns {
 		// These classes don't need to be embedded in 'Addition', nor do they need to be marked internal.
 		// You can use any accessible class of type Context<T> for a scenario.
 		// Making them internal and embedded keeps things tidy.
-		internal class a_calculator_with_a_mock_in_it : Context<Calculator> {
-			public Mock<IDoMath> mock_adder;
-			protected int a, b;
+		
+		internal class a_calculator_that_uses_a_math_provider_interface : Context<Calculator>, IUse<values_for_a_calculator_using_math_provider> {
+			public values_for_a_calculator_using_math_provider Values { get; set; }
 
-			public a_calculator_with_a_mock_in_it () {
-				Given("I have a calculator using the adder interface", () => new Calculator(mock_adder.Object))
-					.And("I type in " + a + " and " + b,
-					c => { c.Press(b); c.Press(a); });
-			}
-
-			public void check_adder_was_used () {
-				mock_adder.Verify(m => m.Add(a, b), Times.Once());
-			}
-
-			public override void Setup () {
-				a = 1;
-				b = 2;
-				mock_adder = new Mock<IDoMath>();
-				mock_adder.Setup(m => m.Add(a, b)).Returns(3);
+			public override void SetupContext () {
+				Given("I have a calculator using the IDoMath interface", () => new Calculator(Values.MathProvider))
+					.And("I type in " + Values.a + " and " + Values.b, c => { c.Press(Values.b); c.Press(Values.a); });
 			}
 		}
-		internal class a_calculator : Context<Calculator> {
-			public a_calculator () {
-				Given("I have a calculator", () => new Calculator());
+
+		internal class values_for_a_calculator_using_math_provider : IProvide<values_for_a_calculator_using_math_provider> {
+			private values_for_a_calculator_using_math_provider SetupWithMocks() {
+				a = 1;
+				b = 2;
+				mock_provider = new Mock<IDoMath>();
+				mock_provider.Setup(m => m.Add(a, b)).Returns(3);
+				MathProvider = mock_provider.Object;
+				return this;
+			}
+
+			public void check_adder_was_used_once () {
+				mock_provider.Verify(m => m.Add(a, b), Times.Once());
+			}
+
+			public int a, b;
+			public IDoMath MathProvider;
+			protected Mock<IDoMath> mock_provider;
+
+			public values_for_a_calculator_using_math_provider[] Data() {
+				return new[] { SetupWithMocks() };
+			}
+
+			public string StringRepresentation() {
+				return "a = " + a + ", b = " + b + " and a mock math provider";
 			}
 		}
 		
+		internal class a_calculator : Context<Calculator> {
+			public override void SetupContext () {
+				Given("I have a calculator", () => new Calculator());
+			}
+		}
 		internal class a_calculator_with_three_numbers_entered : Context<Calculator> {
-			public a_calculator_with_three_numbers_entered () {
+			public override void SetupContext () {
 				Given("I have a calculator", () => new Calculator())
-					.And("I enter 4, 6 and 8", c => {
-					                           	c.Press(4);
-					                           	c.Press(6);
-					                           	c.Press(8);
-					                           });
+					.And("I enter 4, 6 and 8", c =>
+					{
+						c.Press(4);
+						c.Press(6);
+						c.Press(8);
+					});
 			}
 		}
 		#endregion
 
-		#region Scenarios with contexts defined elsewhere (bread-and-butter: do this most of the time.)
+
+		// checking mocks with the Context->Action->Values->Behaviour pattern
+		public Scenario the_calculator_uses_the_adder_supplied =
+			With(() => Context.Of<a_calculator_that_uses_a_math_provider_interface>())
+				.When("adding inputs", c => c.Add())
+				.Using<values_for_a_calculator_using_math_provider>()
+				.Then("adder interface should be used once", (subject, values) => values.check_adder_was_used_once()) // test method in IProvide values, keeps scenario clean
+				.Then("adder interface should be used and only once!", (s, v) => v.check_adder_was_used_once());
+
+
 
 		// this scenario's action ("when") gives NO result, so all the tests ("then") have only the subject.
 		public Scenario calculator_readout_reflects_input =
-			With(() => Context.Of<a_calculator_with_a_mock_in_it>())
+			With(() => Context.Of<a_calculator_that_uses_a_math_provider_interface>())
 				.When("entering zero into it", subject => subject.Press(0))
+				.Using<values_for_a_calculator_using_math_provider>()
 				.Then("the screen should show zero", subject => subject.Readout().should_be_equal_to(0));
 
 
 		// this scenario's action ("when") gives a result, so all the tests ("then") take it as a param.
 		public Scenario adding_returns_the_sum_of_last_two_numbers =
-			With(() => Context.Of<a_calculator_with_a_mock_in_it>())
+			With(() => Context.Of<a_calculator_that_uses_a_math_provider_interface>())
 				.When("adding inputs", c => c.Add())
-				.Then("the result should be the sum of inputs", (subject, result) => result.should_be_equal_to(3))
-				.Then("the screen should show the result", (subject, result) => subject.Readout().should_be_equal_to(result));
+				.Using<values_for_a_calculator_using_math_provider>()
+				.Then("the result should be the sum of inputs", (subject, result, values) => result.should_be_equal_to(3))
+				.Then("the screen should show the result", (s, r, v) => s.Readout().should_be_equal_to(r));
 
 
 		// no-result actions can test for exceptions.
 		// to ensure no result, wrap methods in curly braces.
 		public Scenario pressing_add_without_enough_input_causes_an_exception =
-			With(() => Context.Of<a_calculator_with_a_mock_in_it>())
+			With(() => Context.Of<a_calculator_that_uses_a_math_provider_interface>())
 				.When("I press 'add' three times", AddThreeTimes) // method without parenthesis
+				.Using<values_for_a_calculator_using_math_provider>()
 				.ShouldThrow<InvalidOperationException>()
 				.WithMessage("Stack empty.");
 
 		private static void AddThreeTimes (Calculator c) { // method takes the subject as it's only parameter, so can be passed directly
 			c.Add(); c.Add(); c.Add();
 		}
-
-
-		// This checks that the context is created once per 'then'
-		public Scenario the_calculator_uses_the_adder_supplied =
-			With(() => Context.Of<a_calculator_with_a_mock_in_it>())
-				.When("adding inputs", c => { c.Add(); })
-				.Then<a_calculator_with_a_mock_in_it>("adder interface should be used once",
-													   c => c.check_adder_was_used()) // test method in subject, keeps scenario clean
-				.Then<a_calculator_with_a_mock_in_it>("adder interface should be used and only once!",
-													   c => c.check_adder_was_used());
-		#endregion
-
-		#region Lightweight-contexts (for simple cases or when roughing out an idea)
-
-		// this scenario's action ("when") gives a result, so all the tests ("then") take it as a param.
-		public Scenario when_adding_two_numbers =
-			With(() => Context.Of<a_calculator>())
-			.And("I have pressed 20 into the calculator", ctx => ctx.Press(20))
-			.And("I have pressed 30 into the calculator", ctx => ctx.Press(30))
-			.When("I press the add button", ctx => ctx.Add())
-			.Then("the calculator should give me 50 as a result", (calc, result) => result.should_be_equal_to(50))
-			.Then("the calculator screen should show same as result", (calc, result) => result.should_be_equal_to(calc.Readout()));
-
-		// this scenario's action ("when") gives NO result, so all the tests ("then") have only the subject.
-		public Scenario when_adding_three_numbers =
-			With(() => Context.Of<a_calculator>())
-				.And("I put 3, 8 and 1 into it", ctx => {
-				                                 	ctx.Press(3);
-				                                 	ctx.Press(8);
-				                                 	ctx.Press(1);
-				                                 })
-				.When("I press the add button twice", c => { c.Add(); c.Add(); })
-				.Then("the calculator screen should show 12", c => c.Readout().should_be_equal_to(12));
-
-		#endregion
 
 		// Same context used with different actions. Context will be grouped in output, but actions will be seperate.
 		public Scenario last_item_on_stack_shows =
@@ -135,12 +127,14 @@ namespace CalculatorConcerns {
 
 		public Scenario adding_twice_adds_all_three_items =
 			With(() => Context.Of<a_calculator_with_three_numbers_entered>())
-				.When("Adding twice", c => {
-				                      	c.Add();
-				                      	return c.Add();
-				                      })
+				.When("Adding twice", c =>
+				{
+					c.Add();
+					return c.Add();
+				})
 				.Then("Result should be 18", (c, r) => r.should_be_equal_to(18));
 	}
+
 
 	// Below are scenarios that don't have subjects to be set up.
 	// Expected to be used mostly for testing new() etc.
@@ -151,12 +145,12 @@ namespace CalculatorConcerns {
 				.When("I create a calculator", with => new Calculator())
 				.Then("I should have a new calculator", (no_subject, calculator) => calculator.should_not_be_null());
 
-		
+
 		public Scenario when_doing_things_with_exceptions =
 			GivenNoSubject()
-				.When("I create a calculator with a null adder", c => { new Calculator(null); })
+				.When("I create a calculator with a null math delegate", c => { new Calculator(null); })
 				.ShouldThrow<ArgumentException>()
-				.WithMessage("An adder must be provided");
+				.WithMessage("An math delegate must be provided");
 	}
 
 	[Feature("Subtraction",
@@ -164,12 +158,60 @@ namespace CalculatorConcerns {
 		"To avoid making mistakes in simple arithmatic problems",
 		"I want to be told the difference between two numbers")]
 	public class Subtraction : Feature {
+
+		public Scenario subtracting_numbers_gives_the_expected_result =
+			With(() => Context.Of<a_calculator_with_two_numbers_entered>())
+				.When("I press subtract", c => c.Subtract())
+				.Then("I should get expected result", (s, r) => r.should_be_equal_to(a_calculator_with_two_numbers_entered.expected_result))
+				.Then("screen should show result", (s, r) => s.Readout().should_be_equal_to(r));
+
+		public Scenario subtracting_twice_uses_three_items_entered =
+			With(() => Context.Of<a_calculator_with_three_numbers_entered>())
+				.When("I press subtract twice", press_subtract_twice)
+				.Then("I should get the difference of the three numbers in order", c => c.Readout().should_be_equal_to(-5));
+
+		public Scenario subtracting_two_numbers =
+			With(() => Context.Of<a_calculator_taking_two_inputs>())
+				.When("I press subtract", c => c.Subtract())
+				.Using<values_for_a_calculator_taking_two_inputs>()
+				.Then("I should get the difference of the two inputs in order",
+					  (subject, result, values) => result.should_be_equal_to(values.a_minus_b))
+				.Then("display should match result",
+					  (subject, result, values) => result.should_be_equal_to(subject.Readout()));
+
+
+		public Scenario subtracting_without_enough_input_gives_an_exception =
+			With(() => Context.Of<a_calculator_taking_two_inputs>())
+				.When("I press subtract twice", press_subtract_twice)
+				.Using<values_for_a_calculator_taking_two_inputs>()
+				.ShouldThrow<InvalidOperationException>()
+				.WithMessage("Stack empty.");
+
+		public Scenario subtracting_without_enough_input_gives_an_exception__without_examples =
+			With(() => Context.Of<a_calculator_with_two_numbers_entered>())
+				.When("I press subtract twice", press_subtract_twice)
+				.ShouldThrow<InvalidOperationException>()
+				.WithMessage("Stack empty.");
+
+
+		public Scenario subtracting_two_numbers_without_examples =
+			With<Calculator>(Context.Of<a_calculator_with_two_numbers_entered>)
+				.When("I press subtract", c => { c.Subtract(); })
+				.Then("I should see \"-10\" on the readout",
+					 subject => subject.Readout().should_be_equal_to(-10));
+
+
+		private static void press_subtract_twice (Calculator c) {
+			c.Subtract();
+			c.Subtract();
+		}
+
 		internal class a_calculator_with_two_numbers_entered : Context<Calculator> {
 			public const int a = 10;
 			public const int b = 20;
 			public const int expected_result = -10;
 
-			public a_calculator_with_two_numbers_entered () {
+			public override void SetupContext () {
 				Given("a calculator", () => new Calculator())
 					.And("I type " + a + " and " + b + " into it", s =>
 					{
@@ -178,62 +220,44 @@ namespace CalculatorConcerns {
 					});
 			}
 		}
-
 		internal class a_calculator_with_three_numbers_entered : a_calculator_with_two_numbers_entered {
 			public const int c = 5;
 
-			public a_calculator_with_three_numbers_entered() {
+			public override void SetupContext () {
+				base.SetupContext();
 				GivenBaseContext()
 					.And("I type " + c + " into it", s => s.Press(c));
 			}
 		}
-
-		public Scenario subtracting_numbers_gives_the_expected_result =
-			With(() => Context.Of<a_calculator_with_two_numbers_entered>())
-				.When("I press subtract", c => c.Subtract())
-				.Then("I should get expected result", (s, r) => r.should_be_equal_to(a_calculator_with_two_numbers_entered.expected_result))
-				.Then("screen should show result", (s, r) => s.Readout().should_be_equal_to(r));
-
-		public Scenario subtracting_without_enough_input_gives_an_exception =
-			With(() => Context.Of<a_calculator_with_two_numbers_entered>())
-				.When("I press subtract twice", press_subtract_twice)
-				.ShouldThrow<InvalidOperationException>()
-				.WithMessage("Stack empty.");
-
-		public Scenario subtracting_twice_uses_three_items_entered =
-			With(() => Context.Of<a_calculator_with_three_numbers_entered>())
-				.When("I press subtract twice", press_subtract_twice)
-				.Then("I should get the difference of the three numbers in order", c => c.Readout().should_be_equal_to(-5));
-
-
-		private static void press_subtract_twice (Calculator c) {
-			c.Subtract();
-			c.Subtract();
-		}
-
-		/* I would like to be able to say:
-		 * 
-		 
-		public Scenario subtracting_numbers_gives_the_expected_result = 
-			With(inputs_for_a_calculator, () => Context.Of<a_calculator>())
-				.When("I press subtract", c => c.Subtract())
-				.Then("I should get the difference of the two inputs", (s,r,input) => r.should_equal(i.expected_result));
-		
-		 * 
-		 * This could be a parameter of type 'calculator_input' on the 'a_calculator' context ctor,
-		 * where 'inputs_for_a_calculator' is an IEnumerable<calculator_input>.
-		 * The 'Then' lambda would return subject, [result], input;
-		 * where 'input' would be of type 'calculator_input'. The 'Then' would result in (?one test/multiple tests?)
-		 * that runs all the test cases. [once when/then are split, might make more sense to do multiple]
-		 * 
-		 
-		public class a_calculator : Context<Calculator, calculator_input> {
-			public a_calculator (calculator_input i) {
-				Given(...);
-			}
-		}
-		 
-		 * 
-		 */
 	}
+
+	internal class a_calculator_taking_two_inputs : Context<Calculator>, IUse<values_for_a_calculator_taking_two_inputs> {
+		public values_for_a_calculator_taking_two_inputs Values { get; set; }
+
+		public override void SetupContext () {
+			Given("a calculator", () => new Calculator())
+				.And("I type 'a' into it", s => s.Press(Values.a))
+				.And("I type 'b' into it", s => s.Press(Values.b));
+		}
+	}
+	
+	internal class values_for_a_calculator_taking_two_inputs : IProvide<values_for_a_calculator_taking_two_inputs> {
+		public values_for_a_calculator_taking_two_inputs[] Data () {
+			return new[] {
+					new values_for_a_calculator_taking_two_inputs {a = 0, b = 10, a_minus_b = -10, a_plus_b = 10},
+					new values_for_a_calculator_taking_two_inputs {a = 10, b = 10, a_minus_b = 0, a_plus_b = 20},
+					new values_for_a_calculator_taking_two_inputs {a = 10, b = 0, a_minus_b = 10, a_plus_b = 10},
+				};
+		}
+
+		public string StringRepresentation () {
+			return "{ a = " + a + "; b = " + b + "; a+b : " + a_plus_b + "; a-b : " + a_minus_b + "; }";
+		}
+
+		public int a { get; set; }
+		public int b { get; set; }
+		public int a_minus_b { get; set; }
+		public int a_plus_b { get; set; }
+	}
+
 }

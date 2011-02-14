@@ -1,16 +1,22 @@
 ﻿using System;
 
 namespace FluentBDD {
-	public class no_subject : Context<object> {
-		public no_subject () {
-			Given("no subject", () => null);
-		}
-	}
 
 	public abstract class Feature {
+		public class no_subject : Context<object> {
+			public no_subject () {
+				Given("no subject", () => null);
+			}
 
-		public static Scenario<object, Context<object>> GivenNoSubject() {
+			public override void SetupContext () { }
+		}
+
+		public static ContextBuilder<object> GivenNoSubject () {
 			return With<object>(Context.Of<no_subject>);
+		}
+
+		public static ContextBuilder<TSubject> With<TSubject> (Func<Context<TSubject>> contextProvider) {
+			return new ContextBuilder<TSubject>(contextProvider);
 		}
 
 		internal static T Create<T> () {
@@ -20,11 +26,5 @@ namespace FluentBDD {
 		internal static object CreateFor (Type featureType) {
 			return featureType.GetConstructor(new Type[] { }).Invoke(new object[] { });
 		}
-
-		public static Scenario<T, Context<T>> With<T> (Func<Context<T>> newContext) {
-			var descr = newContext().GetScenario().ContextName;
-			return new Scenario<T, Context<T>>(newContext, descr);
-		}
 	}
-
 }

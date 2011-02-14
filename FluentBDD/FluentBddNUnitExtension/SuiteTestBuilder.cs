@@ -18,12 +18,11 @@ namespace FluentBddNUnitExtension {
 			var featureInstance = Feature.CreateFor(fixtureType);
 			var scenarioFields = GetScenarioFields(fixtureType);
 
+
 			foreach (var scenarioField in scenarioFields) {
-				var name = GetContextName(scenarioField, featureInstance);
-				if (string.IsNullOrEmpty(name) || name == "no subject" || name == "Given no subject") {
-					AddTestsWithoutSubjectGrouping(scenarioField, featureInstance);
-				} else {
-					PrepareTestsWithSubjectGrouping(name, scenarioField, featureInstance);
+				var tests = GetTestClosures(scenarioField, featureInstance);
+				foreach (var test in tests) {
+					GivenCases[FixName(test.Given)][test.When].Add(new ClosureTest(test));
 				}
 			}
 
@@ -41,39 +40,22 @@ namespace FluentBddNUnitExtension {
 				Add(scenario);
 			}
 		}
-		
-		private void PrepareTestsWithSubjectGrouping(string scenarioName, FieldInfo scenarioField, object featureInstance) {
-			var given = GivenCases[scenarioName];
 
-			var tests = GetTestClosures(scenarioField, featureInstance);
-			foreach (var test in tests) {
-				given[test.Cause].Add(new ClosureTest(test));
-			}
+		private string FixName(string givenName) {
+			if (givenName == "Error") return "### ERROR IN TEST SETUP ###";
+			return "Given " + givenName;
 		}
 
-		private void AddTestsWithoutSubjectGrouping(FieldInfo scenarioField, object featureInstance) {
-			var tests = GetTestClosures(scenarioField, featureInstance);
-			foreach (var test in tests) {
-				test.Effect = test.Cause + ", then " + test.Effect;
-				Add(new ClosureTest(test));
-			}
-		}
-		
 
 		private IEnumerable<TestClosure> GetTestClosures (FieldInfo scenarioField, object featureInstance) {
-			var scenario = scenarioField.GetValue(featureInstance) as Scenario;
-			return (scenario == null) ? (ErrorTestClosure()) : (scenario.TestClosures);
-		}
+			Scenario scenario;
 
-		private IEnumerable<TestClosure> ErrorTestClosure() {
-			return new[] { new TestClosure { Effect = CastingError } };
-		}
-
-		private string GetContextName(FieldInfo scenarioField, object featureInstance) {
-			var scenario = scenarioField.GetValue(featureInstance) as Scenario;
-			return (scenario != null) 
-				? (scenario.ContextName)
-				: (CastingError);
+			try {
+				scenario = (Scenario)scenarioField.GetValue(featureInstance);
+				return scenario.BuildTests();
+			} catch( Exception ex) {
+				return new[] { new TestClosure("Error", "Field name = " + scenarioField.Name, ex.Message+"\r\n \r\n"+ex.StackTrace, () => { throw ex; }) };
+			}
 		}
 
 		private IEnumerable<FieldInfo> GetScenarioFields(Type fixtureType) {

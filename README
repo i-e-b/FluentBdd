@@ -20,7 +20,7 @@ To install:
    (or wherever your version of NUnit is installed)
    
 If you user TestRunner.Net, remember to update it's own copy of NUnit
-(usually at C:\Program Files (x86)\TestDriven.NET 3\NUnit\2.5  or similar)
+(usually at "C:\Program Files (x86)\TestDriven.NET 3\NUnit\2.5"  or similar)
    
 To use:
 -------
@@ -31,4 +31,5 @@ behaviours. NUnit will find and runs these as unit tests.
 Notes and known bugs:
 ---------------------
 ReSharper does not find tests to run, even with the extensions
-installed. This has been reported to JetBrains.
+installed. JetBrains don't support this style of plug-in. I will try to
+find time to write a ReSharper plugin.

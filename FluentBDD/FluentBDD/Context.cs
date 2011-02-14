@@ -2,45 +2,31 @@
 
 namespace FluentBDD {
 	public abstract class Context {
-		public static T Of<T>() where T: Context, new() {
-			return new T();
+		public static TContext Of<TContext> () where TContext : Context, new() {
+			return new TContext();
 		}
 	}
+
 
 	public abstract class Context<TSubject> : Context {
-		internal Scenario<TSubject, Context<TSubject>> TheScenarioContext;
-		internal Func<TSubject> CreateSubjectFunc;
-		internal string Description;
-		internal TSubject TheSubject;
+		private SubjectBuilder<TSubject> SubjectSource;
 
-		public virtual void Setup() {}
+		public abstract void SetupContext ();
 
-		public Scenario<TSubject, Context<TSubject>> Given (string description, Func<TSubject> createSubject) {
-			if (TheScenarioContext != null) throw new InvalidOperationException("Context already exists. If you've inherited from another context, continue with 'And(...)'");
-			
-			Description = "Given " + description;
-			Setup();
-			TheSubject = createSubject();
-			TheScenarioContext = new Scenario<TSubject, Context<TSubject>>(TheSubject, "Given " + description);
-			
-			return TheScenarioContext;
+		internal SubjectBuilder<TSubject> SetupAndReturnContextBuilder () {
+			SetupContext();
+			return SubjectSource;
 		}
 
-		public Scenario<TSubject, Context<TSubject>> GivenBaseContext () {
-			if (TheScenarioContext == null) throw new InvalidOperationException("Context has not been created. Try starting with 'Given(...)'");
-			return TheScenarioContext;
+		public SubjectBuilder<TSubject> Given (string description, Func<TSubject> createSubject) {
+			if (SubjectSource != null) throw new ArgumentException("Context already exists. If you've inherited from another context, continue with 'GivenBaseContext().And(...)'");
+			SubjectSource = new SubjectBuilder<TSubject>(description, createSubject);
+			return SubjectSource;
 		}
 
-		internal Scenario<TSubject, Context<TSubject>> GetScenario () {
-			return TheScenarioContext;
+		public SubjectBuilder<TSubject> GivenBaseContext () {
+			if (SubjectSource == null) throw new InvalidOperationException("Context has not been created. Try starting with 'Given(...)'");
+			return SubjectSource;
 		}
 	}
-
-	internal class WrapperContext<TSubject> : Context<TSubject> {
-
-		internal WrapperContext (string description, Func<TSubject> createSubject) {
-			Given(description, createSubject);
-		}
-	}
-
 }

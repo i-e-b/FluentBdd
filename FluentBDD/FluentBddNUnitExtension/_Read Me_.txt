@@ -25,4 +25,4 @@ behaviours. NUnit will find and runs these as unit tests.
 Notes and known bugs:
 ---------------------
 ReSharper does not find tests to run, even with the extensions
-installed. This has been reported to JetBrains.
+installed. This has been reported to JetBrains, who intend to do nothing.

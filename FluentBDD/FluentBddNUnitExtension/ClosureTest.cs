@@ -6,9 +6,9 @@ namespace FluentBddNUnitExtension {
 	internal class ClosureTest : Test {
 		private readonly TestClosure testClosure;
 
-		public ClosureTest (TestClosure testClosure) : base(testClosure.Effect) {
+		public ClosureTest (TestClosure testClosure) : base(testClosure.Then) {
 			this.testClosure = testClosure;
-			TestName.Name = testClosure.Effect;
+			TestName.Name = testClosure.Then + (testClosure.With??"");
 		}
 
 		public override TestResult Run(EventListener listener, ITestFilter filter) {

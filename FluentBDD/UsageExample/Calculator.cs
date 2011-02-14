@@ -14,7 +14,7 @@ namespace UsageExample {
 		}
 
 		public Calculator(IDoMath doMath) {
-			if (doMath == null) throw new ArgumentException("An adder must be provided");
+			if (doMath == null) throw new ArgumentException("An math delegate must be provided");
 			this.doMath = doMath;
 		}
 
