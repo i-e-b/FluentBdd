@@ -22,6 +22,11 @@ namespace FluentBDD {
 		public Scenario<TSubject, TResult> When<TResult> (string description, Func<TSubject, TResult> action) {
 			return new Scenario<TSubject, TResult>(description, ContextSources, action);
 		}
+
+		public Scenario<TSubject, no_result> Verify () {
+			return new Scenario<TSubject, no_result>("inspecting \"" + typeof(TSubject).Name + "\" type",
+			ContextSources, s => { });
+		}
 	}
 
 	public class no_result {}

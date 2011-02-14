@@ -1,12 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace UsageExample {
+	public class SubCalculator {
+		protected int display; // just here to test hierarchy flattening in tests.
+	}
+
 	/// <summary>
 	/// Dummy subject class.
 	/// </summary>
-	public class Calculator {
+	[DataContract, Serializable]
+	public class Calculator : SubCalculator {
+		[DataMember]
 		private readonly IDoMath doMath;
+
+		[DataMember(Name="Stack")]
 		private readonly Stack<int> stack = new Stack<int>();
 
 		public Calculator() {

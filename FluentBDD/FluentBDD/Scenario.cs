@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace FluentBDD {
 	public abstract class Scenario {
 		internal abstract IEnumerable<TestClosure> BuildTests ();
-	}
-
-	public interface ITakeMessage {
-		Scenario WithMessage (string expectedMessage);
 	}
 
 	public class Scenario<TSubject, TResult> : Scenario, ITakeMessage {
@@ -75,12 +72,12 @@ namespace FluentBDD {
 		public virtual Scenario WithMessage (string expectedMessage) {
 			expectedExceptionMessage = expectedMessage;
 			subjectOnlyTests.Add(new Group<string, Action<TSubject>>(
-				"With message " + expectedExceptionMessage, subject => { }));
+				"Should have exception message \"" + expectedExceptionMessage+"\"", subject => { }));
 			return this;
 		}
 		#endregion
 
-		#region Test closure building. Here be dragons!
+		#region Test closure building. These are what get run in NUnit.
 		private IEnumerable<Func<SubjectBuilder<TSubject>>> BuildSubjects () {
 			foreach (var contextSource in contextSources) {
 				var builder = contextSource().SetupAndReturnContextBuilder();
@@ -118,6 +115,48 @@ namespace FluentBDD {
 			return testClosures;
 		}
 		#endregion
+
+		#region Reflection tests
+		public Scenario<TSubject, TResult> ShouldHaveAttribute<TAttributeType> () where TAttributeType : Attribute {
+			subjectOnlyTests.Add(new Group<string, Action<TSubject>>(
+			                     	"Should have " + typeof (TAttributeType).Name,
+			                     	subject => typeof (TSubject)
+			                     	           	.GetCustomAttributes(typeof (TAttributeType), true)
+			                     	           	.Select(attribute => attribute as TAttributeType)
+			                     	           	.ToArray().should_not_be_empty()));
+			return this;
+		}
+
+		public Scenario<TSubject, TResult> ShouldHaveField (string fieldName) {
+			subjectOnlyTests.Add(new Group<string, Action<TSubject>>(
+			                     	"Should have a field named \"" + fieldName + "\"",
+			                     	subject => typeof (TSubject)
+			                     	           	.GetField(fieldName, BindingFlags.FlattenHierarchy | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public)
+			                     	           	.should_not_be_null()
+			                     	));
+			return this;
+		}
+
+		public Scenario<TSubject, TResult> ShouldHaveFieldWithAttribute<TAttributeType> (string fieldName, Func<TAttributeType, bool> condition) where TAttributeType : Attribute {
+			subjectOnlyTests.Add(new Group<string, Action<TSubject>>(
+			                     	"Should have a field named \"" + fieldName + "\" with "+typeof(TAttributeType).Name,
+			                     	subject => {
+			                     		var field = typeof(TSubject).GetField(fieldName, BindingFlags.FlattenHierarchy | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
+										if (field == null) throw new ArgumentException("Field not found: "+fieldName);
+			                     		var attribs = field.GetCustomAttributes(typeof (TAttributeType), true).Select(attribute => attribute as TAttributeType);
+			                     		attribs.should_contain(condition);
+			                     	}));
+			return this;
+		}
+
+		public Scenario<TSubject, TResult> ShouldHaveFieldWithAttribute<TAttributeType> (string fieldName) where TAttributeType : Attribute {
+			return ShouldHaveFieldWithAttribute<TAttributeType>(fieldName, a => true);
+		}
+		#endregion
+	}
+
+	public interface ITakeMessage {
+		Scenario WithMessage (string expectedMessage);
 	}
 
 	public class ScenarioWithExamples<TSubject, TResult, TExample> : Scenario<TSubject, TResult> where TExample : IProvide<TExample>, new() {
@@ -167,7 +206,7 @@ namespace FluentBDD {
 		public override Scenario WithMessage (string expectedMessage) {
 			expectedExceptionMessage = expectedMessage;
 			subjectAndExampleTests.Add(new Group<string, Action<TSubject, TExample>>(
-				"With message " + expectedExceptionMessage, (s,e) => { }));
+				"Should have exception message \"" + expectedExceptionMessage + "\"", (s, e) => { }));
 			return this;
 		}
 		#endregion

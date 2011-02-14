@@ -6,6 +6,7 @@ namespace FluentBDD {
 			Given = given;
 			When = when;
 			Then = then;
+			With = "";
 			TestMethod = testMethod;
 			ExpectedExceptionType = null;
 			ExpectedExceptionMessage = null;
@@ -26,6 +27,7 @@ namespace FluentBDD {
 			Given = given;
 			When = when;
 			Then = then;
+			With = "";
 			TestMethod = testMethod;
 			ExpectedExceptionType = exception;
 			ExpectedExceptionMessage = exceptionMessage;

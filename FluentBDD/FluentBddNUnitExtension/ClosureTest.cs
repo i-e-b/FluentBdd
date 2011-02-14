@@ -4,11 +4,19 @@ using NUnit.Core;
 
 namespace FluentBddNUnitExtension {
 	internal class ClosureTest : Test {
-		private readonly TestClosure testClosure;
+		internal readonly TestClosure testClosure;
 
 		public ClosureTest (TestClosure testClosure) : base(testClosure.Then) {
 			this.testClosure = testClosure;
-			TestName.Name = testClosure.Then + (testClosure.With??"");
+			TestName.Name = testClosure.With ?? "???";
+		}
+
+		public void UseCompressedName() {
+			TestName.Name = testClosure.Then + (testClosure.With ?? "");
+		}
+
+		public bool EmptyWith () {
+			return string.IsNullOrEmpty(testClosure.With);
 		}
 
 		public override TestResult Run(EventListener listener, ITestFilter filter) {
