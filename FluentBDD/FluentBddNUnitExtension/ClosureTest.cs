@@ -75,7 +75,7 @@ namespace FluentBddNUnitExtension {
 			return testClosure.ExpectedExceptionType != null;
 		}
 
-
+		public override int TestCount { get { return 1; } }
 		public override object Fixture { get; set; }
 	}
 }

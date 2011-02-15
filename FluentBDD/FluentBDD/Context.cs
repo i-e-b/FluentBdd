@@ -7,7 +7,6 @@ namespace FluentBDD {
 		}
 	}
 
-
 	public abstract class Context<TSubject> : Context {
 		private SubjectBuilder<TSubject> SubjectSource;
 

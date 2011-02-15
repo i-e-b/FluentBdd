@@ -24,7 +24,7 @@ namespace FluentBDD {
 			subjectOnlyTests = new List<Group<string, Action<TSubject>>>();
 			subjectAndResultTests = new List<Group<string, Action<TSubject, TResult>>>();
 
-			this.Description = description;
+			Description = description;
 			this.contextSources = contextSources;
 			scenarioAction = subject =>
 			{
@@ -37,7 +37,7 @@ namespace FluentBDD {
 			subjectOnlyTests = new List<Group<string, Action<TSubject>>>();
 			subjectAndResultTests = new List<Group<string, Action<TSubject, TResult>>>();
 
-			this.Description = description;
+			Description = description;
 			this.contextSources = contextSources;
 			scenarioAction = action;
 		}
@@ -64,14 +64,14 @@ namespace FluentBDD {
 		#region Exception cases
 		public virtual ITakeMessage ShouldThrow<TException> () where TException : Exception {
 			expectedExceptionType = typeof(TException);
-			subjectOnlyTests.Add(new Group<string, Action<TSubject>>(
+			subjectOnlyTests.Insert(0, new Group<string, Action<TSubject>>(
 				"Should throw " + expectedExceptionType.Name, subject => { }));
 			return this;
 		}
 
 		public virtual Scenario WithMessage (string expectedMessage) {
 			expectedExceptionMessage = expectedMessage;
-			subjectOnlyTests.Add(new Group<string, Action<TSubject>>(
+			subjectOnlyTests.Insert(0, new Group<string, Action<TSubject>>(
 				"Should have exception message \"" + expectedExceptionMessage+"\"", subject => { }));
 			return this;
 		}
@@ -198,14 +198,14 @@ namespace FluentBDD {
 		#region Exception cases
 		public override ITakeMessage ShouldThrow<TException> () {
 			expectedExceptionType = typeof(TException);
-			subjectAndExampleTests.Add(new Group<string, Action<TSubject, TExample>>(
+			subjectAndExampleTests.Insert(0, new Group<string, Action<TSubject, TExample>>(
 				"Should throw " + expectedExceptionType.Name, (s, e) => { }));
 			return this;
 		}
 
 		public override Scenario WithMessage (string expectedMessage) {
 			expectedExceptionMessage = expectedMessage;
-			subjectAndExampleTests.Add(new Group<string, Action<TSubject, TExample>>(
+			subjectAndExampleTests.Insert(0, new Group<string, Action<TSubject, TExample>>(
 				"Should have exception message \"" + expectedExceptionMessage + "\"", (s, e) => { }));
 			return this;
 		}
@@ -223,18 +223,20 @@ namespace FluentBDD {
 					for (int exampleIndex = 0; exampleIndex < exampleData.Length; exampleIndex++) {
 						var example = exampleData[exampleIndex];
 						int index = exampleIndex;
+						Func<Context<TSubject>> source = contextSource;
 						yield return new Group<Func<Context<TSubject>>, TExample>(
 							() => {
 								var closureExample = new TExample().Data()[index];
-								var fresh_context = contextSource();
+								var fresh_context = source();
 								((IUse<TExample>)fresh_context).Values = closureExample;
 								return fresh_context;
 							},
 							example);
 					}
 				} else {
+					var source = contextSource;
 					yield return new Group<Func<Context<TSubject>>, TExample>(
-						() => contextSource(),
+						source,
 						default(TExample));
 				}
 			}
