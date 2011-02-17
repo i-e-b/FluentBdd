@@ -1,8 +1,11 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace FluentBDD {
 
 	public abstract class Feature {
+
+		[EditorBrowsable(EditorBrowsableState.Never)]
 		public class no_subject : Context<object> {
 			public no_subject () {
 				Given("no subject", () => null);

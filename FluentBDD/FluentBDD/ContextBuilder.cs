@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace FluentBDD {
 	public class ContextBuilder<TSubject> {
@@ -18,6 +19,9 @@ namespace FluentBDD {
 			return new Scenario<TSubject, no_result>(description, ContextSources, action);
 		}
 
+		public Scenario<TSubject, no_result> When (string description, Action<TSubject, Context<TSubject>> action) {
+			return new Scenario<TSubject, no_result>(description, ContextSources, action);
+		}
 
 		public Scenario<TSubject, TResult> When<TResult> (string description, Func<TSubject, TResult> action) {
 			return new Scenario<TSubject, TResult>(description, ContextSources, action);
@@ -29,5 +33,6 @@ namespace FluentBDD {
 		}
 	}
 
+	[EditorBrowsable(EditorBrowsableState.Never)]
 	public class no_result {}
 }

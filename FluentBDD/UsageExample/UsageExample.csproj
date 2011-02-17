@@ -56,10 +56,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Calculator.cs" />
+    <Compile Include="ExampleImplementations\Calculator.cs" />
     <Compile Include="CalculatorConcerns.cs" />
     <Compile Include="CalculatorConcerns_Clean_.cs" />
     <Compile Include="ComplexInheritence.cs" />
+    <Compile Include="ExpectationsByInterface.cs" />
+    <Compile Include="ExampleImplementations\GameScorer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

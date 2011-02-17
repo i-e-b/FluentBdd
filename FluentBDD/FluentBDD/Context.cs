@@ -24,7 +24,7 @@ namespace FluentBDD {
 		}
 
 		public SubjectBuilder<TSubject> GivenBaseContext () {
-			if (SubjectSource == null) throw new InvalidOperationException("Context has not been created. Try starting with 'Given(...)'");
+			if (SubjectSource == null) throw new InvalidOperationException("Context has not been created. Remember 'base.SetupContext()' or try starting with 'Given(...)'");
 			return SubjectSource;
 		}
 	}

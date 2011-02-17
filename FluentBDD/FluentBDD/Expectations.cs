@@ -1,6 +1,6 @@
 ﻿namespace FluentBDD {
 
-	public interface IUse<T> where T : IProvide<T>{
+	public interface IUse<T> {
 		T Values { get; set; }
 	}
 
@@ -8,5 +8,6 @@
 		T[] Data();
 		string StringRepresentation();
 	}
+
 
 }

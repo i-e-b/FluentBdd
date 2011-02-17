@@ -8,6 +8,10 @@ namespace FluentBDD {
 	/// Language-like assertions.
 	/// </summary>
 	public static class Assertions {
+		public static void should_be_ignored(this object anything) {
+			Assert.Ignore();
+		}
+
 		public static void should_be_true (this bool condition) {
 			Assert.That(condition, Is.True);
 		}

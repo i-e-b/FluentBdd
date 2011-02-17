@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 
 namespace FluentBDD {
+	[EditorBrowsable(EditorBrowsableState.Always)]
 	public abstract class Scenario {
 		internal abstract IEnumerable<TestClosure> BuildTests ();
 	}
 
+	[EditorBrowsable(EditorBrowsableState.Never)]
 	public class Scenario<TSubject, TResult> : Scenario, ITakeMessage {
 		protected readonly string Description;
 		protected readonly IEnumerable<Func<Context<TSubject>>> contextSources;
-		protected readonly Func<TSubject, TResult> scenarioAction;
+		protected readonly Func<TSubject, Context<TSubject>, TResult> scenarioAction;
 
 		internal readonly List<Group<string, Action<TSubject>>> subjectOnlyTests;
 		internal readonly List<Group<string, Action<TSubject, TResult>>> subjectAndResultTests;
@@ -26,9 +29,22 @@ namespace FluentBDD {
 
 			Description = description;
 			this.contextSources = contextSources;
-			scenarioAction = subject =>
+			scenarioAction = (subject, context) =>
 			{
 				action(subject);
+				return default(TResult);
+			};
+		}
+
+		public Scenario (string description, IEnumerable<Func<Context<TSubject>>> contextSources, Action<TSubject, Context<TSubject>> action) {
+			subjectOnlyTests = new List<Group<string, Action<TSubject>>>();
+			subjectAndResultTests = new List<Group<string, Action<TSubject, TResult>>>();
+
+			Description = description;
+			this.contextSources = contextSources;
+			scenarioAction = (subject, context) =>
+			{
+				action(subject, context);
 				return default(TResult);
 			};
 		}
@@ -39,13 +55,38 @@ namespace FluentBDD {
 
 			Description = description;
 			this.contextSources = contextSources;
-			scenarioAction = action;
+			scenarioAction = (subject, context) =>
+			{
+				return action(subject);
+			};
+		}
+
+		public Scenario (string description, IEnumerable<Func<Context<TSubject>>> contextSources, Func<TSubject, Context<TSubject>, TResult> action) {
+			subjectOnlyTests = new List<Group<string, Action<TSubject>>>();
+			subjectAndResultTests = new List<Group<string, Action<TSubject, TResult>>>();
+
+			Description = description;
+			this.contextSources = contextSources;
+			scenarioAction = (subject, context) =>
+			{
+				return action(subject, context);
+			};
 		}
 		#endregion
 
 		#region USING for IUse/IProvide
-		public ScenarioWithExamples<TSubject, TResult, TExampleSource> Using<TExampleSource> () where TExampleSource : IProvide<TExampleSource>, new() {
-			return new ScenarioWithExamples<TSubject, TResult, TExampleSource>(Description, contextSources, scenarioAction);
+		public ScenarioWithExamples<TSubject, TResult, TExampleSource, TExampleSource> 
+			Using<TExampleSource> ()
+			
+			where TExampleSource : class, IProvide<TExampleSource>, new() {
+
+			return new ScenarioWithExamples<TSubject, TResult, TExampleSource, TExampleSource>(Description, contextSources, scenarioAction);
+		}
+
+		public ScenarioWithExamples<TSubject, TResult, TExampleType, TExampleSource>
+			Using<TExampleType, TExampleSource> ()
+			where TExampleSource : class, TExampleType, IProvide<TExampleType>, new() {
+			return new ScenarioWithExamples<TSubject, TResult, TExampleType, TExampleSource>(Description, contextSources, scenarioAction);
 		}
 		#endregion
 
@@ -69,19 +110,23 @@ namespace FluentBDD {
 			return this;
 		}
 
-		public virtual Scenario WithMessage (string expectedMessage) {
+		Scenario ITakeMessage.WithMessage (string expectedMessage) {
 			expectedExceptionMessage = expectedMessage;
 			subjectOnlyTests.Insert(0, new Group<string, Action<TSubject>>(
 				"Should have exception message \"" + expectedExceptionMessage+"\"", subject => { }));
 			return this;
 		}
+
+		Scenario ITakeMessage.IgnoreMessage () {
+			return this;
+		}
 		#endregion
 
 		#region Test closure building. These are what get run in NUnit.
-		private IEnumerable<Func<SubjectBuilder<TSubject>>> BuildSubjects () {
+		private IEnumerable<Func<Context<TSubject>>> BuildSubjects () {
 			foreach (var contextSource in contextSources) {
-				var builder = contextSource().SetupAndReturnContextBuilder();
-				yield return () => builder;
+				var source = contextSource;
+				yield return source;
 			}
 			yield break;
 		}
@@ -91,25 +136,27 @@ namespace FluentBDD {
 
 			//1
 			testClosures.AddRange(from test in subjectOnlyTests
-			                      from subject in BuildSubjects()
+			                      from contextSource in BuildSubjects()
 			                      select new TestClosure(
-			                      	subject().Description,
+			                      	contextSource().SetupAndReturnContextBuilder().Description,
 			                      	"When " + Description, test.A,
 			                      	() => {
-			                      		var s = subject().Build();
-			                      		scenarioAction(s);
-			                      		test.B(s);
+			                      		var context = contextSource();
+										var subject = context.SetupAndReturnContextBuilder().Build();
+			                      		scenarioAction(subject, context);
+			                      		test.B(subject);
 									}, expectedExceptionType, expectedExceptionMessage));
 
 			//2
 			testClosures.AddRange(from test in subjectAndResultTests
-			                      from subject in BuildSubjects()
+								  from contextSource in BuildSubjects()
 			                      select new TestClosure(
-			                      	subject().Description,
+									contextSource().SetupAndReturnContextBuilder().Description,
 			                      	"When " + Description, test.A,
-			                      	() => {
-			                      		var s = subject().Build();
-			                      		test.B(s, scenarioAction(s));
+									() => {
+										var context = contextSource();
+										var subject = context.SetupAndReturnContextBuilder().Build();
+										test.B(subject, scenarioAction(subject, context));
 									}, expectedExceptionType, expectedExceptionMessage));
 
 			return testClosures;
@@ -155,28 +202,32 @@ namespace FluentBDD {
 		#endregion
 	}
 
+	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface ITakeMessage {
 		Scenario WithMessage (string expectedMessage);
+		Scenario IgnoreMessage();
 	}
 
-	public class ScenarioWithExamples<TSubject, TResult, TExample> : Scenario<TSubject, TResult> where TExample : IProvide<TExample>, new() {
-		internal readonly List<Group<string, Action<TSubject, TResult, TExample>>> subjectAndResultAndExampleTests;
-		internal readonly List<Group<string, Action<TSubject, TExample>>> subjectAndExampleTests;
+	[EditorBrowsable(EditorBrowsableState.Never)]
+	public class ScenarioWithExamples<TSubject, TResult, TExampleType, TExampleSource> : Scenario<TSubject, TResult>, ITakeMessage where TExampleSource : class, TExampleType, IProvide<TExampleType>, new() {
+
+		internal readonly List<Group<string, Action<TSubject, TResult, TExampleSource>>> subjectAndResultAndExampleTests;
+		internal readonly List<Group<string, Action<TSubject, TExampleSource>>> subjectAndExampleTests;
 
 		#region CTORs
-		public ScenarioWithExamples (string description, IEnumerable<Func<Context<TSubject>>> contextSources, Action<TSubject> action)
+		public ScenarioWithExamples (string description, IEnumerable<Func<Context<TSubject>>> contextSources, Action<TSubject, Context<TSubject>> action)
 			: base(description, contextSources, action) {
-			subjectAndResultAndExampleTests = new List<Group<string, Action<TSubject, TResult, TExample>>>();
-			subjectAndExampleTests = new List<Group<string, Action<TSubject, TExample>>>();
+			subjectAndResultAndExampleTests = new List<Group<string, Action<TSubject, TResult, TExampleSource>>>();
+			subjectAndExampleTests = new List<Group<string, Action<TSubject, TExampleSource>>>();
 
 			expectedExceptionType = null;
 			expectedExceptionMessage = null;
 		}
 
-		public ScenarioWithExamples (string description, IEnumerable<Func<Context<TSubject>>> contextSources, Func<TSubject, TResult> action)
+		public ScenarioWithExamples (string description, IEnumerable<Func<Context<TSubject>>> contextSources, Func<TSubject, Context<TSubject>, TResult> action)
 			: base(description, contextSources, action) {
-			subjectAndResultAndExampleTests = new List<Group<string, Action<TSubject, TResult, TExample>>>();
-			subjectAndExampleTests = new List<Group<string, Action<TSubject, TExample>>>();
+			subjectAndResultAndExampleTests = new List<Group<string, Action<TSubject, TResult, TExampleSource>>>();
+			subjectAndExampleTests = new List<Group<string, Action<TSubject, TExampleSource>>>();
 
 			expectedExceptionType = null;
 			expectedExceptionMessage = null;
@@ -184,13 +235,13 @@ namespace FluentBDD {
 		#endregion
 
 		#region THENs
-		public ScenarioWithExamples<TSubject, TResult, TExample> Then (string description, Action<TSubject, TResult, TExample> subjectAndResultAndExampleTest) {
-			subjectAndResultAndExampleTests.Add(new Group<string, Action<TSubject, TResult, TExample>>(description, subjectAndResultAndExampleTest));
+		public ScenarioWithExamples<TSubject, TResult, TExampleType, TExampleSource> Then (string description, Action<TSubject, TResult, TExampleSource> subjectAndResultAndExampleTest) {
+			subjectAndResultAndExampleTests.Add(new Group<string, Action<TSubject, TResult, TExampleSource>>(description, subjectAndResultAndExampleTest));
 			return this;
 		}
 
-		public ScenarioWithExamples<TSubject, TResult, TExample> Then (string description, Action<TSubject, TExample> subjectAndExampleTest) {
-			subjectAndExampleTests.Add(new Group<string, Action<TSubject, TExample>>(description, subjectAndExampleTest));
+		public ScenarioWithExamples<TSubject, TResult, TExampleType, TExampleSource> Then (string description, Action<TSubject, TExampleSource> subjectAndExampleTest) {
+			subjectAndExampleTests.Add(new Group<string, Action<TSubject, TExampleSource>>(description, subjectAndExampleTest));
 			return this;
 		}
 		#endregion
@@ -198,15 +249,19 @@ namespace FluentBDD {
 		#region Exception cases
 		public override ITakeMessage ShouldThrow<TException> () {
 			expectedExceptionType = typeof(TException);
-			subjectAndExampleTests.Insert(0, new Group<string, Action<TSubject, TExample>>(
+			subjectAndExampleTests.Insert(0, new Group<string, Action<TSubject, TExampleSource>>(
 				"Should throw " + expectedExceptionType.Name, (s, e) => { }));
 			return this;
 		}
 
-		public override Scenario WithMessage (string expectedMessage) {
+		Scenario ITakeMessage.WithMessage (string expectedMessage) {
 			expectedExceptionMessage = expectedMessage;
-			subjectAndExampleTests.Insert(0, new Group<string, Action<TSubject, TExample>>(
+			subjectAndExampleTests.Insert(0, new Group<string, Action<TSubject, TExampleSource>>(
 				"Should have exception message \"" + expectedExceptionMessage + "\"", (s, e) => { }));
+			return this;
+		}
+
+		Scenario ITakeMessage.IgnoreMessage () {
 			return this;
 		}
 		#endregion
@@ -215,41 +270,40 @@ namespace FluentBDD {
 		/// <summary>
 		/// Build a subject for each combination of context and examples.
 		/// </summary>
-		private IEnumerable<Group<Func<Context<TSubject>>, TExample>> BuildSubjectsWithExamples () {
-			var exampleData = new TExample().Data();
+		private IEnumerable<Group<Func<Context<TSubject>>, IProvide<TExampleType>>> BuildSubjectsWithExamples () {
+			var exampleData = new TExampleSource().Data();
 			foreach (var contextSource in contextSources) {
 				var context = contextSource();
-				if (context is IUse<TExample>) {
+				if (context is IUse<TExampleType>) {
 					for (int exampleIndex = 0; exampleIndex < exampleData.Length; exampleIndex++) {
 						var example = exampleData[exampleIndex];
 						int index = exampleIndex;
 						Func<Context<TSubject>> source = contextSource;
-						yield return new Group<Func<Context<TSubject>>, TExample>(
+						yield return new Group<Func<Context<TSubject>>, IProvide<TExampleType>>(
 							() => {
-								var closureExample = new TExample().Data()[index];
+								var closureExample = new TExampleSource().Data()[index];
 								var fresh_context = source();
-								((IUse<TExample>)fresh_context).Values = closureExample;
+								((IUse<TExampleType>)fresh_context).Values = closureExample;
 								return fresh_context;
 							},
-							example);
+							example as IProvide<TExampleType>);
 					}
 				} else {
 					var source = contextSource;
-					yield return new Group<Func<Context<TSubject>>, TExample>(
+					yield return new Group<Func<Context<TSubject>>, IProvide<TExampleType>>(
 						source,
-						default(TExample));
+						null);
 				}
 			}
 			yield break;
 		}
 
 		internal override IEnumerable<TestClosure> BuildTests () {
-			// Cause = ActionName, Effect = Then.description,
 			var testClosures = new List<TestClosure>();
 
 			//1
 			testClosures.AddRange(from test in subjectOnlyTests
-			                      from tuple in BuildSubjectsWithExamples()
+			                      from tuple in BuildSubjectsWithExamples().Take(1)
 			                      select new TestClosure(
 									GetLambdaBuilderDescription(tuple.A),
 			                      	"When " + Description, test.A,
@@ -257,7 +311,7 @@ namespace FluentBDD {
 									{
 										var context = tuple._1<Func<Context<TSubject>>>()();
 										var subject = context.SetupAndReturnContextBuilder().Build();
-			                      		scenarioAction(subject);
+			                      		scenarioAction(subject, context);
 			                      		test.B(subject);
 			                      	}, expectedExceptionType, expectedExceptionMessage));
 
@@ -266,12 +320,12 @@ namespace FluentBDD {
 			                      from tuple in BuildSubjectsWithExamples()
 								  select new TestClosure(
 									GetLambdaBuilderDescription(tuple.A),
-									"When " + Description, test.A, " with " + tuple._2<TExample>().StringRepresentation(),
+									"When " + Description, test.A, " with " + tuple._2<TExampleSource>().StringRepresentation(),
 									() =>
 									{
 										var context = tuple._1<Func<Context<TSubject>>>()();
 										var subject = context.SetupAndReturnContextBuilder().Build();
-			                      		test.B(subject, scenarioAction(subject));
+			                      		test.B(subject, scenarioAction(subject, context));
 									}, expectedExceptionType, expectedExceptionMessage));
 
 			//3
@@ -279,28 +333,29 @@ namespace FluentBDD {
 			                      from tuple in BuildSubjectsWithExamples()
 								  select new TestClosure(
 									GetLambdaBuilderDescription(tuple.A),
-									"When " + Description, test.A, " with " + tuple._2<TExample>().StringRepresentation(),
+									"When " + Description, test.A, " with " + tuple._2<TExampleSource>().StringRepresentation(),
 									() =>
 									{
 										var context = tuple._1<Func<Context<TSubject>>>()();
 										var subject = context.SetupAndReturnContextBuilder().Build();
-										var example = ((IUse<TExample>)context).Values;
-			                      		var result = scenarioAction(subject);
-										test.B(subject, result, example);
+										var example = ((IUse<TExampleType>)context).Values;
+			                      		var result = scenarioAction(subject, context);
+										test.B(subject, result, example as TExampleSource);
 									}, expectedExceptionType, expectedExceptionMessage));
 
+			
 			//4
 			testClosures.AddRange(from test in subjectAndExampleTests
 			                      from tuple in BuildSubjectsWithExamples()
 								  select new TestClosure(
 									GetLambdaBuilderDescription(tuple.A),
-									"When " + Description, test.A, " with " + tuple._2<TExample>().StringRepresentation(),
+									"When " + Description, test.A, " with " + tuple._2<TExampleSource>().StringRepresentation(),
 			                      	() => {
 			                      		var context = tuple._1<Func<Context<TSubject>>>()();
 										var subject = context.SetupAndReturnContextBuilder().Build();
-			                      		var example = ((IUse<TExample>)context).Values;
-			                      		scenarioAction(subject);
-										test.B(subject, example);
+										var example = ((IUse<TExampleType>)context).Values;
+			                      		scenarioAction(subject, context);
+										test.B(subject, example as TExampleSource);
 									}, expectedExceptionType, expectedExceptionMessage));
 
 			return testClosures;

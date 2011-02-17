@@ -11,7 +11,7 @@ namespace ComplexInheritence {
 	// Note: this is a 'Feature', but does not have the feature attribute so won't be tested
 	public class Pressing_buttons<TContextProvider, TSubject, TValuesProvider> : Feature
 		where TContextProvider : IDoCalculatorStuff<TSubject, TValuesProvider>, new()
-		where TValuesProvider : IProvide<TValuesProvider>, new() {
+		where TValuesProvider : class, IProvide<TValuesProvider>, new() {
 
 		#region Template bindings
 		public static Context<TSubject> CalculatorTakingTwoInputs () {return (new TContextProvider()).SubjectTakingTwoInputs();}

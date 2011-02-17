@@ -1,6 +1,7 @@
 ﻿using System;
 using FluentBDD;
 using NUnit.Core;
+using NUnit.Framework;
 
 namespace FluentBddNUnitExtension {
 	internal class ClosureTest : Test {
@@ -20,12 +21,15 @@ namespace FluentBddNUnitExtension {
 		}
 
 		public override TestResult Run(EventListener listener, ITestFilter filter) {
-			var result = new TestResult(TestName);
-			listener.TestStarted(TestName);
+			var result = new TestResult(this);
 
 			try {
 				testClosure.TestMethod();
 				TestNonExceptionCondition(result);
+			} catch (IgnoreException iex) {
+				result.Ignore(iex.Message);
+			} catch (InconclusiveException icex) {
+				result.Invalid(icex.Message);
 			} catch (Exception ex) {
 				TestExceptionCondition(result, ex);
 			}
@@ -46,7 +50,7 @@ namespace FluentBddNUnitExtension {
 				if (! ThrownTypeMatchesExpectation(ex)) {
 					result.Failure("Expected exception type of "
 					               + testClosure.ExpectedExceptionType.Name
-					               + " but got " + ex.GetType().Name, "");
+					               + " but got " + ex.GetType().Name, "\r\nat\r\n"+ex.StackTrace);
 				} else {
 					if (! TestExpectsAMessage()) result.Success();
 					else {
@@ -75,7 +79,6 @@ namespace FluentBddNUnitExtension {
 			return testClosure.ExpectedExceptionType != null;
 		}
 
-		public override int TestCount { get { return 1; } }
 		public override object Fixture { get; set; }
 	}
 }

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace FluentBDD {
+	[EditorBrowsable(EditorBrowsableState.Never)]
 	public class TestClosure {
 		public TestClosure (string given, string when, string then, Action testMethod) {
 			Given = given;
@@ -27,7 +29,7 @@ namespace FluentBDD {
 			Given = given;
 			When = when;
 			Then = then;
-			With = "";
+			With = null;
 			TestMethod = testMethod;
 			ExpectedExceptionType = exception;
 			ExpectedExceptionMessage = exceptionMessage;
