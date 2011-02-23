@@ -67,7 +67,7 @@ namespace FluentBddNUnitExtension {
 				scenario = (Scenario)scenarioField.GetValue(featureInstance);
 				return scenario.BuildTests();
 			} catch (Exception ex) {
-				return new[] { new TestClosure("Error", "Field name = " + scenarioField.Name, ex.Message + "\r\n \r\n" + ex.StackTrace, () => { throw ex; }) };
+				return new[] { new TestClosure("Error", "Field name = " + scenarioField.Name, ex.Message + "\r\n \r\n" + ex.StackTrace, () => { throw ex; }, ()=> { }) };
 			}
 		}
 

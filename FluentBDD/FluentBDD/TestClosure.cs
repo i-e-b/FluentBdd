@@ -1,10 +1,11 @@
 ﻿using System;
-using System.ComponentModel;
 
 namespace FluentBDD {
-	[EditorBrowsable(EditorBrowsableState.Never)]
-	public class TestClosure {
-		public TestClosure (string given, string when, string then, Action testMethod) {
+	internal class TestClosure {
+		/// <summary>
+		/// Create an assertion test without expectation values
+		/// </summary>
+		public TestClosure (string given, string when, string then, Action testMethod, Action tearDown) {
 			Given = given;
 			When = when;
 			Then = then;
@@ -12,9 +13,13 @@ namespace FluentBDD {
 			TestMethod = testMethod;
 			ExpectedExceptionType = null;
 			ExpectedExceptionMessage = null;
+			TearDown = tearDown;
 		}
 
-		public TestClosure (string given, string when, string then, string with, Action testMethod) {
+		/// <summary>
+		/// Create an assertion test using expectation values
+		/// </summary>
+		public TestClosure (string given, string when, string then, string with, Action testMethod, Action tearDown) {
 			Given = given;
 			When = when;
 			Then = then;
@@ -22,10 +27,13 @@ namespace FluentBDD {
 			TestMethod = testMethod;
 			ExpectedExceptionType = null;
 			ExpectedExceptionMessage = null;
+			TearDown = tearDown;
 		}
 
-
-		public TestClosure (string given, string when, string then, Action testMethod, Type exception, string exceptionMessage) {
+		/// <summary>
+		/// Create test for exceptions without expectation values
+		/// </summary>
+		public TestClosure (string given, string when, string then, Action testMethod, Type exception, string exceptionMessage, Action tearDown) {
 			Given = given;
 			When = when;
 			Then = then;
@@ -33,9 +41,13 @@ namespace FluentBDD {
 			TestMethod = testMethod;
 			ExpectedExceptionType = exception;
 			ExpectedExceptionMessage = exceptionMessage;
+			TearDown = tearDown;
 		}
 
-		public TestClosure (string given, string when, string then, string with, Action testMethod, Type exception, string exceptionMessage) {
+		/// <summary>
+		/// Create test for exceptions using expectation values
+		/// </summary>
+		public TestClosure (string given, string when, string then, string with, Action testMethod, Type exception, string exceptionMessage, Action tearDown) {
 			Given = given;
 			When = when;
 			Then = then;
@@ -43,6 +55,7 @@ namespace FluentBDD {
 			TestMethod = testMethod;
 			ExpectedExceptionType = exception;
 			ExpectedExceptionMessage = exceptionMessage;
+			TearDown = tearDown;
 		}
 
 		public string Given;
@@ -52,5 +65,6 @@ namespace FluentBDD {
 		public Action TestMethod;
 		public Type ExpectedExceptionType;
 		public string ExpectedExceptionMessage;
+		public Action TearDown;
 	}
 }

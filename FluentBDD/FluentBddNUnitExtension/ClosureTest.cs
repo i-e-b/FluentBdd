@@ -34,6 +34,12 @@ namespace FluentBddNUnitExtension {
 				TestExceptionCondition(result, ex);
 			}
 
+			try {
+				testClosure.TearDown();
+			} catch (Exception ex) {
+				result.Failure("Exception in tear-down: "+ex.Message, ex.StackTrace);
+			}
+
 			listener.TestFinished(result);
 			return result;
 		}

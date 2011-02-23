@@ -12,6 +12,8 @@ namespace FluentBDD {
 
 		public abstract void SetupContext ();
 
+		public virtual void TearDown(){}
+
 		internal SubjectBuilder<TSubject> SetupAndReturnContextBuilder () {
 			SetupContext();
 			return SubjectSource;

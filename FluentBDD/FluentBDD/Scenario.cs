@@ -145,7 +145,9 @@ namespace FluentBDD {
 										var subject = context.SetupAndReturnContextBuilder().Build();
 			                      		scenarioAction(subject, context);
 			                      		test.B(subject);
-									}, expectedExceptionType, expectedExceptionMessage));
+									}, expectedExceptionType, expectedExceptionMessage,
+									() => contextSource().TearDown()
+									));
 
 			//2
 			testClosures.AddRange(from test in subjectAndResultTests
@@ -157,7 +159,8 @@ namespace FluentBDD {
 										var context = contextSource();
 										var subject = context.SetupAndReturnContextBuilder().Build();
 										test.B(subject, scenarioAction(subject, context));
-									}, expectedExceptionType, expectedExceptionMessage));
+									}, expectedExceptionType, expectedExceptionMessage,
+									() => contextSource().TearDown()));
 
 			return testClosures;
 		}
@@ -301,10 +304,7 @@ namespace FluentBDD {
 							example as IProvide<TExampleType>);
 					}
 				} else {
-					var source = contextSource;
-					yield return new Group<Func<Context<TSubject>>, IProvide<TExampleType>>(
-						source,
-						null);
+					throw new InvalidOperationException("Expected " + context.GetType().FullName + " to implement IUse<" + typeof (TExampleType).Name + ">, but could not cast it.");
 				}
 			}
 			yield break;
@@ -315,45 +315,47 @@ namespace FluentBDD {
 
 			//1
 			testClosures.AddRange(from test in subjectOnlyTests
-			                      from tuple in BuildSubjectsWithExamples().Take(1)
+								  from tuple in BuildSubjectsWithExamples().Take(1)
 			                      select new TestClosure(
 									GetLambdaBuilderDescription(tuple.A),
 			                      	"When " + Description, test.A,
 									() =>
 									{
-										var context = tuple._1<Func<Context<TSubject>>>()();
+										var context = GetContext(tuple);
 										var subject = context.SetupAndReturnContextBuilder().Build();
 			                      		scenarioAction(subject, context);
 			                      		test.B(subject);
-			                      	}, expectedExceptionType, expectedExceptionMessage));
+			                      	}, expectedExceptionType, expectedExceptionMessage,
+									() => GetContext(tuple).TearDown()));
 
 			//2
 			testClosures.AddRange(from test in subjectAndResultTests
-			                      from tuple in BuildSubjectsWithExamples()
+								  from tuple in BuildSubjectsWithExamples()
 								  select new TestClosure(
 									GetLambdaBuilderDescription(tuple.A),
 									"When " + Description, test.A, " with " + tuple._2<TExampleSource>().StringRepresentation(),
-									() =>
-									{
-										var context = tuple._1<Func<Context<TSubject>>>()();
+									() => {
+										var context = GetContext(tuple);
 										var subject = context.SetupAndReturnContextBuilder().Build();
 			                      		test.B(subject, scenarioAction(subject, context));
-									}, expectedExceptionType, expectedExceptionMessage));
+									}, expectedExceptionType, expectedExceptionMessage,
+									() => GetContext(tuple).TearDown()));
 
 			//3
 			testClosures.AddRange(from test in subjectAndResultAndExampleTests
-			                      from tuple in BuildSubjectsWithExamples()
+								  from tuple in BuildSubjectsWithExamples()
 								  select new TestClosure(
 									GetLambdaBuilderDescription(tuple.A),
 									"When " + Description, test.A, " with " + tuple._2<TExampleSource>().StringRepresentation(),
 									() =>
 									{
-										var context = tuple._1<Func<Context<TSubject>>>()();
+										var context = GetContext(tuple);
 										var subject = context.SetupAndReturnContextBuilder().Build();
 										var example = ((IUse<TExampleType>)context).Values;
 			                      		var result = scenarioAction(subject, context);
 										test.B(subject, result, example as TExampleSource);
-									}, expectedExceptionType, expectedExceptionMessage));
+									}, expectedExceptionType, expectedExceptionMessage,
+									() => GetContext(tuple).TearDown()));
 
 			
 			//4
@@ -362,32 +364,40 @@ namespace FluentBDD {
 								  select new TestClosure(
 									GetLambdaBuilderDescription(tuple.A),
 									"When " + Description, test.A, " with " + tuple._2<TExampleSource>().StringRepresentation(),
-			                      	() => {
-			                      		var context = tuple._1<Func<Context<TSubject>>>()();
+									() =>
+									{
+										var context = GetContext(tuple);
 										var subject = context.SetupAndReturnContextBuilder().Build();
 										var example = ((IUse<TExampleType>)context).Values;
 			                      		scenarioAction(subject, context);
 										test.B(subject, example as TExampleSource);
-									}, expectedExceptionType, expectedExceptionMessage));
+									}, expectedExceptionType, expectedExceptionMessage,
+									() => GetContext(tuple).TearDown()));
 
 			//5: Tests for exceptions matching an example exception
 			testClosures.AddRange(from test in specificExceptionTests
-			                      from tuple in BuildSubjectsWithExamples()
+								  from tuple in BuildSubjectsWithExamples()
 			                      select new TestClosure(
 			                      	GetLambdaBuilderDescription(tuple.A),
 			                      	"When " + Description, test.A,
 									GetWithExceptionName(tuple, test),
-			                      	() => {
-			                      		var context = tuple._1<Func<Context<TSubject>>>()();
+									() =>
+									{
+										var context = GetContext(tuple);
 			                      		var subject = context.SetupAndReturnContextBuilder().Build();
 			                      		scenarioAction(subject, context);
 			                      	},
 			                      	GetExceptionResultType(tuple, test),
-			                      	GetExceptionMessage(tuple, test)
+			                      	GetExceptionMessage(tuple, test),
+									() => GetContext(tuple).TearDown()
 			                      	));
 
 
 			return testClosures;
+		}
+
+		private Context<TSubject> GetContext(Group<Func<Context<TSubject>>, IProvide<TExampleType>> tuple) {
+			return tuple._1<Func<Context<TSubject>>>()();
 		}
 
 		private Type GetExceptionResultType (Group<Func<Context<TSubject>>, IProvide<TExampleType>> tuple, Group<string, Func<TExampleType, Exception>> test) {

@@ -7,11 +7,11 @@ namespace FluentBDD {
 
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		public class no_subject : Context<object> {
-			public no_subject () {
+			public override void SetupContext () {
 				Given("no subject", () => null);
 			}
 
-			public override void SetupContext () { }
+			public object Values { get; set; }
 		}
 
 		public static ContextBuilder<object> GivenNoSubject () {
