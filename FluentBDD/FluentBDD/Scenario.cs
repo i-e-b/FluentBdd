@@ -213,12 +213,14 @@ namespace FluentBDD {
 
 		internal readonly List<Group<string, Action<TSubject, TResult, TExampleSource>>> subjectAndResultAndExampleTests;
 		internal readonly List<Group<string, Action<TSubject, TExampleSource>>> subjectAndExampleTests;
+		internal readonly List<Group<string, Func<TExampleType, Exception>>> specificExceptionTests;
 
 		#region CTORs
 		public ScenarioWithExamples (string description, IEnumerable<Func<Context<TSubject>>> contextSources, Action<TSubject, Context<TSubject>> action)
 			: base(description, contextSources, action) {
 			subjectAndResultAndExampleTests = new List<Group<string, Action<TSubject, TResult, TExampleSource>>>();
 			subjectAndExampleTests = new List<Group<string, Action<TSubject, TExampleSource>>>();
+			specificExceptionTests = new List<Group<string, Func<TExampleType, Exception>>>();
 
 			expectedExceptionType = null;
 			expectedExceptionMessage = null;
@@ -228,6 +230,7 @@ namespace FluentBDD {
 			: base(description, contextSources, action) {
 			subjectAndResultAndExampleTests = new List<Group<string, Action<TSubject, TResult, TExampleSource>>>();
 			subjectAndExampleTests = new List<Group<string, Action<TSubject, TExampleSource>>>();
+			specificExceptionTests = new List<Group<string, Func<TExampleType, Exception>>>();
 
 			expectedExceptionType = null;
 			expectedExceptionMessage = null;
@@ -262,6 +265,15 @@ namespace FluentBDD {
 		}
 
 		Scenario ITakeMessage.IgnoreMessage () {
+			return this;
+		}
+
+		public ScenarioWithExamples<TSubject, TResult, TExampleType, TExampleSource> ShouldThrow(Func<TExampleType, Exception> sampleExceptionSource) {
+			specificExceptionTests
+				.Add(new Group<string, Func<TExampleType, Exception>>(
+				     	"Should throw exception",
+				     	sampleExceptionSource
+				     	));
 			return this;
 		}
 		#endregion
@@ -358,7 +370,46 @@ namespace FluentBDD {
 										test.B(subject, example as TExampleSource);
 									}, expectedExceptionType, expectedExceptionMessage));
 
+			//5: Tests for exceptions matching an example exception
+			testClosures.AddRange(from test in specificExceptionTests
+			                      from tuple in BuildSubjectsWithExamples()
+			                      select new TestClosure(
+			                      	GetLambdaBuilderDescription(tuple.A),
+			                      	"When " + Description, test.A,
+									GetWithExceptionName(tuple, test),
+			                      	() => {
+			                      		var context = tuple._1<Func<Context<TSubject>>>()();
+			                      		var subject = context.SetupAndReturnContextBuilder().Build();
+			                      		scenarioAction(subject, context);
+			                      	},
+			                      	GetExceptionResultType(tuple, test),
+			                      	GetExceptionMessage(tuple, test)
+			                      	));
+
+
 			return testClosures;
+		}
+
+		private Type GetExceptionResultType (Group<Func<Context<TSubject>>, IProvide<TExampleType>> tuple, Group<string, Func<TExampleType, Exception>> test) {
+			var context = tuple._1<Func<Context<TSubject>>>()();
+			var example = ((IUse<TExampleType>)context).Values;
+			return test.B(example as TExampleSource).GetType();
+		}
+		private string GetExceptionMessage (Group<Func<Context<TSubject>>, IProvide<TExampleType>> tuple, Group<string, Func<TExampleType, Exception>> test) {
+			var context = tuple._1<Func<Context<TSubject>>>()();
+			var example = ((IUse<TExampleType>)context).Values;
+			var message = test.B(example as TExampleSource).Message;
+
+			if (string.IsNullOrEmpty(message)) return null;
+			return message;
+		}
+		private string GetWithExceptionName (Group<Func<Context<TSubject>>, IProvide<TExampleType>> tuple, Group<string, Func<TExampleType, Exception>> test) {
+			var context = tuple._1<Func<Context<TSubject>>>()();
+			var example = ((IUse<TExampleType>)context).Values;
+			var exception = test.B(example as TExampleSource);
+
+			if (string.IsNullOrEmpty(exception.Message)) return "Of type " + exception.GetType() + ", ignoring message, with " + tuple._2<TExampleSource>().StringRepresentation();
+			return "Of type " + exception.GetType() + " and message \"" + exception.Message + "\", with " + tuple._2<TExampleSource>().StringRepresentation();
 		}
 
 		private string GetLambdaBuilderDescription (Func<Context<TSubject>> builderFunc) {
