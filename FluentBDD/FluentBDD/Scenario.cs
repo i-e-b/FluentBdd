@@ -212,6 +212,27 @@ namespace FluentBDD {
 	}
 
 	[EditorBrowsable(EditorBrowsableState.Never)]
+	public class ScenarioWithoutAnAction<TSubject, TExampleType, TExampleSource> : Scenario where TExampleSource : class, TExampleType, IProvide<TExampleType>, new() where TExampleType : class {
+		protected readonly List<Func<Context<TSubject>>> ContextSources;
+
+		public ScenarioWithoutAnAction (List<Func<Context<TSubject>>> contextSources) {
+			ContextSources = contextSources;
+		}
+
+		public ScenarioWithExamples<TSubject, TResult, TExampleType, TExampleSource> When<TResult> (string description, Func<TSubject, IUse<TExampleType>, TResult> action) {
+			return new ScenarioWithExamples<TSubject, TResult, TExampleType, TExampleSource>(description, ContextSources, (subject, context) => action(subject, (IUse<TExampleType>)context ));
+		}
+
+		public ScenarioWithExamples<TSubject, no_result, TExampleType, TExampleSource> When (string description, Action<TSubject, IUse<TExampleType>> action) {
+			return new ScenarioWithExamples<TSubject, no_result, TExampleType, TExampleSource>(description, ContextSources, (subject, context) => action(subject, (IUse<TExampleType>)context));
+		}
+
+		internal override IEnumerable<TestClosure> BuildTests () {
+			yield break;
+		}
+	}
+
+	[EditorBrowsable(EditorBrowsableState.Never)]
 	public class ScenarioWithExamples<TSubject, TResult, TExampleType, TExampleSource> : Scenario<TSubject, TResult>, ITakeMessage where TExampleSource : class, TExampleType, IProvide<TExampleType>, new() {
 
 		internal readonly List<Group<string, Action<TSubject, TResult, TExampleSource>>> subjectAndResultAndExampleTests;

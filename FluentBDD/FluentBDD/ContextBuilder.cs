@@ -31,6 +31,15 @@ namespace FluentBDD {
 			return new Scenario<TSubject, no_result>("inspecting \"" + typeof(TSubject).Name + "\" type",
 			ContextSources, s => { });
 		}
+
+		public ScenarioWithoutAnAction<TSubject, TExampleType, TExampleSource> Using<TExampleType, TExampleSource> () where TExampleSource : class, TExampleType, IProvide<TExampleType>, new() where TExampleType : class {
+			return new ScenarioWithoutAnAction<TSubject, TExampleType, TExampleSource>(ContextSources);
+		}
+
+		public ScenarioWithoutAnAction<TSubject, TExampleSource, TExampleSource> Using<TExampleSource> ()
+			where TExampleSource : class, IProvide<TExampleSource>, new() {
+			return new ScenarioWithoutAnAction<TSubject, TExampleSource, TExampleSource>(ContextSources);
+		}
 	}
 
 	[EditorBrowsable(EditorBrowsableState.Never)]

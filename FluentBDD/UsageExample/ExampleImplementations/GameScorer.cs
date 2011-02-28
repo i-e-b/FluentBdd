@@ -51,5 +51,17 @@ namespace UsageExample {
 		private bool isSpare (int frameIndex) {
 			return throws[frameIndex] + throws[frameIndex + 1] == 10;
 		}
+
+
+		// This is temporary crap...
+		public void StoreNickName(string nickName) {
+			NickName = nickName;
+		}
+
+		protected string NickName { get; set; }
+
+		public string GetNickName () {
+			return NickName;
+		}
 	}
 }

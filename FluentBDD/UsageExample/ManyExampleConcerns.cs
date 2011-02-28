@@ -1,85 +1,18 @@
 ﻿using System;
 using FluentBDD;
-using UsageExample;
 using Moq;
 using System.Runtime.Serialization;
 
 // This set of classes demonstrates the usage of the FluentBdd framework.
 // The first few tests have a lot of comments explaining usage.
 // The later ones are cleaner, and better represent what you'd expect to write.
-namespace CalculatorConcerns {
+namespace UsageExample {
 
 	[Feature("Addition",
 		"As a user of a calculator",
 		"To avoid making mistakes",
 		"I want to be told the sum of two numbers")]
 	public class Addition : Feature {
-
-		#region Contexts
-		// Contexts provide the subject for a scenario. They are a way to 
-		// combine creation, setup and value injection without needing to
-		// specify any behaviour or any specific concrete values.
-
-
-		// These classes don't need to be embedded in 'Addition', nor do they need to be marked internal.
-		// You can use any accessible class of type Context<T> for a scenario.
-		// Making them internal and embedded keeps things tidy.
-		internal class a_calculator_that_uses_a_math_provider_interface_and_two_values : Context<Calculator>, IUse<values_for_a_calculator_using_math_provider> {
-			public values_for_a_calculator_using_math_provider Values { get; set; }
-
-			public override void SetupContext () {
-				Given("I have a calculator using the IDoMath interface", () => new Calculator(Values.MathProvider))
-					.And("I type in " + Values.a + " and " + Values.b, c => { c.Press(Values.b); c.Press(Values.a); });
-			}
-		}
-
-		internal class a_calculator_that_uses_internal_logic_and_two_values: Context<Calculator>, IUse<values_for_a_calculator_using_math_provider> {
-			public values_for_a_calculator_using_math_provider Values { get; set; }
-			// This context is a bit contrived to show how to test more than one context against 
-			// a single set of expectations.
-			public override void SetupContext () {
-				Given("I have a calculator using internal logic", () => new Calculator())
-					.And("I type in " + Values.a + " and " + Values.b, c => { c.Press(Values.b); c.Press(Values.a); });
-			}
-		}
-
-
-		// Expectations for scenarios -- values for input and output, tests around mocks.
-		// These help to keep contexts and behaviour specs nice and clean.
-		// These can be re-used by any context that implements the matching IUse<>
-		internal class values_for_a_calculator_using_math_provider : IProvide<values_for_a_calculator_using_math_provider> {
-			private values_for_a_calculator_using_math_provider SetupWithMocks() {
-				a = 1;
-				b = 2;
-				a_plus_b = a + b;
-				mock_provider = new Mock<IDoMath>();
-				mock_provider.Setup(m => m.Add(a, b)).Returns(3);
-				MathProvider = mock_provider.Object;
-				return this;
-			}
-
-			public void check_adder_was_used_once () {
-				mock_provider.Verify(m => m.Add(a, b), Times.Once());
-			}
-
-			public int a, b;
-			public int a_plus_b;
-			public IDoMath MathProvider;
-			protected Mock<IDoMath> mock_provider;
-
-			public values_for_a_calculator_using_math_provider[] Data() {
-				return new[] { SetupWithMocks() };
-			}
-
-			public string StringRepresentation() {
-				return "a = " + a + ", b = " + b + " and a mock math provider";
-			}
-		}
-
-		// more contexts at the bottom of the file...
-		#endregion
-
-
 		// checking mocks with the Context->Action->Values->Behaviour pattern
 		public Scenario the_calculator_uses_the_adder_supplied = // the name of the scenario is inconsequential to how the tests are run. Use something instructive
 			With(() => Context.Of<a_calculator_that_uses_a_math_provider_interface_and_two_values>())
@@ -135,14 +68,25 @@ namespace CalculatorConcerns {
 				.Then("the result should be the sum of inputs", (subject, result, values) => result.should_be_equal_to(3))
 				.Then("the screen should show the result", (s, r, v) => s.Readout().should_be_equal_to(r));
 
+
+
 		// this scenario uses the context's values in the test Action.
 		// it's a bit messy, and should generally be avoided.
 		public Scenario using_context_in_test_action =
 			With(() => Context.Of<a_calculator_that_uses_a_math_provider_interface_and_two_values>())
-				.When("I press 'a' again", (subject, context) => 
+				.When("I press 'a' again", (subject, context) =>
 					subject.Press(((a_calculator_that_uses_a_math_provider_interface_and_two_values)context).Values.a))
 				.Using<values_for_a_calculator_using_math_provider>()
 				.Then("the screen should show 'a'", (s, r, v) => s.Readout().should_be_equal_to(v.a));
+
+		// A better way is to use the flipped using/when layout
+		// and performing an action with the IUse<T> context
+		public Scenario using_context_expectations_in_test_action =
+			With(() => Context.Of<a_calculator_that_uses_a_math_provider_interface_and_two_values>())
+			.Using<values_for_a_calculator_using_math_provider>()
+			.When("I press 'a'", (subject, context) => subject.Press(context.Values.a))
+			.Then("I should see 'a' on the screen", (s, r, v) => s.Readout().should_be_equal_to(v.a));
+
 
 
 		// Testing for exceptions
@@ -188,6 +132,72 @@ namespace CalculatorConcerns {
 		private static int AddTwice(Calculator c) {
 			c.Add(); return c.Add();
 		}
+
+
+		#region Contexts
+		// Contexts provide the subject for a scenario. They are a way to 
+		// combine creation, setup and value injection without needing to
+		// specify any behaviour or any specific concrete values.
+
+
+		// These classes don't need to be embedded in 'Addition', nor do they need to be marked internal.
+		// You can use any accessible class of type Context<T> for a scenario.
+		// Making them internal and embedded keeps things tidy.
+		internal class a_calculator_that_uses_a_math_provider_interface_and_two_values : Context<Calculator>, IUse<values_for_a_calculator_using_math_provider> {
+			public values_for_a_calculator_using_math_provider Values { get; set; }
+
+			public override void SetupContext () {
+				Given("I have a calculator using the IDoMath interface", () => new Calculator(Values.MathProvider))
+					.And("I type in " + Values.a + " and " + Values.b, c => { c.Press(Values.b); c.Press(Values.a); });
+			}
+		}
+
+		internal class a_calculator_that_uses_internal_logic_and_two_values : Context<Calculator>, IUse<values_for_a_calculator_using_math_provider> {
+			public values_for_a_calculator_using_math_provider Values { get; set; }
+			// This context is a bit contrived to show how to test more than one context against 
+			// a single set of expectations.
+			public override void SetupContext () {
+				Given("I have a calculator using internal logic", () => new Calculator())
+					.And("I type in " + Values.a + " and " + Values.b, c => { c.Press(Values.b); c.Press(Values.a); });
+			}
+		}
+
+
+		// Expectations for scenarios -- values for input and output, tests around mocks.
+		// These help to keep contexts and behaviour specs nice and clean.
+		// These can be re-used by any context that implements the matching IUse<>
+		internal class values_for_a_calculator_using_math_provider : IProvide<values_for_a_calculator_using_math_provider> {
+			private values_for_a_calculator_using_math_provider SetupWithMocks () {
+				a = 1;
+				b = 2;
+				a_plus_b = a + b;
+				mock_provider = new Mock<IDoMath>();
+				mock_provider.Setup(m => m.Add(a, b)).Returns(3);
+				MathProvider = mock_provider.Object;
+				return this;
+			}
+
+			public void check_adder_was_used_once () {
+				mock_provider.Verify(m => m.Add(a, b), Times.Once());
+			}
+
+			public int a, b;
+			public int a_plus_b;
+			public IDoMath MathProvider;
+			protected Mock<IDoMath> mock_provider;
+
+			public values_for_a_calculator_using_math_provider[] Data () {
+				return new[] { SetupWithMocks() };
+			}
+
+			public string StringRepresentation () {
+				return "a = " + a + ", b = " + b + " and a mock math provider";
+			}
+		}
+
+		// more contexts at the bottom of the file...
+		#endregion
+
 	}
 
 

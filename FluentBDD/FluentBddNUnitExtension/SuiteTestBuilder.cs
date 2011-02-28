@@ -15,18 +15,14 @@ namespace FluentBddNUnitExtension {
 			GivenCases = new Map<string, Map<string, ListMap<string, ClosureTest>>>(); // GIVEN => (WHEN => (THEN, {WITH}))
 			PrepareFeatureBase(fixtureType);
 
-
 			var featureInstance = Feature.CreateFor(fixtureType);
 			var scenarioFields = GetScenarioFields(fixtureType);
 
+			BuildAndMapTestClosures(scenarioFields, featureInstance);
+			BuildTestTreeFromClosureMap(fixtureType);
+		}
 
-			foreach (var scenarioField in scenarioFields) {
-				var tests = GetTestClosures(scenarioField, featureInstance);
-				foreach (var test in tests) {
-					GivenCases[FixName(test.Given)][test.When][test.Then].Add(new ClosureTest(test));
-				}
-			}
-
+		private void BuildTestTreeFromClosureMap(Type fixtureType) {
 			foreach (var given in GivenCases.Keys) {
 				var scenario = new TestFixture(fixtureType);
 				scenario.TestName.Name = given;
@@ -51,6 +47,15 @@ namespace FluentBddNUnitExtension {
 					scenario.Add(when_suite);
 				}
 				Add(scenario);
+			}
+		}
+
+		private void BuildAndMapTestClosures(IEnumerable<FieldInfo> scenarioFields, object featureInstance) {
+			foreach (var scenarioField in scenarioFields) {
+				var tests = GetTestClosures(scenarioField, featureInstance);
+				foreach (var test in tests) {
+					GivenCases[FixName(test.Given)][test.When][test.Then].Add(new ClosureTest(test));
+				}
 			}
 		}
 
