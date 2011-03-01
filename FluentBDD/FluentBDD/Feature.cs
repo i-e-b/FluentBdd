@@ -8,14 +8,24 @@ namespace FluentBDD {
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		public class no_subject : Context<no_subject> {
 			public override void SetupContext () {
-				Given("no subject", () => null);
+				Given("no subject", () => new no_subject());
 			}
+		}
 
-			public object Values { get; set; }
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		public class static_context<T> : Context<no_subject>, IUse<T> {
+			public T Values { get; set; }
+			public override void SetupContext () {
+				Given("no subject", () => new no_subject());
+			}
 		}
 
 		public static ContextBuilder<no_subject> GivenNoSubject () {
 			return With<no_subject>(Context.Of<no_subject>);
+		}
+
+		public static ContextBuilder<no_subject> GivenStaticContextFor<T> () {
+			return With<no_subject>(Context.Of<static_context<T>>);
 		}
 
 		public static ContextBuilder<TSubject> With<TSubject> (Func<Context<TSubject>> contextProvider) {

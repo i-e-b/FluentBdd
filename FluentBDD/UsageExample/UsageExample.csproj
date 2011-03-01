@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExampleImplementations\Calculator.cs" />
+    <Compile Include="InvariantMethods.cs" />
     <Compile Include="ManyExampleConcerns.cs" />
     <Compile Include="CalculatorConcerns_Clean_.cs" />
     <Compile Include="ComplexInheritence.cs" />

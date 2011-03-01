@@ -1,6 +1,6 @@
 FluentBDD
 =========
-A small framework and NUnit extension for writing BDD-style tests in a fluent manner.
+A framework and NUnit extension for writing BDD-style behaviours in a fluent manner, resulting in unit tests.
 
 
 FluentBDD NUnit Extension

@@ -212,7 +212,7 @@ namespace FluentBDD {
 	}
 
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public class ScenarioWithoutAnAction<TSubject, TExampleType, TExampleSource> : Scenario where TExampleSource : class, TExampleType, IProvide<TExampleType>, new() where TExampleType : class {
+	public class ScenarioWithoutAnAction<TSubject, TExampleType, TExampleSource> : Scenario where TExampleSource : class, TExampleType, IProvide<TExampleType>, new() {
 		protected readonly List<Func<Context<TSubject>>> ContextSources;
 
 		public ScenarioWithoutAnAction (List<Func<Context<TSubject>>> contextSources) {
