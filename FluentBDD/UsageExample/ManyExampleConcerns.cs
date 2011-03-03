@@ -1,5 +1,6 @@
 ﻿using System;
 using FluentBDD;
+using FluentBDD.Assertions;
 using Moq;
 using System.Runtime.Serialization;
 

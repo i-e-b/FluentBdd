@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using FluentBDD;
+using FluentBDD.Assertions;
 
 namespace UsageExample {
 	[Feature("Contexts with tear-downs")]

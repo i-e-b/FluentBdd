@@ -1,5 +1,6 @@
 ﻿using System;
 using FluentBDD;
+using FluentBDD.Assertions;
 using UsageExample;
 
 // This file shows a way to wrap up a complex set of behaviour behind an interface (IDoCalculatorStuff)

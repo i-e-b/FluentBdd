@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using FluentBDD;
+using FluentBDD.Assertions;
 using UsageExample;
 
 /*

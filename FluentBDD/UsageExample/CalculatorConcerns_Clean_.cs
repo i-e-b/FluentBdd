@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 using FluentBDD;
+using FluentBDD.Assertions;
 using UsageExample;
 
 // This is a clean version of "CalculatorConcerns", showing real-world usage.

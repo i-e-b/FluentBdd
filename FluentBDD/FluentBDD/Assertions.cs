@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 
-namespace FluentBDD {
+namespace FluentBDD.Assertions {
 	/// <summary>
 	/// Language-like assertions.
 	/// </summary>

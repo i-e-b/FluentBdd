@@ -1,4 +1,5 @@
 ﻿using FluentBDD;
+using FluentBDD.Assertions;
 
 namespace UsageExample {
 	[Feature("Invariant method testing",

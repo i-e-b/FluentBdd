@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using FluentBDD.Assertions;
 
 namespace FluentBDD {
 	[EditorBrowsable(EditorBrowsableState.Always)]
@@ -91,6 +92,19 @@ namespace FluentBDD {
 		#endregion
 
 		#region THENs
+
+		public Scenario<TSubject, TResult> Then_ (string description, Func<SmartAssertions<TSubject, TResult, no_values>, Action<TSubject, TResult>> theTest) {
+			subjectAndResultTests.Add(new Group<string, Action<TSubject, TResult>>
+				(description, theTest(new SmartAssertions<TSubject, TResult, no_values>())));
+			return this;
+		}
+		public Scenario<TSubject, TResult> Then_ (string description, Func<SmartAssertions<TSubject, TResult, no_values>, Action<TSubject>> theTest) {
+			subjectOnlyTests.Add(new Group<string, Action<TSubject>>
+				(description, theTest(new SmartAssertions<TSubject, TResult, no_values>())));
+			return this;
+		}
+
+
 		public Scenario<TSubject, TResult> Then (string description, Action<TSubject> subjectOnlyTest) {
 			subjectOnlyTests.Add(new Group<string, Action<TSubject>>(description, subjectOnlyTest));
 			return this;
@@ -204,6 +218,9 @@ namespace FluentBDD {
 		}
 		#endregion
 	}
+
+	[EditorBrowsable(EditorBrowsableState.Never)]
+	public class no_values {}
 
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface ITakeMessage {
