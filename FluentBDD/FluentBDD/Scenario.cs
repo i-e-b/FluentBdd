@@ -279,6 +279,14 @@ namespace FluentBDD {
 		#endregion
 
 		#region THENs
+
+		public Scenario<TSubject, TResult> Then_ (string description, Func<SmartAssertions<TSubject, TResult, TExampleSource>, Action<TSubject, TResult, TExampleSource>> theTest) {
+			subjectAndResultAndExampleTests.Add(new Group<string, Action<TSubject, TResult, TExampleSource>>
+				(description, theTest(new SmartAssertions<TSubject, TResult, TExampleSource>())));
+			return this;
+		}
+
+
 		public ScenarioWithExamples<TSubject, TResult, TExampleType, TExampleSource> Then (string description, Action<TSubject, TResult, TExampleSource> subjectAndResultAndExampleTest) {
 			subjectAndResultAndExampleTests.Add(new Group<string, Action<TSubject, TResult, TExampleSource>>(description, subjectAndResultAndExampleTest));
 			return this;
