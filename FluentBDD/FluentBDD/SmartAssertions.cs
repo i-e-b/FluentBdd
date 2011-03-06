@@ -35,6 +35,11 @@ namespace FluentBDD {
 			}
 
 
+			public Action<TSubject, TResult> subject (Func<TSubject, object> valuesTest) {
+				if (invert) return (subject, result) => Assert.That(getFromSubject(subject), Is.Not.EqualTo(valuesTest(subject)));
+				return (subject, result) => Assert.That(getFromSubject(subject), Is.EqualTo(valuesTest(subject)));
+			}
+
 		}
 
 		public Result result { get { return new Result(); } }
@@ -63,10 +68,15 @@ namespace FluentBDD {
 				return (subject, result, values) => Assert.That(result, Is.EqualTo(valuesTest(values)));
 			}
 
+			public Action<TSubject, TResult> subject (Func<TSubject, object> valuesTest) {
+				if (invert) return (subject, result) => Assert.That(result, Is.Not.EqualTo(valuesTest(subject)));
+				return (subject, result) => Assert.That(result, Is.EqualTo(valuesTest(subject)));
+			}
 		}
 
 		public interface IMatch {
 			Action<TSubject, TResult, TExpectations> expectation (Func<TExpectations, object> valuesTest);
+			Action<TSubject, TResult> subject (Func<TSubject, object> func);
 		}
 
 		public interface IAssertWithSubject {

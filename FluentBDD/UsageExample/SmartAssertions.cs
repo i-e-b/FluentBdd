@@ -30,9 +30,33 @@ namespace UsageExample {
 				.Then_("the DTO should be storing different string to expectation", _ => _.subject(s => s.storedString).should.not.match.expectation(v=>v.aValue));
 
 		// comparing result to subject
+		public Scenario test5 =
+			With(() => Context.Of<a_dto>())
+				.When("I return 'booga'", o => "booga")
+				.Then_("the DTO should be same as result", _ => _.result.should.match.subject(s => s.storedString));
+
+		public Scenario test6 =
+			With(() => Context.Of<a_dto>())
+				.Using<some_expectations>()
+				.When("I return 'wogga'", (o,e) => e.Values.aValue)
+				.Then_("the DTO should be storing different string to result", _ => _.result.should.not.match.subject(s => s.storedString));
+
+		// comparing subject to subject
+		public Scenario test7 =
+			With(() => Context.Of<a_dto>())
+				.When("I return 'booga'", o => "booga")
+				.Then_("subject string should be equal to itself", _ => _.subject(s => s.storedString).should.match.subject(s => s.storedString));
+
+		public Scenario test8 =
+			With(() => Context.Of<a_dto>())
+				.Using<some_expectations>()
+				.When("I return 'wogga'", (o, e) => e.Values.aValue)
+				.Then_("subject string should be equal to itself", _ => _.subject(s => s.storedString).should.match.subject(s => s.storedString));
 
 
-		// note: there is not "test expectation is..." on purpose. We don't test our expectations!
+		// note: there is not "expectation.should..." on purpose. We don't test our expectations!
+
+		// todo: all the other assertions in old-style assertions.
 	}
 
 	public class some_expectations : IProvide<some_expectations> {
