@@ -44,11 +44,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assertions.cs" />
+    <Compile Include="Feature.cs" />
     <Compile Include="Context.cs" />
     <Compile Include="ContextBuilder.cs" />
     <Compile Include="Expectations.cs" />
-    <Compile Include="Feature.cs" />
-    <Compile Include="FeatureAttribute.cs" />
+    <Compile Include="Behaviours.cs" />
+    <Compile Include="BehaviourAttribute.cs" />
+    <Compile Include="IBuildTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scenario.cs" />
     <Compile Include="SmartAssertions.cs" />

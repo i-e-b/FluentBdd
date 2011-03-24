@@ -15,14 +15,27 @@ namespace FluentBddNUnitExtension {
 			GivenCases = new Map<string, Map<string, ListMap<string, ClosureTest>>>(); // GIVEN => (WHEN => (THEN, {WITH}))
 			PrepareFeatureBase(fixtureType);
 
-			var featureInstance = Feature.CreateFor(fixtureType);
-			var scenarioFields = GetScenarioFields(fixtureType);
+			var sourceInstance = CreateInstanceOf(fixtureType);
+			if (Reflect.HasAttribute(fixtureType, typeof(BehaviourAttribute).FullName, false)) {
+				var scenarioFields = GetFields<Scenario>(fixtureType);
 
-			BuildAndMapTestClosures(scenarioFields, featureInstance);
+				BuildAndMapScenarioTestClosures(scenarioFields, sourceInstance);
+			} else if (Reflect.HasAttribute(fixtureType, typeof(FeatureAttribute).FullName, false)) {
+				var behaviourFields = GetFields<Feature>(fixtureType);
+
+				BuildAndMapScenarioTestClosures(behaviourFields, sourceInstance);
+			}
+			
 			BuildTestTreeFromClosureMap(fixtureType);
 		}
 
-		private void BuildTestTreeFromClosureMap(Type fixtureType) {
+
+
+		private static object CreateInstanceOf (Type type) {
+			return type.GetConstructor(new Type[] { }).Invoke(new object[] { });
+		}
+
+		private void BuildTestTreeFromClosureMap (Type fixtureType) {
 			foreach (var given in GivenCases.Keys) {
 				var scenario = new TestFixture(fixtureType);
 				scenario.TestName.Name = given;
@@ -50,7 +63,7 @@ namespace FluentBddNUnitExtension {
 			}
 		}
 
-		private void BuildAndMapTestClosures(IEnumerable<FieldInfo> scenarioFields, object featureInstance) {
+		private void BuildAndMapScenarioTestClosures (IEnumerable<FieldInfo> scenarioFields, object featureInstance) {
 			foreach (var scenarioField in scenarioFields) {
 				var tests = GetTestClosures(scenarioField, featureInstance);
 				foreach (var test in tests) {
@@ -60,33 +73,38 @@ namespace FluentBddNUnitExtension {
 		}
 
 		private string FixName (string givenName) {
-			if (givenName == "Error") return "### ERROR IN TEST SETUP ###";
-			return "Given " + givenName;
+			if (givenName == "Error" || givenName == "Given Error") return "### ERROR IN TEST SETUP ###";
+			return givenName;
 		}
 
-
-		private IEnumerable<TestClosure> GetTestClosures (FieldInfo scenarioField, object featureInstance) {
-			Scenario scenario;
+		private IEnumerable<TestClosure> GetTestClosures (FieldInfo sourceField, object featureInstance) {
+			IBuildTests builder;
 
 			try {
-				scenario = (Scenario)scenarioField.GetValue(featureInstance);
-				return scenario.BuildTests();
+				builder = (IBuildTests)sourceField.GetValue(featureInstance);
+				return builder.BuildTests();
 			} catch (Exception ex) {
-				return new[] { new TestClosure("Error", "Field name = " + scenarioField.Name, ex.Message + "\r\n \r\n" + ex.StackTrace, () => { throw ex; }, ()=> { }) };
+				return new[] { new TestClosure("Error", "Field name = " + sourceField.Name, ex.Message + "\r\n \r\n" + ex.StackTrace, () => { throw ex; }, () => { }) };
 			}
 		}
 
-		private IEnumerable<FieldInfo> GetScenarioFields (Type fixtureType) {
+		private IEnumerable<FieldInfo> GetFields<T> (Type fixtureType) {
 			return fixtureType.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
-				.Where(f => f.FieldType == typeof(Scenario))
+				.Where(f => f.FieldType == typeof(T))
 				.ToArray();
 		}
 
 		private void PrepareFeatureBase (Type fixtureType) {
-			Fixture = Reflect.Construct(fixtureType);
+			try {
+				Fixture = Reflect.Construct(fixtureType);
+			} catch {
+				throw new Exception("Failed to construct " + fixtureType.FullName);
+			}
 
 			foreach (var attrib in fixtureType.GetCustomAttributes(false)) {
-				if (attrib is FeatureAttribute) {
+				if (attrib is BehaviourAttribute) {
+					TestName.Name = (attrib as BehaviourAttribute).Description;
+				} else if (attrib is FeatureAttribute) {
 					TestName.Name = (attrib as FeatureAttribute).Description;
 				}
 			}

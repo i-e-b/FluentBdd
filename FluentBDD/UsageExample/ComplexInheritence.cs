@@ -10,7 +10,7 @@ namespace ComplexInheritence {
 
 	#region Template for behaviour --->
 	// Note: this is a 'Feature', but does not have the feature attribute so won't be tested
-	public class Pressing_buttons<TContextProvider, TSubject, TValuesProvider> : Feature
+	public class Pressing_buttons<TContextProvider, TSubject, TValuesProvider> : Behaviours
 		where TContextProvider : IDoCalculatorStuff<TSubject, TValuesProvider>, new()
 		where TValuesProvider : class, IProvide<TValuesProvider>, new() {
 
@@ -26,14 +26,14 @@ namespace ComplexInheritence {
 
 		// Two inputs
 		public Scenario calculator_can_add_two_numbers =
-			With<TSubject>(CalculatorTakingTwoInputs)
+			Given<TSubject>(CalculatorTakingTwoInputs)
 				.When("I press the button once", c => press_button_n_times(c, 1))
 				.Using<TValuesProvider>()
 				.Then("result should be result of first and second", (s, r, v) => result_should_be_first_then_second(r,v))
 				.Then("readout should be same as result", (s,r,v) => subject_readout_should_match_result(s,r));
 
 		public Scenario cant_add_more_than_I_have_inputs_for_with_2_inputs =
-			With<TSubject>(CalculatorTakingTwoInputs)
+			Given<TSubject>(CalculatorTakingTwoInputs)
 				.When("I press the button twice", c => press_button_n_times(c, 2))
 				.Using<TValuesProvider>()
 				.ShouldThrow<InvalidOperationException>()
@@ -41,21 +41,21 @@ namespace ComplexInheritence {
 
 		// Three inputs
 		public Scenario calculator_can_add_two_of_three_numbers =
-			With<TSubject>(CalculatorTakingThreeInputs)
+			Given<TSubject>(CalculatorTakingThreeInputs)
 				.When("I press the button once", c => press_button_n_times(c, 1))
 				.Using<TValuesProvider>()
 				.Then("result should be result of second and third input", (s, r, v) => result_should_be_second_then_third(r,v))
 				.Then("readout should be same as result", subject_readout_should_match_result);
 
 		public Scenario calculator_can_add_three_numbers =
-			With<TSubject>(CalculatorTakingThreeInputs)
+			Given<TSubject>(CalculatorTakingThreeInputs)
 				.When("I press the button twice", c => press_button_n_times(c, 2))
 				.Using<TValuesProvider>()
 				.Then("result should be result of second and third then first input", (s, r, v) => result_should_be_second_and_third_then_first(r,v))
 				.Then("readout should be same as result", subject_readout_should_match_result);
 
 		public Scenario cant_add_more_than_I_have_inputs_for_with_3_inputs =
-			With<TSubject>(CalculatorTakingThreeInputs)
+			Given<TSubject>(CalculatorTakingThreeInputs)
 				.When("I press the button three times", c => press_button_n_times(c, 3))
 				.Using<TValuesProvider>()
 				.ShouldThrow<InvalidOperationException>()
@@ -135,7 +135,7 @@ namespace ComplexInheritence {
 	#endregion
 
 	// Not a descendant of 'Feature', but has the feature attribute (so will be tested)
-	[Feature("Addition",
+	[Behaviour("Addition",
 		"As a user of a calculator",
 		"To avoid making mistakes",
 		"I want to be told the sum of numbers")]
@@ -160,7 +160,7 @@ namespace ComplexInheritence {
 	}
 
 	
-	[Feature("Subtraction",
+	[Behaviour("Subtraction",
 		"As a user of a calculator",
 		"To avoid making mistakes",
 		"I want to be told the difference of numbers")]

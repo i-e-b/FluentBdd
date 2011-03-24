@@ -15,8 +15,14 @@ namespace FluentBDD {
 		public virtual void TearDown(){}
 
 		internal SubjectBuilder<TSubject> SetupAndReturnContextBuilder () {
-			SetupContext();
-			return SubjectSource;
+			try {
+				SetupContext();
+				return SubjectSource;
+			} catch (NullReferenceException nrex) {
+				throw new Exception("Context setup failed due to a null reference. Did you provide a value source?", nrex);
+			} catch (Exception ex) {
+				throw new Exception("Context setup failed: " + ex.Message, ex);
+			}
 		}
 
 		public SubjectBuilder<TSubject> Given (string description, Func<TSubject> createSubject) {

@@ -2,10 +2,10 @@
 using FluentBDD.Assertions;
 
 namespace UsageExample {
-	[Feature("Invariant method testing",
+	[Behaviour("Invariant method testing",
 		"When testing invariant functions (such as static calculations)",
 		"we can test a set of inputs and outputs as a sanity test of our logic.")]
-	public class InvariantMethods : Feature {
+	public class InvariantMethods : Behaviours {
 
 		public Scenario complex_calculation_should_work =
 			GivenStaticContextFor<values_for_complex_calculation>()

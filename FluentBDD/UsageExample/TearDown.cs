@@ -4,15 +4,15 @@ using FluentBDD;
 using FluentBDD.Assertions;
 
 namespace UsageExample {
-	[Feature("Contexts with tear-downs")]
-	public class TearDown :Feature {
+	[Behaviour("Contexts with tear-downs")]
+	public class TearDown : Behaviours {
 		public Scenario tear_downs =
-			With(() => Context.Of<teardown_context>())
+			Given(() => Context.Of<teardown_context>())
 				.When("I call the create file method", s => s.CreateFile())
 				.Using<values_of_files_to_create>()
-				.Then("File should exist", (s, v) => File.Exists(v.FileName).should_be_true())
-				.Then("Should tear down for each test case", (s, v) => File.Exists(v.FileName).should_be_true())
-				.Then("These tests would fail if teardown wasn't being called", (s, v) => File.Exists(v.FileName).should_be_true());
+				.Then("file should exist", (s, v) => File.Exists(v.FileName).should_be_true())
+				.Then("should tear down for each test case", (s, v) => File.Exists(v.FileName).should_be_true())
+				.Then("these tests would fail if teardown wasn't being called", (s, v) => File.Exists(v.FileName).should_be_true());
 	}
 
 
@@ -32,7 +32,7 @@ namespace UsageExample {
 	public class teardown_context : Context<FileCreator>, IUse<values_of_files_to_create> {
 		public values_of_files_to_create Values { get; set; }
 		public override void SetupContext() {
-			Given("A file creator with a file name", () => new FileCreator(Values.FileName));
+			Given("a file creator with a file name", () => new FileCreator(Values.FileName));
 		}
 
 		public override void TearDown () {

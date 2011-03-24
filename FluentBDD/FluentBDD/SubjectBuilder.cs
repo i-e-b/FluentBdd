@@ -20,15 +20,21 @@ namespace FluentBDD {
 		}
 
 		internal TSubject Build() {
-			var subject = SubjectSource();
-			foreach (var mutator in Mutators) {
-				mutator(subject);
+			try {
+				var subject = SubjectSource();
+				foreach (var mutator in Mutators) {
+					mutator(subject);
+				}
+				return subject;
+			} catch (NullReferenceException nrex) {
+				throw new Exception("Subject setup failed due to a null reference. Did you provide a value source?", nrex);
+			} catch (Exception ex) {
+				throw new Exception("Subject setup failed: " + ex.Message, ex);
 			}
-			return subject;
 		}
 
 		public override string ToString () {
-			return base.ToString() + "with " + Mutators.Count + " sideffects; Subject looks like " + SubjectSource();
+			return base.ToString() + " with " + Mutators.Count + " sideffects; Subject looks like " + SubjectSource();
 		}
 	}
 }

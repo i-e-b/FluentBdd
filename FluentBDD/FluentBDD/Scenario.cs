@@ -7,12 +7,14 @@ using FluentBDD.Assertions;
 
 namespace FluentBDD {
 	[EditorBrowsable(EditorBrowsableState.Always)]
-	public abstract class Scenario {
-		internal abstract IEnumerable<TestClosure> BuildTests ();
+	public abstract class Scenario: IBuildTests {
+		IEnumerable<TestClosure> IBuildTests.BuildTests() {
+			return null;
+		}
 	}
 
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public class Scenario<TSubject, TResult> : Scenario, ITakeMessage {
+	public class Scenario<TSubject, TResult> : Scenario, ITakeMessage, IBuildTests {
 		protected readonly string Description;
 		protected readonly IEnumerable<Func<Context<TSubject>>> contextSources;
 		protected readonly Func<TSubject, Context<TSubject>, TResult> scenarioAction;
@@ -120,14 +122,14 @@ namespace FluentBDD {
 		public virtual ITakeMessage ShouldThrow<TException> () where TException : Exception {
 			expectedExceptionType = typeof(TException);
 			subjectOnlyTests.Insert(0, new Group<string, Action<TSubject>>(
-				"Should throw " + expectedExceptionType.Name, subject => { }));
+				"should throw " + expectedExceptionType.Name, subject => { }));
 			return this;
 		}
 
 		Scenario ITakeMessage.WithMessage (string expectedMessage) {
 			expectedExceptionMessage = expectedMessage;
 			subjectOnlyTests.Insert(0, new Group<string, Action<TSubject>>(
-				"Should have exception message \"" + expectedExceptionMessage+"\"", subject => { }));
+				"should have exception message \"" + expectedExceptionMessage+"\"", subject => { }));
 			return this;
 		}
 
@@ -145,15 +147,15 @@ namespace FluentBDD {
 			yield break;
 		}
 
-		internal override IEnumerable<TestClosure> BuildTests () {
+		IEnumerable<TestClosure> IBuildTests.BuildTests () {
 			var testClosures = new List<TestClosure>();
 
 			//1
 			testClosures.AddRange(from test in subjectOnlyTests
 			                      from contextSource in BuildSubjects()
 			                      select new TestClosure(
-			                      	contextSource().SetupAndReturnContextBuilder().Description,
-			                      	"When " + Description, test.A,
+									"Given " + contextSource().SetupAndReturnContextBuilder().Description,
+			                      	"When " + Description, "Then " + test.A,
 			                      	() => {
 			                      		var context = contextSource();
 										var subject = context.SetupAndReturnContextBuilder().Build();
@@ -167,8 +169,8 @@ namespace FluentBDD {
 			testClosures.AddRange(from test in subjectAndResultTests
 								  from contextSource in BuildSubjects()
 			                      select new TestClosure(
-									contextSource().SetupAndReturnContextBuilder().Description,
-			                      	"When " + Description, test.A,
+									"Given " + contextSource().SetupAndReturnContextBuilder().Description,
+									"When " + Description, "Then " + test.A,
 									() => {
 										var context = contextSource();
 										var subject = context.SetupAndReturnContextBuilder().Build();
@@ -220,15 +222,6 @@ namespace FluentBDD {
 	}
 
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public class no_values {}
-
-	[EditorBrowsable(EditorBrowsableState.Never)]
-	public interface ITakeMessage {
-		Scenario WithMessage (string expectedMessage);
-		Scenario IgnoreMessage();
-	}
-
-	[EditorBrowsable(EditorBrowsableState.Never)]
 	public class ScenarioWithoutAnAction<TSubject, TExampleType, TExampleSource> : Scenario where TExampleSource : class, TExampleType, IProvide<TExampleType>, new() {
 		protected readonly List<Func<Context<TSubject>>> ContextSources;
 
@@ -243,14 +236,10 @@ namespace FluentBDD {
 		public ScenarioWithExamples<TSubject, no_result, TExampleType, TExampleSource> When (string description, Action<TSubject, IUse<TExampleType>> action) {
 			return new ScenarioWithExamples<TSubject, no_result, TExampleType, TExampleSource>(description, ContextSources, (subject, context) => action(subject, (IUse<TExampleType>)context));
 		}
-
-		internal override IEnumerable<TestClosure> BuildTests () {
-			yield break;
-		}
 	}
 
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public class ScenarioWithExamples<TSubject, TResult, TExampleType, TExampleSource> : Scenario<TSubject, TResult>, ITakeMessage where TExampleSource : class, TExampleType, IProvide<TExampleType>, new() {
+	public class ScenarioWithExamples<TSubject, TResult, TExampleType, TExampleSource> : Scenario<TSubject, TResult>, ITakeMessage, IBuildTests where TExampleSource : class, TExampleType, IProvide<TExampleType>, new() {
 
 		internal readonly List<Group<string, Action<TSubject, TResult, TExampleSource>>> subjectAndResultAndExampleTests;
 		internal readonly List<Group<string, Action<TSubject, TExampleSource>>> subjectAndExampleTests;
@@ -302,14 +291,14 @@ namespace FluentBDD {
 		public override ITakeMessage ShouldThrow<TException> () {
 			expectedExceptionType = typeof(TException);
 			subjectAndExampleTests.Insert(0, new Group<string, Action<TSubject, TExampleSource>>(
-				"Should throw " + expectedExceptionType.Name, (s, e) => { }));
+				"should throw " + expectedExceptionType.Name, (s, e) => { }));
 			return this;
 		}
 
 		Scenario ITakeMessage.WithMessage (string expectedMessage) {
 			expectedExceptionMessage = expectedMessage;
 			subjectAndExampleTests.Insert(0, new Group<string, Action<TSubject, TExampleSource>>(
-				"Should have exception message \"" + expectedExceptionMessage + "\"", (s, e) => { }));
+				"should have exception message \"" + expectedExceptionMessage + "\"", (s, e) => { }));
 			return this;
 		}
 
@@ -320,7 +309,7 @@ namespace FluentBDD {
 		public ScenarioWithExamples<TSubject, TResult, TExampleType, TExampleSource> ShouldThrow(Func<TExampleType, Exception> sampleExceptionSource) {
 			specificExceptionTests
 				.Add(new Group<string, Func<TExampleType, Exception>>(
-				     	"Should throw exception",
+				     	"should throw exception",
 				     	sampleExceptionSource
 				     	));
 			return this;
@@ -356,15 +345,15 @@ namespace FluentBDD {
 			yield break;
 		}
 
-		internal override IEnumerable<TestClosure> BuildTests () {
+		IEnumerable<TestClosure> IBuildTests.BuildTests () {
 			var testClosures = new List<TestClosure>();
 
 			//1
 			testClosures.AddRange(from test in subjectOnlyTests
 								  from tuple in BuildSubjectsWithExamples().Take(1)
 			                      select new TestClosure(
-									GetLambdaBuilderDescription(tuple.A),
-			                      	"When " + Description, test.A,
+									"Given " + GetLambdaBuilderDescription(tuple.A),
+									"When " + Description, "Then " + test.A,
 									() =>
 									{
 										var context = GetContext(tuple);
@@ -378,8 +367,9 @@ namespace FluentBDD {
 			testClosures.AddRange(from test in subjectAndResultTests
 								  from tuple in BuildSubjectsWithExamples()
 								  select new TestClosure(
-									GetLambdaBuilderDescription(tuple.A),
-									"When " + Description, test.A, " with " + tuple._2<TExampleSource>().StringRepresentation(),
+									"Given " + GetLambdaBuilderDescription(tuple.A),
+									"When " + Description, "Then " + test.A, 
+									" with " + tuple._2<TExampleSource>().StringRepresentation(),
 									() => {
 										var context = GetContext(tuple);
 										var subject = context.SetupAndReturnContextBuilder().Build();
@@ -391,8 +381,9 @@ namespace FluentBDD {
 			testClosures.AddRange(from test in subjectAndResultAndExampleTests
 								  from tuple in BuildSubjectsWithExamples()
 								  select new TestClosure(
-									GetLambdaBuilderDescription(tuple.A),
-									"When " + Description, test.A, " with " + tuple._2<TExampleSource>().StringRepresentation(),
+									"Given " + GetLambdaBuilderDescription(tuple.A),
+									"When " + Description, "Then " + test.A, 
+									" with " + tuple._2<TExampleSource>().StringRepresentation(),
 									() =>
 									{
 										var context = GetContext(tuple);
@@ -408,8 +399,9 @@ namespace FluentBDD {
 			testClosures.AddRange(from test in subjectAndExampleTests
 			                      from tuple in BuildSubjectsWithExamples()
 								  select new TestClosure(
-									GetLambdaBuilderDescription(tuple.A),
-									"When " + Description, test.A, " with " + tuple._2<TExampleSource>().StringRepresentation(),
+									"Given " + GetLambdaBuilderDescription(tuple.A),
+									"When " + Description, "Then " + test.A,
+									" with " + tuple._2<TExampleSource>().StringRepresentation(),
 									() =>
 									{
 										var context = GetContext(tuple);
@@ -424,8 +416,8 @@ namespace FluentBDD {
 			testClosures.AddRange(from test in specificExceptionTests
 								  from tuple in BuildSubjectsWithExamples()
 			                      select new TestClosure(
-			                      	GetLambdaBuilderDescription(tuple.A),
-			                      	"When " + Description, test.A,
+									"Given " + GetLambdaBuilderDescription(tuple.A),
+									"When " + Description, "Then " + test.A,
 									GetWithExceptionName(tuple, test),
 									() =>
 									{
@@ -476,5 +468,14 @@ namespace FluentBDD {
 			}
 		}
 		#endregion
+	}
+
+	[EditorBrowsable(EditorBrowsableState.Never)]
+	public class no_values {}
+
+	[EditorBrowsable(EditorBrowsableState.Never)]
+	public interface ITakeMessage {
+		Scenario WithMessage (string expectedMessage);
+		Scenario IgnoreMessage();
 	}
 }

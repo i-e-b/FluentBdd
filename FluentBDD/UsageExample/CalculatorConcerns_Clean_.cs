@@ -6,9 +6,9 @@ using UsageExample;
 
 // This is a clean version of "CalculatorConcerns", showing real-world usage.
 // Your own specifications should look more like this!
-namespace CalculatorConcerns__Clean__ {
-	[Feature("Creation")]
-	public class Creation : Feature {
+namespace CalculatorConcerns {
+	[Behaviour("Creation")]
+	public class Creation : Behaviours {
 		public Scenario when_creating_a_calculator =
 			GivenNoSubject()
 				.When("I create a calculator", with => new Calculator())
@@ -22,21 +22,21 @@ namespace CalculatorConcerns__Clean__ {
 				.WithMessage("An math delegate must be provided");
 	}
 
-	[Feature("Addition",
+	[Behaviour("Addition",
 		"As a user of a calculator",
 		"To avoid making mistakes",
 		"I want to be told the sum of numbers")]
 	public class Addition : common_calculator_concerns {
 		// Two inputs
 		public Scenario calculator_can_add_two_numbers =
-			With(() => Context.Of<a_calculator_taking_two_inputs>())
+			Given(() => Context.Of<a_calculator_taking_two_inputs>())
 				.When("I press add once", c => press_add_n_times(c, 1))
 				.Using<values_for_calculator_taking_inputs>()
 				.Then("result should be sum of first and second", (s, r, v) => r.should_be_equal_to(v.first_plus_second))
 				.Then("readout should be same as result", calculator_readout_should_match_result);
 
 		public Scenario cant_add_more_than_I_have_inputs_for_with_2_inputs =
-			With(() => Context.Of<a_calculator_taking_two_inputs>())
+			Given(() => Context.Of<a_calculator_taking_two_inputs>())
 				.When("I press add twice", c => press_add_n_times(c, 2))
 				.Using<values_for_calculator_taking_inputs>()
 				.ShouldThrow<InvalidOperationException>()
@@ -44,21 +44,21 @@ namespace CalculatorConcerns__Clean__ {
 
 		// Three inputs
 		public Scenario calculator_can_add_two_of_three_numbers =
-			With(() => Context.Of<a_calculator_taking_three_inputs>())
+			Given(() => Context.Of<a_calculator_taking_three_inputs>())
 				.When("I press add once", c => press_add_n_times(c, 1))
 				.Using<values_for_calculator_taking_inputs>()
 				.Then("result should be sum of second and third input", (s, r, v) => r.should_be_equal_to(v.second_plus_third))
 				.Then("readout should be same as result", calculator_readout_should_match_result);
 
 		public Scenario calculator_can_add_three_numbers =
-			With(() => Context.Of<a_calculator_taking_three_inputs>())
+			Given(() => Context.Of<a_calculator_taking_three_inputs>())
 				.When("I press add twice", c => press_add_n_times(c, 2))
 				.Using<values_for_calculator_taking_inputs>()
 				.Then("result should be sum of first, second and third input", (s, r, v) => r.should_be_equal_to(v.first_second_plus_third))
 				.Then("readout should be same as result", calculator_readout_should_match_result);
 
 		public Scenario cant_add_more_than_I_have_inputs_for_with_3_inputs =
-			With(() => Context.Of<a_calculator_taking_three_inputs>())
+			Given(() => Context.Of<a_calculator_taking_three_inputs>())
 				.When("I press add three times", c => press_add_n_times(c, 3))
 				.Using<values_for_calculator_taking_inputs>()
 				.ShouldThrow<InvalidOperationException>()
@@ -67,21 +67,21 @@ namespace CalculatorConcerns__Clean__ {
 
 	}
 
-	[Feature("Subtraction",
+	[Behaviour("Subtraction",
 		"As a user of a calculator",
 		"To avoid making mistakes",
 		"I want to be told the difference between two numbers")]
 	public class Subtraction : common_calculator_concerns {
 		// Two inputs
 		public Scenario calculator_can_add_two_numbers =
-			With(() => Context.Of<a_calculator_taking_two_inputs>())
+			Given(() => Context.Of<a_calculator_taking_two_inputs>())
 				.When("I press subtract once", c => press_subtract_n_times(c, 1))
 				.Using<values_for_calculator_taking_inputs>()
 				.Then("result should be difference of first and second", (s, r, v) => r.should_be_equal_to(v.first_minus_second))
 				.Then("readout should be same as result", calculator_readout_should_match_result);
 
 		public Scenario cant_add_more_than_I_have_inputs_for_with_2_inputs =
-			With(() => Context.Of<a_calculator_taking_two_inputs>())
+			Given(() => Context.Of<a_calculator_taking_two_inputs>())
 				.When("I press subtract twice", c => press_subtract_n_times(c, 2))
 				.Using<values_for_calculator_taking_inputs>()
 				.ShouldThrow<InvalidOperationException>()
@@ -89,21 +89,21 @@ namespace CalculatorConcerns__Clean__ {
 
 		// Three inputs
 		public Scenario calculator_can_add_two_of_three_numbers =
-			With(() => Context.Of<a_calculator_taking_three_inputs>())
+			Given(() => Context.Of<a_calculator_taking_three_inputs>())
 				.When("I press subtract once", c => press_subtract_n_times(c, 1))
 				.Using<values_for_calculator_taking_inputs>()
 				.Then("result should be sum of second and third input", (s, r, v) => r.should_be_equal_to(v.second_minus_third))
 				.Then("readout should be same as result", calculator_readout_should_match_result);
 
 		public Scenario calculator_can_add_three_numbers =
-			With(() => Context.Of<a_calculator_taking_three_inputs>())
+			Given(() => Context.Of<a_calculator_taking_three_inputs>())
 				.When("I press subtract twice", c => press_subtract_n_times(c, 2))
 				.Using<values_for_calculator_taking_inputs>()
 				.Then("result should be sum of first, second and third input", (s, r, v) => r.should_be_equal_to(v.first_minus__second_minus_third))
 				.Then("readout should be same as result", calculator_readout_should_match_result);
 
 		public Scenario cant_add_more_than_I_have_inputs_for_with_3_inputs =
-			With(() => Context.Of<a_calculator_taking_three_inputs>())
+			Given(() => Context.Of<a_calculator_taking_three_inputs>())
 				.When("I press subtract three times", c => press_subtract_n_times(c, 3))
 				.Using<values_for_calculator_taking_inputs>()
 				.ShouldThrow<InvalidOperationException>()
@@ -111,13 +111,13 @@ namespace CalculatorConcerns__Clean__ {
 	}
 
 
-	[Feature("Data Contracts",
+	[Behaviour("Data Contracts",
 		"As calculator service provider",
 		"To make loads of money, I want to be able to serialise my calculator via SOAP",
 		"For this to work, I need attributes on the calculator and it's fields")]
-	public class DataContracts : Feature {
+	public class DataContracts : Behaviours {
 		public Scenario calculator_should_have_datacontracts =
-			With(() => Context.Of<a_calculator>())
+			Given(() => Context.Of<a_calculator>())
 				.Verify()
 				.ShouldHaveAttribute<DataContractAttribute>()
 				.ShouldHaveAttribute<SerializableAttribute>()
@@ -164,7 +164,7 @@ namespace CalculatorConcerns__Clean__ {
 	}
 
 	/// <summary> A few methods that help keep scenarios clean </summary>
-	public class common_calculator_concerns : Feature {
+	public class common_calculator_concerns : Behaviours {
 		protected static int press_add_n_times (Calculator calculator, int n) {
 			if (n < 1) throw new ArgumentException("n must be gte 1");
 			for (int i = 0; i < n - 1; i++) {

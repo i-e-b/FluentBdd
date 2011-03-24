@@ -2,11 +2,11 @@
 using FluentBDD;
 
 namespace UsageExample {
-	[Feature("Exceptions in expectations")]
-	class ExceptionsInExpectations : Feature {
+	[Behaviour("Exceptions in expectations")]
+	class ExceptionsInExpectations : Behaviours {
 
 		public Scenario a_load_of_different_exceptions =
-			With(() => Context.Of<an_exception_throwing_class>())
+			Given(() => Context.Of<an_exception_throwing_class>())
 				.When("I cause an exception", s => s.ThrowException())
 				.Using<exception_expectations>()
 				.ShouldThrow(v => v.ExpectedException);
@@ -16,7 +16,7 @@ namespace UsageExample {
 		public exception_expectations Values { get; set; }
 
 		public override void SetupContext() {
-			Given("An exception throwing class", () => new ExceptionThrowingClass(Values.ExceptionNumber));
+			Given("an exception throwing class", () => new ExceptionThrowingClass(Values.ExceptionNumber));
 		}
 	}
 

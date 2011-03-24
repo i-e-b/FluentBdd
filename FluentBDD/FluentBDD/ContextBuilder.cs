@@ -42,6 +42,14 @@ namespace FluentBDD {
 		}
 	}
 
+	public class ContextBuilder<TSubject, TExampleType> : ContextBuilder<TSubject> where TExampleType : class {
+		public ContextBuilder(Func<Context<TSubject>> firstContext) : base(firstContext) {}
+
+		public new ScenarioWithoutAnAction<TSubject, TExampleType, TExampleSource> Using<TExampleSource>() where TExampleSource : class, TExampleType, IProvide<TExampleType>, new() {
+			return new ScenarioWithoutAnAction<TSubject, TExampleType, TExampleSource>(ContextSources);
+		}
+	}
+
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public class no_result {}
 }

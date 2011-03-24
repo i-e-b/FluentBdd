@@ -51,7 +51,7 @@ namespace FluentBddNUnitExtension {
 
 		private void TestExceptionCondition(TestResult result, Exception ex) {
 			if (! TestShouldThrowException()) {
-				result.Failure(ex.Message, ex.StackTrace);
+				result.Failure("Test or setup failed: "+ex.Message, ex.StackTrace);
 			} else {
 				if (! ThrownTypeMatchesExpectation(ex)) {
 					result.Failure("Expected exception type of "

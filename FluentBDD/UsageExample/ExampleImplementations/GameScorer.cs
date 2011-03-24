@@ -1,15 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace UsageExample {
 	public class GameScorer {
-		public GameScorer () {
-			currentRoll = 0;
-		}
-
-		private readonly int[] throws = new int[21];
-		private int currentRoll;
+		private readonly List<int> throws = new List<int>(21);
 
 		public int ScoreGame () {
+			if (throws.Count > 21) throw new ArgumentException("Too many throws");
+			while (throws.Count < 20) { throws.Add(0); }
 			int score = 0;
 			int frameIndex = 0;
 			for (int frame = 0; frame < 10; frame++) {
@@ -28,8 +26,7 @@ namespace UsageExample {
 		}
 
 		public void ThrowBowlingBall (int pinsIHitInThisBowlingThrow) {
-			if (currentRoll >= 21) throw new ArgumentException("Game is over");
-			throws[currentRoll++] = pinsIHitInThisBowlingThrow;
+			throws.Add(pinsIHitInThisBowlingThrow);
 		}
 
 		private bool isStrike (int frameIndex) {

@@ -1,4 +1,5 @@
 ﻿using System;
+using FluentBDD;
 using NUnit.Core;
 using NUnit.Core.Extensibility;
 
@@ -6,10 +7,11 @@ namespace FluentBddNUnitExtension {
 	/// <summary>
 	/// Add-in interface: NUnit uses this for installation and binding.
 	/// </summary>
-	[NUnitAddin(Description = "FluentBDD Scenario/Feature test suite builder")]
+	[NUnitAddin(Description = "FluentBDD Behaviour/Feature/Scenario test suite builder")]
 	public class ScenarioBuilder : IAddin, ISuiteBuilder {
 		public bool CanBuildFrom(Type type) {
-			return Reflect.HasAttribute(type, "FluentBDD.FeatureAttribute", false);
+			return Reflect.HasAttribute(type, typeof(BehaviourAttribute).FullName, false)
+				|| Reflect.HasAttribute(type, typeof(FeatureAttribute).FullName, false);
 		}
 
 		public Test BuildFrom(Type type) {

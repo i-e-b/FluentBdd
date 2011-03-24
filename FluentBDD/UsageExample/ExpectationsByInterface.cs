@@ -13,33 +13,32 @@ using UsageExample;
 
 // The bowling scores example from SpecFlow
 namespace BowlingScores {
-	[Feature("Score calculation",
+	[Behaviour("Score calculation",
 		"In order to know my performance",
 		"As a player",
 		"I want the system to calculate my total score")]
-	class ScoringConcerns : Feature {
+	class ScoringConcerns : Behaviours {
 		public Scenario scoring_for_a_series_of_games_played =
-			With(()=> Context.Of<a_game_scorer_that_takes_a_series_of_pin_hits>())
+			Given(()=> Context.Of<a_game_scorer_that_takes_a_series_of_pin_hits>())
 				.When("I score a valid game", gs => gs.ScoreGame())
 				.Using<IGameExpectations, expectations_for_valid_games>()
 				.Then("I should get a final score", (gs, result, values) => result.should_be_equal_to(values.finalScore));
 
 		public Scenario I_shouldnt_be_able_to_bowl_when_the_game_is_over =
-			With<GameScorer>(Context.Of<a_game_scorer_that_takes_a_series_of_pin_hits>)
+			Given<GameScorer>(Context.Of<a_game_scorer_that_takes_a_series_of_pin_hits>)
 				.When("I score an invalid game", gs => gs.ScoreGame())
 				.Using<IGameExpectations, values_for_a_game_with_too_many_throws>()
 				.ShouldThrow<ArgumentException>()
-				.WithMessage("Game is over");
+				.WithMessage("Too many throws");
 
 
 
 		// Inverting Using/When example, with interface
 		public Scenario storing_nick_name =
-			With(() => Context.Of<a_game_scorer_that_takes_a_series_of_pin_hits>())
+			Given(() => Context.Of<a_game_scorer_that_takes_a_series_of_pin_hits>())
 			.Using<IGameExpectations, expectations_for_valid_games>()
 			.When("I store the game's nick name", (subject, context) => subject.StoreNickName(context.Values.nickName))
 			.Then("I should be able to retrieve the game's nick name", (s, r, v) => s.GetNickName().should_be_equal_to(v.nickName));
-
 	}
 
 	// this context takes IGameExpectations as it's values, so can take many providers
