@@ -20,22 +20,16 @@ namespace FluentBDD {
 			}
 		}
 
-		public static ContextBuilder<no_subject> GivenNoSubject () {
+		public static ScenarioBuilder<no_subject> GivenNoSubject () {
 			return Given<no_subject>(Context.Of<no_subject>);
 		}
 
-		public static ContextBuilder<no_subject> GivenStaticContextFor<T> () {
+		public static ScenarioBuilder<no_subject> GivenStaticContextFor<T> () {
 			return Given<no_subject>(Context.Of<static_context<T>>);
 		}
 
-		public static ContextBuilder<TSubject> Given<TSubject> (Func<Context<TSubject>> contextProvider) {
-			return new ContextBuilder<TSubject>(contextProvider);
-		}
-	}
-
-	public abstract class Behaviours<TExampleType> : Behaviours where TExampleType : class {
-		public new static ContextBuilder<TSubject, TExampleType> Given<TSubject> (Func<Context<TSubject>> contextProvider) {
-			return new ContextBuilder<TSubject, TExampleType>(contextProvider);
+		public static ScenarioBuilder<TSubject> Given<TSubject> (Func<Context<TSubject>> contextProvider) {
+			return new ScenarioBuilder<TSubject>(contextProvider);
 		}
 	}
 }

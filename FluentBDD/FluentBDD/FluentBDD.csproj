@@ -46,7 +46,8 @@
     <Compile Include="Assertions.cs" />
     <Compile Include="Feature.cs" />
     <Compile Include="Context.cs" />
-    <Compile Include="ContextBuilder.cs" />
+    <Compile Include="Proved.cs" />
+    <Compile Include="ScenarioBuilder.cs" />
     <Compile Include="Expectations.cs" />
     <Compile Include="Behaviours.cs" />
     <Compile Include="BehaviourAttribute.cs" />

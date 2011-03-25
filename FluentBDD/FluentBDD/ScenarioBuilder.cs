@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace FluentBDD {
-	public class ContextBuilder<TSubject> {
+	public class ScenarioBuilder<TSubject> {
 		protected readonly List<Func<Context<TSubject>>> ContextSources;
 
-		public ContextBuilder(Func<Context<TSubject>> firstContext) {
+		public ScenarioBuilder(Func<Context<TSubject>> firstContext) {
 			ContextSources = new List<Func<Context<TSubject>>> {firstContext};
 		}
 
-		public ContextBuilder<TSubject> And (Func<Context<TSubject>> contextProvider) {
+		public ScenarioBuilder<TSubject> And (Func<Context<TSubject>> contextProvider) {
 			ContextSources.Add(contextProvider);
 			return this;
 		}
@@ -42,8 +42,8 @@ namespace FluentBDD {
 		}
 	}
 
-	public class ContextBuilder<TSubject, TExampleType> : ContextBuilder<TSubject> where TExampleType : class {
-		public ContextBuilder(Func<Context<TSubject>> firstContext) : base(firstContext) {}
+	public class ScenarioBuilder<TSubject, TExampleType> : ScenarioBuilder<TSubject> where TExampleType : class {
+		public ScenarioBuilder(Func<Context<TSubject>> firstContext) : base(firstContext) {}
 
 		public new ScenarioWithoutAnAction<TSubject, TExampleType, TExampleSource> Using<TExampleSource>() where TExampleSource : class, TExampleType, IProvide<TExampleType>, new() {
 			return new ScenarioWithoutAnAction<TSubject, TExampleType, TExampleSource>(ContextSources);
