@@ -56,19 +56,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExampleImplementations\Calculator.cs" />
-    <Compile Include="InvariantMethods.cs" />
+    <Compile Include="Implementations\Calculator.cs" />
+    <Compile Include="AdvancedExamples\InvariantMethods.cs" />
     <Compile Include="ManyExampleConcerns.cs" />
-    <Compile Include="CalculatorConcerns_Clean_.cs" />
-    <Compile Include="ComplexInheritence.cs" />
-    <Compile Include="ExceptionsInExpectations.cs" />
+    <Compile Include="CalculatorConcerns.cs" />
+    <Compile Include="AdvancedExamples\ComplexInheritence.cs" />
+    <Compile Include="AdvancedExamples\ExceptionsInExpectations.cs" />
     <Compile Include="ExpectationsByInterface.cs" />
-    <Compile Include="ExampleImplementations\GameScorer.cs" />
-    <Compile Include="OutsideIn_CoveredBy.cs" />
+    <Compile Include="Implementations\GameScorer.cs" />
+    <Compile Include="FeatureSpecification.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SmartAssertions.cs" />
+    <Compile Include="Experimental\SmartAssertions.cs" />
     <Compile Include="TearDown.cs" />
-    <Compile Include="_Experiment__SplitProofs.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FluentBDD\FluentBDD.csproj">

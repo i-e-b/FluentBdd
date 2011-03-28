@@ -6,8 +6,8 @@ using UsageExample;
 // This file shows a way to wrap up a complex set of behaviour behind an interface (IDoCalculatorStuff)
 // defining a set of behaviours without defining contexts, actions or specific tests -- allowing these
 // to be specified multiple times later (with sets different contexts/values/tests)
-namespace ComplexInheritence {
-
+namespace Advanced.ComplexInheritence {
+	
 	#region Template for behaviour --->
 	// Note: this is a 'Feature', but does not have the feature attribute so won't be tested
 	public class Pressing_buttons<TContextProvider, TSubject, TValuesProvider> : Behaviours

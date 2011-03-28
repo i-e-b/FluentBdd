@@ -1,6 +1,11 @@
 ﻿using FluentBDD;
 
 namespace UsageExample {
+	/// <summary>
+	/// Concept: have a sub-interface on "Then" that hides the need to have
+	/// a big (subject, result, values) lambda expression, and that means
+	/// you don't get a ton of assertion extension methods messing up intellisense.
+	/// </summary>
 	[Behaviour("Smart assertions")]
 	public class SmartAssertions : Behaviours {
 

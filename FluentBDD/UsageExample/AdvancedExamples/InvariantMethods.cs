@@ -1,7 +1,7 @@
 ﻿using FluentBDD;
 using FluentBDD.Assertions;
 
-namespace UsageExample {
+namespace Advanced.UsageExample {
 	[Behaviour("Invariant method testing",
 		"When testing invariant functions (such as static calculations)",
 		"we can test a set of inputs and outputs as a sanity test of our logic.")]

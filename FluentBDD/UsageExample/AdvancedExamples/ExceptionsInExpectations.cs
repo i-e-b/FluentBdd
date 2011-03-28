@@ -1,7 +1,7 @@
 ﻿using System;
 using FluentBDD;
 
-namespace UsageExample {
+namespace Advanced.UsageExample {
 	[Behaviour("Exceptions in expectations")]
 	class ExceptionsInExpectations : Behaviours {
 

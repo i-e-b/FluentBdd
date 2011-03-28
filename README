@@ -27,6 +27,12 @@ To use:
 Include "FluentBDD.dll" into your test project, and start writing
 behaviours. NUnit will find and runs these as unit tests.
 
+Help:
+-----
+Have a look in the UsageExamples project, start with "CalculatorConcerns.cs"
+There is a PowerPoint presentation to look through which gives the concepts and a 
+walk through of a feature. A PDF is given if you don't have a PowerPoint reader.
+
 
 Notes and known bugs:
 ---------------------

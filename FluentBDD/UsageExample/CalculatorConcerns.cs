@@ -4,9 +4,34 @@ using FluentBDD;
 using FluentBDD.Assertions;
 using UsageExample;
 
-// This is a clean version of "CalculatorConcerns", showing real-world usage.
-// Your own specifications should look more like this!
 namespace CalculatorConcerns {
+	[Feature("Calculator features")]
+	public class CalculatorFeatures : Feature {
+		public Feature creation =
+			For("Calculator users")
+				.To("start using a calculator")
+				.Should("be able to create a calculator")
+				.CoveredBy<Creation>();
+
+		public Feature addition =
+			For("Calculator users")
+				.To("find the sum of a list of numbers")
+				.Should("have an addition function on the calculator")
+				.CoveredBy<Addition>();
+
+		public Feature subtraction =
+			For("Calculator users")
+				.To("find the difference of a list of numbers")
+				.Should("have a subtraction function on the calculator")
+				.CoveredBy<Subtraction>();
+
+		public Feature data_contracts =
+			For("Calculator feature aggregators")
+				.To("be able to serialise the state of a calculator")
+				.Should("have data contract attributes set on the calculator")
+				.CoveredBy<DataContracts>();
+	}
+
 	[Behaviour("Creation")]
 	public class Creation : Behaviours {
 		public Scenario when_creating_a_calculator =
@@ -22,22 +47,19 @@ namespace CalculatorConcerns {
 				.WithMessage("An math delegate must be provided");
 	}
 
-	[Behaviour("Addition",
-		"As a user of a calculator",
-		"To avoid making mistakes",
-		"I want to be told the sum of numbers")]
+	[Behaviour("Addition")]
 	public class Addition : common_calculator_concerns {
 		// Two inputs
 		public Scenario calculator_can_add_two_numbers =
 			Given(() => Context.Of<a_calculator_taking_two_inputs>())
-				.When("I press add once", c => press_add_n_times(c, 1))
+				.When("I press add once", calculator => press_add_n_times(calculator, 1))
 				.Using<values_for_calculator_taking_inputs>()
-				.Then("result should be sum of first and second", (s, r, v) => r.should_be_equal_to(v.first_plus_second))
+				.Then("result should be sum of first and second", (calculator, result, values) => result.should_be_equal_to(values.first_plus_second))
 				.Then("readout should be same as result", calculator_readout_should_match_result);
 
 		public Scenario cant_add_more_than_I_have_inputs_for_with_2_inputs =
 			Given(() => Context.Of<a_calculator_taking_two_inputs>())
-				.When("I press add twice", c => press_add_n_times(c, 2))
+				.When("I press add twice", calculator => press_add_n_times(calculator, 2))
 				.Using<values_for_calculator_taking_inputs>()
 				.ShouldThrow<InvalidOperationException>()
 				.WithMessage("Stack empty.");
@@ -45,32 +67,27 @@ namespace CalculatorConcerns {
 		// Three inputs
 		public Scenario calculator_can_add_two_of_three_numbers =
 			Given(() => Context.Of<a_calculator_taking_three_inputs>())
-				.When("I press add once", c => press_add_n_times(c, 1))
+				.When("I press add once", calculator => press_add_n_times(calculator, 1))
 				.Using<values_for_calculator_taking_inputs>()
-				.Then("result should be sum of second and third input", (s, r, v) => r.should_be_equal_to(v.second_plus_third))
+				.Then("result should be sum of second and third input", (calculator, result, values) => result.should_be_equal_to(values.second_plus_third))
 				.Then("readout should be same as result", calculator_readout_should_match_result);
 
 		public Scenario calculator_can_add_three_numbers =
 			Given(() => Context.Of<a_calculator_taking_three_inputs>())
 				.When("I press add twice", c => press_add_n_times(c, 2))
 				.Using<values_for_calculator_taking_inputs>()
-				.Then("result should be sum of first, second and third input", (s, r, v) => r.should_be_equal_to(v.first_second_plus_third))
+				.Then("result should be sum of first, second and third input", (calculator, result, values) => result.should_be_equal_to(values.first_second_plus_third))
 				.Then("readout should be same as result", calculator_readout_should_match_result);
 
 		public Scenario cant_add_more_than_I_have_inputs_for_with_3_inputs =
 			Given(() => Context.Of<a_calculator_taking_three_inputs>())
-				.When("I press add three times", c => press_add_n_times(c, 3))
+				.When("I press add three times", calculator => press_add_n_times(calculator, 3))
 				.Using<values_for_calculator_taking_inputs>()
 				.ShouldThrow<InvalidOperationException>()
 				.WithMessage("Stack empty.");
-				
-
 	}
 
-	[Behaviour("Subtraction",
-		"As a user of a calculator",
-		"To avoid making mistakes",
-		"I want to be told the difference between two numbers")]
+	[Behaviour("Subtraction")]
 	public class Subtraction : common_calculator_concerns {
 		// Two inputs
 		public Scenario calculator_can_add_two_numbers =
@@ -110,11 +127,7 @@ namespace CalculatorConcerns {
 				.WithMessage("Stack empty.");
 	}
 
-
-	[Behaviour("Data Contracts",
-		"As calculator service provider",
-		"To make loads of money, I want to be able to serialise my calculator via SOAP",
-		"For this to work, I need attributes on the calculator and it's fields")]
+	[Behaviour("Data Contracts")]
 	public class DataContracts : Behaviours {
 		public Scenario calculator_should_have_datacontracts =
 			Given(() => Context.Of<a_calculator>())
@@ -126,7 +139,44 @@ namespace CalculatorConcerns {
 	}
 
 	#region Contexts and Expectations
-	public class values_for_calculator_taking_inputs : IProvide<values_for_calculator_taking_inputs> {
+	internal class a_calculator_taking_three_inputs: Context<Calculator>, IUse<values_for_calculator_taking_inputs> {
+		public values_for_calculator_taking_inputs Values { get; set; }
+		public override void SetupContext() {
+			Given("a calculator", () => new Calculator())
+				.And("I type in the first, second and third values",
+					 c =>
+					 {
+						 c.Press(Values.first);
+						 c.Press(Values.second);
+						 c.Press(Values.third);
+					 });
+		}
+	}
+
+	internal class a_calculator_taking_two_inputs : Context<Calculator>, IUse<values_for_calculator_taking_inputs> {
+		public values_for_calculator_taking_inputs Values { get; set; }
+		public override void SetupContext () {
+			Given("a calculator", () => new Calculator())
+				.And("I type in the first and second values",
+					 c =>
+					 {
+						 c.Press(Values.first);
+						 c.Press(Values.second);
+					 });
+		}
+	}
+	
+	internal class a_calculator : Context<Calculator> {
+		public override void SetupContext () {
+			Given("I have a calculator", () => new Calculator());
+		}
+	}
+
+	/// <summary>
+	/// Quite a complex expectation provider -- this uses a 'createFor' method to 
+	/// generate each instance.
+	/// </summary>
+	internal class values_for_calculator_taking_inputs : IProvide<values_for_calculator_taking_inputs> {
 		public int first, second, third;
 
 		public int first_plus_second;
@@ -187,36 +237,5 @@ namespace CalculatorConcerns {
 		
 	}
 
-	public class a_calculator_taking_three_inputs: Context<Calculator>, IUse<values_for_calculator_taking_inputs> {
-		public values_for_calculator_taking_inputs Values { get; set; }
-		public override void SetupContext() {
-			Given("a calculator", () => new Calculator())
-				.And("I type in the first, second and third values",
-					 c =>
-					 {
-						 c.Press(Values.first);
-						 c.Press(Values.second);
-						 c.Press(Values.third);
-					 });
-		}
-	}
-	public class a_calculator_taking_two_inputs : Context<Calculator>, IUse<values_for_calculator_taking_inputs> {
-		public values_for_calculator_taking_inputs Values { get; set; }
-		public override void SetupContext () {
-			Given("a calculator", () => new Calculator())
-				.And("I type in the first and second values",
-					 c =>
-					 {
-						 c.Press(Values.first);
-						 c.Press(Values.second);
-					 });
-		}
-	}
-
-	internal class a_calculator : Context<Calculator> {
-		public override void SetupContext () {
-			Given("I have a calculator", () => new Calculator());
-		}
-	}
 	#endregion
 }

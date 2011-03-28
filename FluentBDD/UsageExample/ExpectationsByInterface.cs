@@ -18,27 +18,16 @@ namespace BowlingScores {
 		"As a player",
 		"I want the system to calculate my total score")]
 	class ScoringConcerns : Behaviours {
-		public Scenario scoring_for_a_series_of_games_played =
-			Given(()=> Context.Of<a_game_scorer_that_takes_a_series_of_pin_hits>())
-				.When("I score a valid game", gs => gs.ScoreGame())
-				.Using<IGameExpectations, expectations_for_valid_games>()
-				.Then("I should get a final score", (gs, result, values) => result.should_be_equal_to(values.finalScore));
+		public Scenario scoring_for_a_series_of_games_played = Proved.By<IGameExpectations, valid_games>()
+			.Given<GameScorer, a_game_scorer_that_takes_a_series_of_pin_hits>()
+			.When("I score a valid game", (game_scorer, example) => game_scorer.ScoreGame())
+			.Then("I should get a final score", (game_scorer, result, values) => result.should_be_equal_to(values.finalScore));
 
-		public Scenario I_shouldnt_be_able_to_bowl_when_the_game_is_over =
-			Given<GameScorer>(Context.Of<a_game_scorer_that_takes_a_series_of_pin_hits>)
-				.When("I score an invalid game", gs => gs.ScoreGame())
-				.Using<IGameExpectations, values_for_a_game_with_too_many_throws>()
-				.ShouldThrow<ArgumentException>()
-				.WithMessage("Too many throws");
-
-
-
-		// Inverting Using/When example, with interface
-		public Scenario storing_nick_name =
-			Given(() => Context.Of<a_game_scorer_that_takes_a_series_of_pin_hits>())
-			.Using<IGameExpectations, expectations_for_valid_games>()
-			.When("I store the game's nick name", (subject, context) => subject.StoreNickName(context.Values.nickName))
-			.Then("I should be able to retrieve the game's nick name", (s, r, v) => s.GetNickName().should_be_equal_to(v.nickName));
+		public Scenario I_shouldnt_be_able_to_bowl_when_the_game_is_over = Proved.By<IGameExpectations, games_with_too_many_throws>()
+			.Given<GameScorer, a_game_scorer_that_takes_a_series_of_pin_hits>()
+			.When("I score an invalid game", (game_scorer, example) => game_scorer.ScoreGame())
+			.ShouldThrow<ArgumentException>()
+			.WithMessage("Too many throws");
 	}
 
 	// this context takes IGameExpectations as it's values, so can take many providers
@@ -65,28 +54,28 @@ namespace BowlingScores {
 	}
 
 	// one provider of values/expectations
-	internal class expectations_for_valid_games : IGameExpectations, IProvide<IGameExpectations> {
+	internal class valid_games : IGameExpectations, IProvide<IGameExpectations> {
 		public int finalScore { get; set; }
 		public string nickName { get; set; }
 		public int[] pinHits { get; set; }
 
-		private static readonly expectations_for_valid_games[] values = new[] {
-			new expectations_for_valid_games {
+		private static readonly valid_games[] values = new[] {
+			new valid_games {
 				nickName = "Gutter game", finalScore = 0, pinHits = new[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 			},
-			new expectations_for_valid_games {
+			new valid_games {
 				nickName = "One spare", finalScore = 29, pinHits = new[] {3, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0}
 			},
-			new expectations_for_valid_games {
+			new valid_games {
 				nickName = "All spares", finalScore = 110, pinHits = new[] {1, 9, 1, 9, 1, 9, 1, 9, 1, 9, 1, 9, 1, 9, 1, 9, 1, 9, 1, 9, 1}
 			},
-			new expectations_for_valid_games {
+			new valid_games {
 				nickName = "Beginner's game", finalScore = 43, pinHits = new[] {2, 7, 1, 5, 1, 1, 1, 3, 1, 1, 1, 4, 1, 1, 1, 1, 8, 1, 1, 1, 0}
 			},
-			new expectations_for_valid_games {
+			new valid_games {
 				nickName = "Another beginner's game", finalScore = 40, pinHits = new[] {2, 7, 3, 4, 1, 1, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 5, 1}
 			},
-			new expectations_for_valid_games {
+			new valid_games {
 				nickName = "All Strikes", finalScore = 300, pinHits = new[] {10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10}
 			}
 		};
@@ -99,13 +88,13 @@ namespace BowlingScores {
 	}
 
 	// a different, but compatible provider of values/expectations
-	internal class values_for_a_game_with_too_many_throws : IGameExpectations, IProvide<IGameExpectations> {
+	internal class games_with_too_many_throws : IGameExpectations, IProvide<IGameExpectations> {
 		public int finalScore { get; set; }
 		public string nickName { get; set; }
 		public int[] pinHits { get; set; }
 
-		private static readonly values_for_a_game_with_too_many_throws[] values = new[] {
-			new values_for_a_game_with_too_many_throws {
+		private static readonly games_with_too_many_throws[] values = new[] {
+			new games_with_too_many_throws {
 				nickName = "Too many throws", finalScore = 0, pinHits = new[] {3, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 5, 5, 5}
 			}
 		};
