@@ -13,25 +13,23 @@ using UsageExample;
 
 // The bowling scores example from SpecFlow
 namespace BowlingScores {
-	[Behaviour("Score calculation",
-		"In order to know my performance",
-		"As a player",
-		"I want the system to calculate my total score")]
+	[Behaviour("Score calculation")]
 	class ScoringConcerns : Behaviours {
 		public Scenario scoring_for_a_series_of_games_played = Proved.By<IGameExpectations, valid_games>()
-			.Given<GameScorer, a_game_scorer_that_takes_a_series_of_pin_hits>()
-			.When("I score a valid game", (game_scorer, example) => game_scorer.ScoreGame())
-			.Then("I should get a final score", (game_scorer, result, values) => result.should_be_equal_to(values.finalScore));
+			.Given<GameScorer, that_takes_a_series_of_pin_hits>()
+			.When("I score a valid game",			(game_scorer, example) => game_scorer.ScoreGame())
+			.Then("I should get a final score",		(game_scorer, result, values) => result.should_be_equal_to(values.finalScore));
+
 
 		public Scenario I_shouldnt_be_able_to_bowl_when_the_game_is_over = Proved.By<IGameExpectations, games_with_too_many_throws>()
-			.Given<GameScorer, a_game_scorer_that_takes_a_series_of_pin_hits>()
-			.When("I score an invalid game", (game_scorer, example) => game_scorer.ScoreGame())
+			.Given<GameScorer, that_takes_a_series_of_pin_hits>()
+			.When("I score an invalid game",		(game_scorer, example) => game_scorer.ScoreGame())
 			.ShouldThrow<ArgumentException>()
 			.WithMessage("Too many throws");
 	}
 
 	// this context takes IGameExpectations as it's values, so can take many providers
-	internal class a_game_scorer_that_takes_a_series_of_pin_hits : Context<GameScorer>, IUse<IGameExpectations> {
+	internal class that_takes_a_series_of_pin_hits : Context<GameScorer>, IUse<IGameExpectations> {
 		public IGameExpectations Values { get; set; }
 
 		public override void SetupContext () {
