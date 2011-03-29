@@ -56,6 +56,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Experimental\SmartAssertions.cs" />
     <Compile Include="Implementations\Calculator.cs" />
     <Compile Include="AdvancedExamples\InvariantMethods.cs" />
     <Compile Include="ManyExampleConcerns.cs" />
@@ -66,7 +67,7 @@
     <Compile Include="Implementations\GameScorer.cs" />
     <Compile Include="FeatureSpecification.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Experimental\SmartAssertions.cs" />
+    <Compile Include="Experimental\SmartAssertionsTests.cs" />
     <Compile Include="TearDown.cs" />
   </ItemGroup>
   <ItemGroup>

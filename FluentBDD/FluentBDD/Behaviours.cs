@@ -20,6 +20,12 @@ namespace FluentBDD {
 			}
 		}
 
+		public static Provable<TExampleType, TExampleSource> ProvedBy<TExampleType, TExampleSource> ()
+			where TExampleSource : class, TExampleType, IProvide<TExampleType>, new()
+			where TExampleType : class {
+			return new Provable<TExampleType, TExampleSource>();
+		}
+
 		public static ScenarioBuilder<no_subject> GivenNoSubject () {
 			return Given<no_subject>(Context.Of<no_subject>);
 		}

@@ -94,19 +94,6 @@ namespace FluentBDD {
 		#endregion
 
 		#region THENs
-
-		public Scenario<TSubject, TResult> Then_ (string description, Func<SmartAssertions<TSubject, TResult, no_values>, Action<TSubject, TResult>> theTest) {
-			subjectAndResultTests.Add(new Group<string, Action<TSubject, TResult>>
-				(description, theTest(new SmartAssertions<TSubject, TResult, no_values>())));
-			return this;
-		}
-		public Scenario<TSubject, TResult> Then_ (string description, Func<SmartAssertions<TSubject, TResult, no_values>, Action<TSubject>> theTest) {
-			subjectOnlyTests.Add(new Group<string, Action<TSubject>>
-				(description, theTest(new SmartAssertions<TSubject, TResult, no_values>())));
-			return this;
-		}
-
-
 		public Scenario<TSubject, TResult> Then (string description, Action<TSubject> subjectOnlyTest) {
 			subjectOnlyTests.Add(new Group<string, Action<TSubject>>(description, subjectOnlyTest));
 			return this;
@@ -268,14 +255,6 @@ namespace FluentBDD {
 		#endregion
 
 		#region THENs
-
-		public Scenario<TSubject, TResult> Then_ (string description, Func<SmartAssertions<TSubject, TResult, TExampleSource>, Action<TSubject, TResult, TExampleSource>> theTest) {
-			subjectAndResultAndExampleTests.Add(new Group<string, Action<TSubject, TResult, TExampleSource>>
-				(description, theTest(new SmartAssertions<TSubject, TResult, TExampleSource>())));
-			return this;
-		}
-
-
 		public ScenarioWithExamples<TSubject, TResult, TExampleType, TExampleSource> Then (string description, Action<TSubject, TResult, TExampleSource> subjectAndResultAndExampleTest) {
 			subjectAndResultAndExampleTests.Add(new Group<string, Action<TSubject, TResult, TExampleSource>>(description, subjectAndResultAndExampleTest));
 			return this;

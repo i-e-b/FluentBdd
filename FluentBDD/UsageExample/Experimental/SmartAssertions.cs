@@ -1,201 +1,210 @@
-﻿using FluentBDD;
+﻿using System;
+using NUnit.Framework;
 
-namespace UsageExample {
-	/// <summary>
-	/// Concept: have a sub-interface on "Then" that hides the need to have
-	/// a big (subject, result, values) lambda expression, and that means
-	/// you don't get a ton of assertion extension methods messing up intellisense.
-	/// </summary>
-	[Behaviour("Smart assertions")]
-	public class SmartAssertions : Behaviours {
-
-		// no expectations
-		public Scenario test1 =
-			Given(() => Context.Of<a_thing>())
-				.When("I return 10", o => 10)
-				.Then_("the result should be 10", the => the.result.should.equal(10))
-				.Then_("the result should not be 11", the => the.result.should.not.equal(11));
-
-		public Scenario test2 =
-			Given(() => Context.Of<a_dto>())
-				.When("I do nothing", o => { })
-				.Then_("the DTO should be storing 'booga'", _ => _.subject(s => s.storedString).should.equal("booga"));
-
-		// using expectations
-		public Scenario test3 =
-			Given(() => Context.Of<a_dto>())
-				.When("I return 'wogga'", o => "wogga")
-				.Using<some_expectations>()
-				.Then_("the returned string should be the same as expectation", _ => _.result.should.match.expectation(v => v.aValue));
-
-		public Scenario test4 =
-			Given(() => Context.Of<a_dto>())
-				.When("I do nothing", o => { })
-				.Using<some_expectations>()
-				.Then_("the DTO should be storing different string to expectation", _ => _.subject(s => s.storedString).should.not.match.expectation(v => v.aValue));
-
-		// comparing result to subject
-		public Scenario test5 =
-			Given(() => Context.Of<a_dto>())
-				.When("I return 'booga'", o => "booga")
-				.Then_("the DTO should be same as result", _ => _.result.should.match.subject(s => s.storedString));
-
-		public Scenario test6 =
-			Given(() => Context.Of<a_dto>())
-				.Using<some_expectations>()
-				.When("I return 'wogga'", (o, e) => e.Values.aValue)
-				.Then_("the DTO should be storing different string to result", _ => _.result.should.not.match.subject(s => s.storedString));
-
-		// comparing subject to subject
-		public Scenario test7 =
-			Given(() => Context.Of<a_dto>())
-				.When("I return 'booga'", o => "booga")
-				.Then_("subject string should be equal to itself", _ => _.subject(s => s.storedString).should.match.subject(s => s.storedString));
-
-		public Scenario test8 =
-			Given(() => Context.Of<a_dto>())
-				.Using<some_expectations>()
-				.When("I return 'wogga'", (o, e) => e.Values.aValue)
-				.Then_("subject string should be equal to itself", _ => _.subject(s => s.storedString).should.match.subject(s => s.storedString));
-
-
-		// note: there is not "expectation.should..." on purpose. We don't test our expectations!
-
-		// ignore
-		public Scenario test9 =
-			Given(() => Context.Of<a_thing>())
-				.When("ignoring test", o => { })
-				.Then_("should be ignored", it => it.should_be_ignored);
-
-		// true/false result
-		public Scenario test10 =
-			Given(() => Context.Of<a_thing>())
-				.When("testing result for true", o => true)
-				.Then_("should be true", the => the.result.should.be._true);
-
-		public Scenario test11 =
-			Given(() => Context.Of<a_thing>())
-				.When("testing result for true", o => true)
-				.Then_("should not be false", the => the.result.should.not.be._false);
-
-		// true/false subject
-		public Scenario test12 =
-			Given(() => Context.Of<a_dto>())
-				.When("testing subject for true", o => { o.boolValue = true; })
-				.Then_("should be true", the => the.subject(s => s.boolValue).should.be._true);
-
-		public Scenario test13 =
-			Given(() => Context.Of<a_dto>())
-				.When("testing result for true", o => { o.boolValue = true; })
-				.Then_("should be true", the => the.subject(s => s.boolValue).should.not.be._false);
-
-		// same as: result->value
-		private const string a_string = "Hello!";
-		public Scenario test14 =
-			Given(() => Context.Of<a_dto>())
-				.When("testing result with same instance", o => a_string)
-				.Then_("should be same instance", the => the.result.should.be.the_same._as(a_string));
-
-		// same as: result->expectation
-		public Scenario test15 =
-			Given(() => Context.Of<a_dto>())
-				.Using<some_expectations>()
-				.When("testing result with same instance", (o, e) => e.Values.aValue)
-				.Then_("should be same instance", the => the.result.should.be.the_same.as_expectation(e => e.aValue));
-		public Scenario test16 =
-			Given(() => Context.Of<a_dto>())
-				.Using<some_expectations>()
-				.When("testing result with different instance", (o, e) => a_string)
-				.Then_("should not be same instance", the => the.result.should.not.be.the_same.as_expectation(e => e.aValue));
-
-		// same as: result->subject
-		public Scenario test17 =
-			Given(() => Context.Of<a_dto>())
-				.When("testing result with same instance", s => s.storedString)
-				.Then_("should be same instance", the => the.result.should.be.the_same.as_subject(s => s.storedString));
-
-		// same as: subject->value
-		public Scenario test18 =
-			Given(() => Context.Of<a_dto>())
-				.When("testing result with same instance injected into subject", o => { o.objectValue = a_string; })
-				.Then_("should be same instance", the => the.subject(s=>s.objectValue).should.be.the_same._as(a_string));
-
-		// same as: subject->expectation
-		public Scenario test19 =
-			Given(() => Context.Of<a_dto>())
-				.When("testing result with different instance", o => o.storedString = a_string)
-				.Using<some_expectations>()
-				.Then_("should not be same instance", the => the.subject(s=>s.storedString).should.not.be.the_same.as_expectation(e=>e.aValue));
-
-		// same as: subject->subject
-		public Scenario test20 =
-			Given(() => Context.Of<a_dto>())
-				.When("testing string against itself", o => o.storedString = a_string)
-				.Using<some_expectations>()
-				.Then_("should be same instance", the => the.subject(s=>s.storedString).should.be.the_same.as_subject(s=>s.storedString));
-
-		// Try this syntax? (first with auto description, second without)
-		//      .Then().subject(s=>s.storedString).should.be.the_same.as_subject(s=>s.storedString);
-		// or   .Then("should be same instance").subject(s=>s.storedString).should.be.the_same.as_subject(s=>s.storedString)
-		// smart assertion is given the source scenario, and passes it back from assertion methods.
-		// build a set of description, expected lambda, actual lambda, assertion.
-
-
-		// greater than: result->value
-		// greater than: result->expectation
-		// greater than: result->subject
-		// greater than: subject->value
-		// greater than: subject->expectation
-		// greater than: subject->subject
-
-		// greater or equal: result->value
-		// greater or equal: result->expectation
-		// greater or equal: result->subject
-		// greater or equal: subject->value
-		// greater or equal: subject->expectation
-		// greater or equal: subject->subject
-
-
-		// todo: all the other assertions in old-style assertions.
-		// ignore, be true, be false, be same as, greater than, greater or equal to,
-		// less than, less or equal to, be null, empty (string), 
-		// instance of <T>, instance of (Type), contain (string), contain (enumerable->object),
-		// contain (enumerable-> (T->bool)), contain same elements as (enumerable->enumerable),
-		// contain same sequence as (enumerable->enumerable), 
-	}
-
-
-	public class some_expectations : IProvide<some_expectations> {
-		public string aValue;
-
-		public some_expectations[] Data () {
-			return new[] {
-				new some_expectations {aValue = "wogga"}
-			};
+// Older style, function generating "Smart Assertions".
+// To be replaced with a subfluent interface.
+namespace FluentBDD {
+	public static class SmartAssertionExtensions {
+		public static Scenario<TSubject, TResult> Then<TSubject, TResult> (this Scenario<TSubject, TResult> source, string description, Func<SmartAssertions<TSubject, TResult, no_values>, Action<TSubject, TResult>> theTest) {
+			return source.Then(description, theTest(new SmartAssertions<TSubject, TResult, no_values>()));
 		}
+		public static Scenario<TSubject, TResult> Then<TSubject, TResult> (this Scenario<TSubject, TResult> source, string description, Func<SmartAssertions<TSubject, TResult, no_values>, Action<TSubject>> theTest) {
+			return source.Then(description, theTest(new SmartAssertions<TSubject, TResult, no_values>()));
+		}
+		
 
-		public string StringRepresentation () {
-			return "string = " + aValue;
+		public static ScenarioWithExamples<TSubject, TResult, TExampleType, TExampleSource> Then<TSubject, TResult, TExampleType, TExampleSource>
+			(this ScenarioWithExamples<TSubject, TResult, TExampleType, TExampleSource> source, string description, Func<SmartAssertions<TSubject, TResult, TExampleSource>, Action<TSubject, TResult, TExampleSource>> theTest) where TExampleSource : class, TExampleType, IProvide<TExampleType>, new() {
+
+			return source.Then(description, theTest(new SmartAssertions<TSubject, TResult, TExampleSource>()));
 		}
 	}
+	
+	public class SmartAssertions<TSubject, TResult, TExpectations> {
 
-	public class a_dto : Context<DtoThing>, IUse<some_expectations> {
-		public some_expectations Values { get; set; }
-		public override void SetupContext () {
-			Given("a DTO object", () => new DtoThing())
-				.And("I store 'booga' in it", dto => dto.storedString = "booga");
+		private static bool AsBool (object thing) {
+			var asbool = thing as bool?;
+			if (!asbool.HasValue) throw new ArgumentException("Can't cast from " + thing.GetType().Name + " to bool");
+			return asbool.Value;
 		}
-	}
 
-	public class DtoThing {
-		public object objectValue;
-		public string storedString;
-		public bool boolValue;
-	}
-
-	public class a_thing : Context<object> {
-		public override void SetupContext () {
-			Given("an object", () => new object());
+		public Subject subject (Func<TSubject, object> getFromSubject) {
+			return new Subject(getFromSubject);
 		}
+
+		public Result result { get { return new Result(); } }
+
+		public Action<TSubject> should_be_ignored {
+			get { return subject => Assert.Ignore(); }
+		}
+
+		public class Subject : IAssertWithSubject, IMatch, IAm_Subject, IAmSameAs_Subject {
+			private readonly Func<TSubject, object> getFromSubject;
+			private bool invert;
+
+			public IAssertWithSubject should { get { return this; } }
+
+			public Subject (Func<TSubject, object> getFromSubject) {
+				this.getFromSubject = getFromSubject;
+			}
+
+			IAssertWithSubject IAssertWithSubject.not { get { invert = true; return this; } }
+			IAm_Subject IAssertWithSubject.be { get { return this; } }
+
+			Action<TSubject> IAm_Subject._true {
+				get {
+					if (invert) return subject => Assert.That(AsBool(getFromSubject(subject)), Is.False);
+					return subject => Assert.That(AsBool(getFromSubject(subject)), Is.True);
+				}
+			}
+
+			Action<TSubject> IAm_Subject._false {
+				get {
+					invert = !invert;
+					return (this as IAm_Subject)._true;
+				}
+			}
+
+			Action<TSubject> IAssertWithSubject.equal (object value) {
+				if (invert) return subject => Assert.That(getFromSubject(subject), Is.Not.EqualTo(value));
+				return subject => Assert.That(getFromSubject(subject), Is.EqualTo(value));
+			}
+
+			IMatch IAssertWithSubject.match { get { return this; } }
+
+			Action<TSubject, TResult, TExpectations> IMatch.expectation (Func<TExpectations, object> valuesTest) {
+				if (invert) return (subject, result, values) => Assert.That(getFromSubject(subject), Is.Not.EqualTo(valuesTest(values)));
+				return (subject, result, values) => Assert.That(getFromSubject(subject), Is.EqualTo(valuesTest(values)));
+			}
+
+
+			Action<TSubject, TResult> IMatch.subject (Func<TSubject, object> valuesTest) {
+				return (subject,result) => TestSubjectAgainstSubject(valuesTest, Assert.AreEqual, Assert.AreNotEqual)(subject);
+			}
+
+			private Action<TSubject> TestSubjectAgainstValue(object value, Action<object, object> forwardTest, Action<object, object> inverseTest) {
+				if (invert) return subject => inverseTest(getFromSubject(subject), value);
+				return subject => forwardTest(getFromSubject(subject), value);
+			}
+			private Action<TSubject> TestSubjectAgainstSubject(Func<TSubject, object> valuesTest, Action<object, object> forwardTest, Action<object, object> inverseTest) {
+				if (invert) return subject => inverseTest(getFromSubject(subject), valuesTest(subject));
+				return subject => forwardTest(getFromSubject(subject), valuesTest(subject));
+			}
+			private Action<TSubject, TResult, TExpectations> TestSubjectAgainstExpectations(Func<TExpectations, TResult> valuesTest, Action<object, object> forwardTest, Action<object, object> inverseTest) {
+				if (invert) return (subject, result, values) => inverseTest(getFromSubject(subject), valuesTest(values));
+				return (subject, result, values) => forwardTest(getFromSubject(subject), valuesTest(values));
+			}
+
+			IAmSameAs_Subject IAm_Subject.the_same { get { return this; } }
+
+			Action<TSubject> IAmSameAs_Subject._as (object value) {
+				return TestSubjectAgainstValue(value, Assert.AreSame, Assert.AreNotSame);
+			}
+
+			Action<TSubject, TResult, TExpectations> IAmSameAs_Subject.as_expectation (Func<TExpectations, TResult> valuesTest) {
+				return TestSubjectAgainstExpectations(valuesTest, Assert.AreSame, Assert.AreNotSame);
+			}
+
+			Action<TSubject> IAmSameAs_Subject.as_subject (Func<TSubject, object> valuesTest) {
+				return TestSubjectAgainstSubject(valuesTest, Assert.AreSame, Assert.AreNotSame);
+			}
+		}
+		public class Result : IAssertWithSubjectAndResult, IMatch, IAm_Result, IAmSameAs_Result {
+			private bool invert;
+
+			public IAssertWithSubjectAndResult should {get { return this; }}
+			IMatch IAssertWithSubjectAndResult.match { get { return this; } }
+			IAssertWithSubjectAndResult IAssertWithSubjectAndResult.not {get {invert = true;return this;}}
+			IAm_Result IAssertWithSubjectAndResult.be { get { return this; } }
+			IAmSameAs_Result IAm_Result.the_same { get { return this; } }
+
+				Action<TSubject, TResult> IAm_Result._true {
+				get {
+					if (!(typeof(bool).IsAssignableFrom(typeof(TResult))))
+						throw new ArgumentException("Can't cast from " + typeof(TResult).Name + " to bool");
+
+					if (invert) return (subject, result) => Assert.That(AsBool(result), Is.False);
+					return (subject, result) => Assert.That(AsBool(result), Is.True);
+				}
+			}
+			Action<TSubject, TResult> IAm_Result._false {
+				get {
+					invert = !invert;
+					return (this as IAm_Result)._true;
+				}
+			}
+
+			Action<TSubject, TResult> IAssertWithSubjectAndResult.equal (TResult value) {
+				if (invert) return (subject, result) => Assert.That(result, Is.Not.EqualTo(value));
+				return (subject, result) => Assert.That(result, Is.EqualTo(value));
+			}
+
+			Action<TSubject, TResult, TExpectations> IMatch.expectation (Func<TExpectations, object> valuesTest) {
+				if (invert) return (subject, result, values) => Assert.That(result, Is.Not.EqualTo(valuesTest(values)));
+				return (subject, result, values) => Assert.That(result, Is.EqualTo(valuesTest(values)));
+			}
+
+			Action<TSubject, TResult> IMatch.subject (Func<TSubject, object> valuesTest) {
+				if (invert) return (subject, result) => Assert.That(result, Is.Not.EqualTo(valuesTest(subject)));
+				return (subject, result) => Assert.That(result, Is.EqualTo(valuesTest(subject)));
+			}
+
+
+			Action<TSubject, TResult> IAmSameAs_Result._as (TResult value) {
+				if (invert) return (subject, result) => Assert.That(result, Is.Not.SameAs(value));
+				return (subject, result) => Assert.That(result, Is.EqualTo(value));
+			}
+
+			Action<TSubject, TResult, TExpectations> IAmSameAs_Result.as_expectation (Func<TExpectations, TResult> valuesTest) {
+				if (invert) return (subject, result, values) => Assert.That(result, Is.Not.EqualTo(valuesTest(values)));
+				return (subject, result, values) => Assert.That(result, Is.EqualTo(valuesTest(values)));
+			}
+
+			Action<TSubject, TResult> IAmSameAs_Result.as_subject (Func<TSubject, TResult> valuesTest) {
+				if (invert) return (subject, result) => Assert.That(result, Is.Not.EqualTo(valuesTest(subject)));
+				return (subject, result) => Assert.That(result, Is.EqualTo(valuesTest(subject)));
+			}
+		}
+
+		public interface IMatch {
+			Action<TSubject, TResult, TExpectations> expectation (Func<TExpectations, object> valuesTest);
+			Action<TSubject, TResult> subject (Func<TSubject, object> func);
+		}
+
+		public interface IAssertWithSubject {
+			IMatch match { get; }
+			IAssertWithSubject not { get; }
+			IAm_Subject be { get; }
+			Action<TSubject> equal (object value);
+		}
+		public interface IAm_Subject {
+			Action<TSubject> _true { get; }
+			Action<TSubject> _false { get; }
+			IAmSameAs_Subject the_same { get; }
+		}
+		public interface IAmSameAs_Subject {
+			Action<TSubject> _as (object value);
+			Action<TSubject, TResult, TExpectations> as_expectation (Func<TExpectations, TResult> valuesTest);
+			Action<TSubject> as_subject(Func<TSubject, object> valuesTest);
+		}
+
+		public interface IAssertWithSubjectAndResult {
+			IMatch match { get; }
+			IAssertWithSubjectAndResult not { get; }
+			IAm_Result be { get; }
+			Action<TSubject, TResult> equal (TResult value);
+		}
+		public interface IAm_Result {
+			Action<TSubject, TResult> _true { get; }
+			Action<TSubject, TResult> _false { get; }
+			IAmSameAs_Result the_same { get; }
+		}
+		public interface IAmSameAs_Result {
+			Action<TSubject, TResult> _as(TResult value);
+			Action<TSubject, TResult, TExpectations> as_expectation(Func<TExpectations, TResult> valuesTest);
+			Action<TSubject, TResult> as_subject(Func<TSubject, TResult> valuesTest);
+		}
+
 	}
+
 }
