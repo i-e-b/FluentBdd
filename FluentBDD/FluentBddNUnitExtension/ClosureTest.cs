@@ -44,6 +44,10 @@ namespace FluentBddNUnitExtension {
 			return result;
 		}
 
+		public override string TestType {
+			get { return "Test"; }
+		}
+
 		private void TestNonExceptionCondition(TestResult result) {
 			if (! TestShouldThrowException()) result.Success();
 			else result.Failure("The scenario did not throw an exception", "");
