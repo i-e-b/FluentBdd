@@ -21,6 +21,9 @@ To install:
    
 If you user TestRunner.Net, remember to update it's own copy of NUnit
 (usually at "C:\Program Files (x86)\TestDriven.NET 3\NUnit\2.5"  or similar)
+
+There is an aggressive and experimental powershell script "Install.ps1" which will attempt to 
+build and install FluentBDD into every copy of NUnit in your Program Files folders.
    
 To use:
 -------

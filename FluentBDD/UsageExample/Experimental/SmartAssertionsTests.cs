@@ -1,6 +1,6 @@
 ﻿using FluentBDD;
 
-namespace UsageExample {
+namespace UsageExample.Experimental {
 	/// <summary>
 	/// Concept: have a sub-interface on "Then" that hides the need to have
 	/// a big (subject, result, values) lambda expression, and that means
@@ -162,8 +162,22 @@ namespace UsageExample {
 		// instance of <T>, instance of (Type), contain (string), contain (enumerable->object),
 		// contain (enumerable-> (T->bool)), contain same elements as (enumerable->enumerable),
 		// contain same sequence as (enumerable->enumerable), 
+
+
+
 	}
 
+	/// <summary>
+	/// An attempt at a newer version of the above
+	/// </summary>
+	[Behaviour("Fluent assertions")]
+	public class FluentAssertions : Behaviours {
+		/*public Scenario noProof1 =
+			Given(() => Context.Of<a_dto>())
+				.When("doing stuff", s => s.objectValue)
+				.Then_("should get something").result.should.Not.EqualTo(0).match.subject(s => s.storedString));*/
+
+	}
 
 	public class some_expectations : IProvide<some_expectations> {
 		public string aValue;
