@@ -4,7 +4,6 @@ using FluentBDD;
 namespace Advanced.UsageExample {
 	[Behaviour("Exceptions in expectations")]
 	class ExceptionsInExpectations : Behaviours {
-
 		public Scenario a_load_of_different_exceptions =
 			Given(() => Context.Of<an_exception_throwing_class>())
 				.When("I cause an exception", s => s.ThrowException())
@@ -16,7 +15,9 @@ namespace Advanced.UsageExample {
 		public exception_expectations Values { get; set; }
 
 		public override void SetupContext() {
-			Given("an exception throwing class", () => new ExceptionThrowingClass(Values.ExceptionNumber));
+			Given("an exception throwing class", () => {
+				Console.WriteLine ("Creating "+Values.ExceptionNumber+", "+Values.ExpectedException.GetType()+", "+Values.ExpectedException.Message);
+				return new ExceptionThrowingClass(Values.ExceptionNumber);});
 		}
 	}
 
@@ -24,17 +25,19 @@ namespace Advanced.UsageExample {
 		public int ExceptionNumber;
 		public Exception ExpectedException;
 
-		private static readonly exception_expectations[] values = new[] {
-			new exception_expectations {ExceptionNumber = 0, ExpectedException = new Exception("Hello")},
+		public exception_expectations[] Data() {
+			return new[] {
 			new exception_expectations {ExceptionNumber = 1, ExpectedException = new Exception("")},
 			new exception_expectations {ExceptionNumber = 2, ExpectedException = new ArgumentException("")},
-			new exception_expectations {ExceptionNumber = 3, ExpectedException = new ArgumentException("Booyah!")}
+			new exception_expectations {ExceptionNumber = 4, ExpectedException = new ArgumentException("Other message")},
+			new exception_expectations {ExceptionNumber = 3, ExpectedException = new ArgumentException("Booyah!")},
+			new exception_expectations {ExceptionNumber = 0, ExpectedException = new Exception("Hello")}
 		};
-
-		public exception_expectations[] Data() {
-			return values;
 		}
 
+		public override string ToString () {
+			return StringRepresentation();
+		}
 		public string StringRepresentation() {
 			return "[" + ExceptionNumber + "] = " + ExpectedException.GetType() + ", \"" + ExpectedException.Message + "\"";
 		}
@@ -53,6 +56,7 @@ namespace Advanced.UsageExample {
 				case 1: throw new Exception("Disregard this message!");
 				case 2: throw new ArgumentException("Disregard this message!");
 				case 3: throw new ArgumentException("Booyah!");
+				case 4: throw new ArgumentException("Other message");
 			}
 		}
 	}

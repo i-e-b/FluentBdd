@@ -48,17 +48,19 @@ namespace FluentBDD {
 			if (CoveringTypes == null || CoveringTypes.Count < 1) throw new InconclusiveException("No coverages defined");
 
 			var isOk = true;
+			var message = "???";
 			foreach (var coveringType in CoveringTypes) {
 				var featureAttribCount = coveringType.GetCustomAttributes(typeof (BehaviourAttribute), false).Length;
+				featureAttribCount += coveringType.GetCustomAttributes(typeof (FeatureAttribute), false).Length;
 				
 				if (featureAttribCount == 1) {
-					Console.WriteLine(coveringType.FullName + " is a behaviour set [OK]");
+					message = coveringType.FullName + " is a behaviour or feature set [OK]";
 				} else {
 					isOk = false;
-					Console.WriteLine(coveringType.FullName + " is not a behaviour set [FAIL]");
+					message = coveringType.FullName + " is not a behaviour or feature set [FAIL]";
 				}
 			}
-			Assert.AreEqual(true, isOk);
+			Assert.AreEqual(true, isOk, message);
 		}
 		#endregion
 

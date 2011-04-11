@@ -148,7 +148,7 @@ namespace FluentBDD {
 										var subject = context.SetupAndReturnContextBuilder().Build();
 			                      		scenarioAction(subject, context);
 			                      		test.B(subject);
-									}, expectedExceptionType, expectedExceptionMessage,
+									}, () => expectedExceptionType, () => expectedExceptionMessage,
 									() => contextSource().TearDown()
 									));
 
@@ -162,7 +162,7 @@ namespace FluentBDD {
 										var context = contextSource();
 										var subject = context.SetupAndReturnContextBuilder().Build();
 										test.B(subject, scenarioAction(subject, context));
-									}, expectedExceptionType, expectedExceptionMessage,
+									}, () => expectedExceptionType, () => expectedExceptionMessage,
 									() => contextSource().TearDown()));
 
 			return testClosures;
@@ -329,7 +329,7 @@ namespace FluentBDD {
 
 			//1
 			testClosures.AddRange(from test in subjectOnlyTests
-								  from tuple in BuildSubjectsWithExamples().Take(1)
+								  from tuple in BuildSubjectsWithExamples()
 			                      select new TestClosure(
 									"Given " + GetLambdaBuilderDescription(tuple.A),
 									"When " + Description, "Then " + test.A,
@@ -339,7 +339,7 @@ namespace FluentBDD {
 										var subject = context.SetupAndReturnContextBuilder().Build();
 			                      		scenarioAction(subject, context);
 			                      		test.B(subject);
-			                      	}, expectedExceptionType, expectedExceptionMessage,
+			                      	}, () => expectedExceptionType, () => expectedExceptionMessage,
 									() => GetContext(tuple).TearDown()));
 
 			//2
@@ -353,7 +353,7 @@ namespace FluentBDD {
 										var context = GetContext(tuple);
 										var subject = context.SetupAndReturnContextBuilder().Build();
 			                      		test.B(subject, scenarioAction(subject, context));
-									}, expectedExceptionType, expectedExceptionMessage,
+									}, () => expectedExceptionType, () => expectedExceptionMessage,
 									() => GetContext(tuple).TearDown()));
 
 			//3
@@ -370,7 +370,7 @@ namespace FluentBDD {
 										var example = ((IUse<TExampleType>)context).Values;
 			                      		var result = scenarioAction(subject, context);
 										test.B(subject, result, example as TExampleSource);
-									}, expectedExceptionType, expectedExceptionMessage,
+									}, () => expectedExceptionType, () => expectedExceptionMessage,
 									() => GetContext(tuple).TearDown()));
 
 			
@@ -388,7 +388,7 @@ namespace FluentBDD {
 										var example = ((IUse<TExampleType>)context).Values;
 			                      		scenarioAction(subject, context);
 										test.B(subject, example as TExampleSource);
-									}, expectedExceptionType, expectedExceptionMessage,
+									}, () => expectedExceptionType, () => expectedExceptionMessage,
 									() => GetContext(tuple).TearDown()));
 
 			//5: Tests for exceptions matching an example exception
@@ -401,11 +401,13 @@ namespace FluentBDD {
 									() =>
 									{
 										var context = GetContext(tuple);
-			                      		var subject = context.SetupAndReturnContextBuilder().Build();
+										var subject = context.SetupAndReturnContextBuilder().Build();
+										var example = ((IUse<TExampleType>)context).Values;
 			                      		scenarioAction(subject, context);
+										test.B(example as TExampleSource);
 			                      	},
-			                      	GetExceptionResultType(tuple, test),
-			                      	GetExceptionMessage(tuple, test),
+			                      	() => GetExceptionResultType(tuple, test),
+			                      	() => GetExceptionMessage(tuple, test),
 									() => GetContext(tuple).TearDown()
 			                      	));
 
@@ -414,27 +416,23 @@ namespace FluentBDD {
 		}
 
 		private Context<TSubject> GetContext(Group<Func<Context<TSubject>>, IProvide<TExampleType>> tuple) {
-			return tuple._1<Func<Context<TSubject>>>()();
+			return tuple._1<Func<Context<TSubject>>>().Invoke();
 		}
-
-		private Type GetExceptionResultType (Group<Func<Context<TSubject>>, IProvide<TExampleType>> tuple, Group<string, Func<TExampleType, Exception>> test) {
-			var context = tuple._1<Func<Context<TSubject>>>()();
+		private Exception GetException(Group<Func<Context<TSubject>>, IProvide<TExampleType>> tuple, Group<string, Func<TExampleType, Exception>> test) {
+			var context = tuple._1<Func<Context<TSubject>>>().Invoke();
 			var example = ((IUse<TExampleType>)context).Values;
-			return test.B(example as TExampleSource).GetType();
+			return test.B(example as TExampleSource);	
+		}
+		private Type GetExceptionResultType (Group<Func<Context<TSubject>>, IProvide<TExampleType>> tuple, Group<string, Func<TExampleType, Exception>> test) {
+			return GetException(tuple, test).GetType();
 		}
 		private string GetExceptionMessage (Group<Func<Context<TSubject>>, IProvide<TExampleType>> tuple, Group<string, Func<TExampleType, Exception>> test) {
-			var context = tuple._1<Func<Context<TSubject>>>()();
-			var example = ((IUse<TExampleType>)context).Values;
-			var message = test.B(example as TExampleSource).Message;
-
+			var message = GetException(tuple, test).Message;
 			if (string.IsNullOrEmpty(message)) return null;
 			return message;
 		}
 		private string GetWithExceptionName (Group<Func<Context<TSubject>>, IProvide<TExampleType>> tuple, Group<string, Func<TExampleType, Exception>> test) {
-			var context = tuple._1<Func<Context<TSubject>>>()();
-			var example = ((IUse<TExampleType>)context).Values;
-			var exception = test.B(example as TExampleSource);
-
+			var exception = GetException(tuple, test);
 			if (string.IsNullOrEmpty(exception.Message)) return "Of type " + exception.GetType() + ", ignoring message, with " + tuple._2<TExampleSource>().StringRepresentation();
 			return "Of type " + exception.GetType() + " and message \"" + exception.Message + "\", with " + tuple._2<TExampleSource>().StringRepresentation();
 		}
@@ -450,7 +448,10 @@ namespace FluentBDD {
 	}
 
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public class no_values {}
+	public class no_values : IProvide<no_values> {
+		public no_values[] Data(){return new no_values[]{};}
+		public string StringRepresentation(){return "### ERROR: use of expectation values but none provided ###";}
+	}
 
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public interface ITakeMessage {

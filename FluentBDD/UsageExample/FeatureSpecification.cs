@@ -69,4 +69,19 @@ namespace CustomerFeatures {
 					.CoveredBy<CalculatorConcerns.Subtraction>();
 
 	}
+	
+	[Feature("Drill down")]
+	public class drillDown:Feature {
+		public Feature drill_down = 
+			For("Programmers using FluentBDD")
+				.To("successfully practice outside-in development")
+				.Should("allow features to be covered by other features")
+				.CoveredBy<detailFeature>();
+	}
+	
+	[Feature("Detail features")]
+	public class detailFeature:Feature {}
+	[Behaviour("Dummy behaviour")]
+	public class dummyBehaviour: Behaviours{}
+	
 }

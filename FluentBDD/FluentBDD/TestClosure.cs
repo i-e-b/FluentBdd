@@ -11,8 +11,8 @@ namespace FluentBDD {
 			Then = then;
 			With = "";
 			TestMethod = testMethod;
-			ExpectedExceptionType = null;
-			ExpectedExceptionMessage = null;
+			ExpectedExceptionType = ()=>null;
+			ExpectedExceptionMessage = ()=>null;
 			TearDown = tearDown;
 		}
 
@@ -25,15 +25,15 @@ namespace FluentBDD {
 			Then = then;
 			With = with;
 			TestMethod = testMethod;
-			ExpectedExceptionType = null;
-			ExpectedExceptionMessage = null;
+			ExpectedExceptionType = ()=>null;
+			ExpectedExceptionMessage = ()=>null;
 			TearDown = tearDown;
 		}
 
 		/// <summary>
 		/// Create test for exceptions without expectation values
 		/// </summary>
-		public TestClosure (string given, string when, string then, Action testMethod, Type exception, string exceptionMessage, Action tearDown) {
+		public TestClosure (string given, string when, string then, Action testMethod, Func<Type> exception, Func<string> exceptionMessage, Action tearDown) {
 			Given = given;
 			When = when;
 			Then = then;
@@ -47,7 +47,7 @@ namespace FluentBDD {
 		/// <summary>
 		/// Create test for exceptions using expectation values
 		/// </summary>
-		public TestClosure (string given, string when, string then, string with, Action testMethod, Type exception, string exceptionMessage, Action tearDown) {
+		public TestClosure (string given, string when, string then, string with, Action testMethod, Func<Type> exception, Func<string> exceptionMessage, Action tearDown) {
 			Given = given;
 			When = when;
 			Then = then;
@@ -63,8 +63,8 @@ namespace FluentBDD {
 		public string Then;
 		public string With;
 		public Action TestMethod;
-		public Type ExpectedExceptionType;
-		public string ExpectedExceptionMessage;
+		public Func<Type> ExpectedExceptionType;
+		public Func<string> ExpectedExceptionMessage;
 		public Action TearDown;
 	}
 }

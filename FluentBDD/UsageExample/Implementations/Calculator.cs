@@ -31,6 +31,7 @@ namespace UsageExample {
 			stack.Push(i);
 		}
 		public int Add () {
+			if (stack.Count < 2) throw new InvalidOperationException("Stack empty.");
 			var r = doMath.Add(stack.Pop(), stack.Pop());
 			stack.Push(r);
 			return r;
@@ -40,6 +41,7 @@ namespace UsageExample {
 		}
 
 		public int Subtract () {
+			if (stack.Count < 2) throw new InvalidOperationException("Stack empty.");
 			var b = stack.Pop();
 			var a = stack.Pop();
 			var r = doMath.Subtract(a, b);

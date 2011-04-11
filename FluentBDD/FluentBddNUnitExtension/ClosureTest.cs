@@ -23,23 +23,25 @@ namespace FluentBddNUnitExtension {
 		public override TestResult Run(EventListener listener, ITestFilter filter) {
 			var result = new TestResult(this);
 
-			try {
-				testClosure.TestMethod();
-				TestNonExceptionCondition(result);
-			} catch (IgnoreException iex) {
-				result.Ignore(iex.Message);
-			} catch (InconclusiveException icex) {
-				result.Invalid(icex.Message);
-			} catch (Exception ex) {
-				TestExceptionCondition(result, ex);
+			lock (testClosure) {
+				try {
+					testClosure.TestMethod();
+					TestNonExceptionCondition(result);
+				} catch (IgnoreException iex) {
+					result.Ignore(iex.Message);
+				} catch (InconclusiveException icex) {
+					result.Invalid(icex.Message);
+				} catch (Exception ex) {
+					TestExceptionCondition(result, ex);
+				}
+	
+				try {
+					testClosure.TearDown();
+				} catch (Exception ex) {
+					result.Failure("Exception in tear-down: "+ex.Message, ex.StackTrace);
+				}
 			}
-
-			try {
-				testClosure.TearDown();
-			} catch (Exception ex) {
-				result.Failure("Exception in tear-down: "+ex.Message, ex.StackTrace);
-			}
-
+			
 			listener.TestFinished(result);
 			return result;
 		}
@@ -59,14 +61,14 @@ namespace FluentBddNUnitExtension {
 			} else {
 				if (! ThrownTypeMatchesExpectation(ex)) {
 					result.Failure("Expected exception type of "
-					               + testClosure.ExpectedExceptionType.Name
+					               + testClosure.ExpectedExceptionType().Name
 					               + " but got " + ex.GetType().Name, "\r\nat\r\n"+ex.StackTrace);
 				} else {
 					if (! TestExpectsAMessage()) result.Success();
 					else {
 						if (ThrownMessageMatchesExpectation(ex)) result.Success();
 						else result.Failure("Expected exception message \r\n\""
-						                    + testClosure.ExpectedExceptionMessage
+						                    + testClosure.ExpectedExceptionMessage()
 						                    + "\" but got \r\n\"" + ex.Message, "\"");
 					}
 				}
@@ -74,19 +76,23 @@ namespace FluentBddNUnitExtension {
 		}
 
 		private bool ThrownMessageMatchesExpectation(Exception ex) {
-			return testClosure.ExpectedExceptionMessage == ex.Message;
+			return testClosure.ExpectedExceptionMessage() == ex.Message;
 		}
 
 		private bool TestExpectsAMessage() {
-			return testClosure.ExpectedExceptionMessage != null;
+			return testClosure.ExpectedExceptionMessage != null
+				&&
+				testClosure.ExpectedExceptionMessage() != null;
 		}
 
 		private bool ThrownTypeMatchesExpectation(Exception ex) {
-			return testClosure.ExpectedExceptionType == ex.GetType();
+			return testClosure.ExpectedExceptionType() == ex.GetType();
 		}
 
 		private bool TestShouldThrowException() {
-			return testClosure.ExpectedExceptionType != null;
+			return testClosure.ExpectedExceptionType != null
+				&&
+				testClosure.ExpectedExceptionType() != null;
 		}
 
 		public override object Fixture { get; set; }
