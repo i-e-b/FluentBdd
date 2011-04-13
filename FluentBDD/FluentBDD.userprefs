@@ -1,0 +1,40 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" ctype="Workspace" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="FluentBddNUnitExtension/SuiteTestBuilder.cs" ctype="Workbench">
+    <Files>
+      <File FileName="FluentBddNUnitExtension/SuiteTestBuilder.cs" Line="14" Column="23" />
+      <File FileName="FluentBDD/TreeBuilding/Builder.cs" Line="41" Column="4" />
+      <File FileName="FluentBDD/TreeBuilding/ListMap.cs" Line="3" Column="1" />
+      <File FileName="FluentBDD/TreeBuilding/Map.cs" Line="6" Column="39" />
+      <File FileName="FluentBDD/TestClosure.cs" Line="10" Column="16" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="FluentBDD" expanded="True">
+            <Node name="Assertions" expanded="True" />
+            <Node name="TreeBuilding" expanded="True" />
+          </Node>
+          <Node name="FluentBddNUnitExtension" expanded="True">
+            <Node name="SuiteTestBuilder.cs" selected="True" />
+          </Node>
+        </State>
+      </Pad>
+      <Pad Id="ClassPad">
+        <State expanded="True" selected="True" />
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State />
+      </Pad>
+      <Pad Id="MonoDevelop.NUnit.TestPad">
+        <State expanded="True">
+          <Node name="UsageExample" selected="True" />
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches ctype="PinnedWatchStore" />
+</Properties>

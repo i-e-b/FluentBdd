@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace FluentBDD {
-	internal class TestClosure {
+	public class TestClosure {
 		/// <summary>
 		/// Create an assertion test without expectation values
 		/// </summary>

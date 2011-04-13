@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRecord xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Results>
+    <UnitTestResult>
+      <TestDate>2011-04-06T23:48:16</TestDate>
+      <Status>Failure</Status>
+      <TotalFailures>0</TotalFailures>
+      <TotalSuccess>0</TotalSuccess>
+      <TotalIgnored>0</TotalIgnored>
+      <Time />
+      <Message>Couldn't create a remote process.</Message>
+      <StackTrace>  at MonoDevelop.Core.Execution.ProcessHostController.CreateInstance (System.String assemblyPath, System.String typeName, System.String[] addins) [0x00000] in &lt;filename unknown&gt;:0 
+  at (wrapper remoting-invoke-with-check) MonoDevelop.Core.Execution.ProcessHostController:CreateInstance (string,string,string[])
+  at MonoDevelop.Core.Execution.ProcessService.CreateExternalProcessObject (System.Type type, IExecutionHandler executionHandler) [0x00000] in &lt;filename unknown&gt;:0 
+  at MonoDevelop.NUnit.NUnitAssemblyTestSuite.RunUnitTest (MonoDevelop.NUnit.UnitTest test, System.String suiteName, System.String testName, MonoDevelop.NUnit.TestContext testContext) [0x00000] in &lt;filename unknown&gt;:0 
+  at MonoDevelop.NUnit.NUnitAssemblyTestSuite.OnRun (MonoDevelop.NUnit.TestContext testContext) [0x00000] in &lt;filename unknown&gt;:0 
+  at MonoDevelop.NUnit.UnitTest.Run (MonoDevelop.NUnit.TestContext testContext) [0x00000] in &lt;filename unknown&gt;:0 </StackTrace>
+    </UnitTestResult>
+    <UnitTestResult>
+      <TestDate>2011-04-06T23:49:40</TestDate>
+      <Status>Ignored</Status>
+      <TotalFailures>0</TotalFailures>
+      <TotalSuccess>0</TotalSuccess>
+      <TotalIgnored>0</TotalIgnored>
+      <Time />
+      <Message>Has no TestFixtures</Message>
+    </UnitTestResult>
+  </Results>
+</TestRecord>
