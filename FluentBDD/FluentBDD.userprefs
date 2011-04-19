@@ -1,23 +1,16 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" ctype="Workspace" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="FluentBddNUnitExtension/SuiteTestBuilder.cs" ctype="Workbench">
+  <MonoDevelop.Ide.Workbench ActiveDocument="FluentBDD/TreeBuilding/Tree.cs" ctype="Workbench">
     <Files>
-      <File FileName="FluentBddNUnitExtension/SuiteTestBuilder.cs" Line="14" Column="23" />
-      <File FileName="FluentBDD/TreeBuilding/Builder.cs" Line="41" Column="4" />
-      <File FileName="FluentBDD/TreeBuilding/ListMap.cs" Line="3" Column="1" />
-      <File FileName="FluentBDD/TreeBuilding/Map.cs" Line="6" Column="39" />
-      <File FileName="FluentBDD/TestClosure.cs" Line="10" Column="16" />
+      <File FileName="FluentBDD/TreeBuilding/Tree.cs" Line="4" Column="7" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="FluentBDD" expanded="True">
-            <Node name="Assertions" expanded="True" />
-            <Node name="TreeBuilding" expanded="True" />
+            <Node name="TreeBuilding" expanded="True" selected="True" />
           </Node>
-          <Node name="FluentBddNUnitExtension" expanded="True">
-            <Node name="SuiteTestBuilder.cs" selected="True" />
-          </Node>
+          <Node name="FluentBddNUnitExtension" expanded="True" />
         </State>
       </Pad>
       <Pad Id="ClassPad">

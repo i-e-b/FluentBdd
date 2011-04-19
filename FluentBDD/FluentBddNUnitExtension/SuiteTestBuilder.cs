@@ -8,8 +8,6 @@ using NUnit.Core;
 
 namespace FluentBddNUnitExtension {
 	public class SuiteTestBuilder : TestSuite {
-		public const string CastingError = "Error: failed to cast to Scenario type. Make sure you NUnit plugins and BddLibrary are the same version!";
-		
 		public SuiteTestBuilder (Type fixtureType)
 			: base(fixtureType) {
 			PrepareFeatureBase(fixtureType);
@@ -20,6 +18,11 @@ namespace FluentBddNUnitExtension {
 			BuildTestTreeFromClosureMap(givenCases, fixtureType);
 		}
 
+		/// <summary>
+		/// Go through the TestClosureTree, building a tree of TestFixures with Test nodes. 
+		/// </summary>
+		/// <remarks>This should be replaced with a simpler, recursive method once
+		/// the TestClosureTree is a pure tree structure</remarks>
 		private void BuildTestTreeFromClosureMap (TestClosureTree GivenCases, Type fixtureType) {
 			foreach (var given in GivenCases.Keys) {
 				var scenario = new TestFixture(fixtureType);

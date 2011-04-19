@@ -4,6 +4,9 @@ using NUnit.Core;
 using NUnit.Framework;
 
 namespace FluentBddNUnitExtension {
+	/// <summary>
+	/// This class wraps a FluentBDD test closure as an NUnit test
+	/// </summary>
 	internal class ClosureTest : Test {
 		internal readonly TestClosure testClosure;
 

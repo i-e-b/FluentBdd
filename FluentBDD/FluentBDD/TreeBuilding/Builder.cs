@@ -6,6 +6,7 @@ using FluentBDD;
 
 namespace FluentBDD.TreeBuilding
 {
+	// TODO: replace this weird thing with a pure tree structure (tests at leafs only)
 	public class TestClosureTree: Map<string, Map<string, ListMap<string, TestClosure>>>
 	{
 		public TestClosureTree ():base(){}
@@ -13,6 +14,9 @@ namespace FluentBDD.TreeBuilding
 	
 	public static class Builder
 	{
+		/// <summary>
+		/// Builds a set of TestClosureTrees for the given spec class (spec means marked as Feature or Behaviour)
+		/// </summary>
 		public static TestClosureTree BuildSpecificationTree (Type containingType) {
 			var givenCases = new TestClosureTree(); // GIVEN => (WHEN => (THEN, {WITH}))
 
@@ -30,6 +34,9 @@ namespace FluentBDD.TreeBuilding
 			return givenCases;
 		}
 		
+		/// <summary>
+		/// Reads and returns the description / title of the specification
+		/// </summary>
 		public static string GetSpecificationDescription (Type fixtureType) {
 			foreach (var attrib in fixtureType.GetCustomAttributes(false)) {
 				if (attrib is BehaviourAttribute) {
