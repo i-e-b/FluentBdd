@@ -12,11 +12,8 @@ namespace FluentBddNUnitExtension {
 
 		public ClosureTest (TestClosure testClosure) : base(testClosure.Then) {
 			this.testClosure = testClosure;
-			TestName.Name = testClosure.With ?? "???";
-		}
-
-		public void UseCompressedName() {
-			TestName.Name = testClosure.Then + (testClosure.With ?? "");
+			TestName.Name = testClosure.With ?? "";
+			if (string.IsNullOrEmpty(TestName.Name)) TestName.Name = testClosure.Then + (testClosure.With ?? "");
 		}
 
 		public bool EmptyWith () {

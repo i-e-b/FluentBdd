@@ -32,7 +32,7 @@ namespace CalculatorConcerns {
 				.CoveredBy<DataContracts>();
 	}
 
-	[Behaviour("Creation")]
+	[Behaviour("Calculator Creation")]
 	public class Creation : Behaviours {
 		public Scenario when_creating_a_calculator =
 			GivenNoSubject()
