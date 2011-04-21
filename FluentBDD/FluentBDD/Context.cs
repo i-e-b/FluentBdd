@@ -1,11 +1,7 @@
 ﻿using System;
 
 namespace FluentBDD {
-	public abstract class Context {
-		public static TContext Of<TContext> () where TContext : Context, new() {
-			return new TContext();
-		}
-	}
+	public abstract class Context {}
 
 	public abstract class Context<TSubject> : Context {
 		private SubjectBuilder<TSubject> SubjectSource;

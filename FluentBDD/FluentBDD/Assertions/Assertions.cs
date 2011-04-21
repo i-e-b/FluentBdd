@@ -9,7 +9,7 @@ namespace FluentBDD.Assertions {
 	/// </summary>
 	public static class Assertions {
 		public static void should_be_ignored(this object anything) {
-			Assert.Ignore();
+			Assert.Ignore("Ignored");
 		}
 
 		public static void should_be_true (this bool condition) {

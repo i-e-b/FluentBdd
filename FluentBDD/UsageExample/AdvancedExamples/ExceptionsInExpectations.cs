@@ -5,9 +5,9 @@ namespace Advanced.UsageExample {
 	[Behaviour("Exceptions in expectations")]
 	class ExceptionsInExpectations : Behaviours {
 		public Scenario a_load_of_different_exceptions =
-			Given(() => Context.Of<an_exception_throwing_class>())
-				.When("I cause an exception", s => s.ThrowException())
-				.Using<exception_expectations>()
+			ProvedBy<exception_expectations>()
+				.Given<ExceptionThrowingClass, an_exception_throwing_class>()
+				.When("I cause an exception", (s, e) => s.ThrowException())
 				.ShouldThrow(v => v.ExpectedException);
 	}
 
@@ -15,9 +15,7 @@ namespace Advanced.UsageExample {
 		public exception_expectations Values { get; set; }
 
 		public override void SetupContext() {
-			Given("an exception throwing class", () => {
-				Console.WriteLine ("Creating "+Values.ExceptionNumber+", "+Values.ExpectedException.GetType()+", "+Values.ExpectedException.Message);
-				return new ExceptionThrowingClass(Values.ExceptionNumber);});
+			Given("an exception throwing class", () => new ExceptionThrowingClass(Values.ExceptionNumber));
 		}
 	}
 

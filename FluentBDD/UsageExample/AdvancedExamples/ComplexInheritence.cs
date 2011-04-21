@@ -27,37 +27,37 @@ namespace Advanced.ComplexInheritence {
 		// Two inputs
 		public Scenario calculator_can_add_two_numbers =
 			Given<TSubject>(CalculatorTakingTwoInputs)
-				.When("I press the button once", c => press_button_n_times(c, 1))
 				.Using<TValuesProvider>()
+				.When("I press the button once", (c,e) => press_button_n_times(c, 1))
 				.Then("result should be result of first and second", (s, r, v) => result_should_be_first_then_second(r,v))
 				.Then("readout should be same as result", (s,r,v) => subject_readout_should_match_result(s,r));
 
 		public Scenario cant_add_more_than_I_have_inputs_for_with_2_inputs =
 			Given<TSubject>(CalculatorTakingTwoInputs)
-				.When("I press the button twice", c => press_button_n_times(c, 2))
 				.Using<TValuesProvider>()
+				.When("I press the button twice", (c,e) => press_button_n_times(c, 2))
 				.ShouldThrow<InvalidOperationException>()
 				.WithMessage("Stack empty.");
 
 		// Three inputs
 		public Scenario calculator_can_add_two_of_three_numbers =
 			Given<TSubject>(CalculatorTakingThreeInputs)
-				.When("I press the button once", c => press_button_n_times(c, 1))
 				.Using<TValuesProvider>()
+				.When("I press the button once", (c,e) => press_button_n_times(c, 1))
 				.Then("result should be result of second and third input", (s, r, v) => result_should_be_second_then_third(r,v))
 				.Then("readout should be same as result", subject_readout_should_match_result);
 
 		public Scenario calculator_can_add_three_numbers =
 			Given<TSubject>(CalculatorTakingThreeInputs)
-				.When("I press the button twice", c => press_button_n_times(c, 2))
 				.Using<TValuesProvider>()
+				.When("I press the button twice", (c,e) => press_button_n_times(c, 2))
 				.Then("result should be result of second and third then first input", (s, r, v) => result_should_be_second_and_third_then_first(r,v))
 				.Then("readout should be same as result", subject_readout_should_match_result);
 
 		public Scenario cant_add_more_than_I_have_inputs_for_with_3_inputs =
 			Given<TSubject>(CalculatorTakingThreeInputs)
-				.When("I press the button three times", c => press_button_n_times(c, 3))
 				.Using<TValuesProvider>()
+				.When("I press the button three times", (c,e) => press_button_n_times(c, 3))
 				.ShouldThrow<InvalidOperationException>()
 				.WithMessage("Stack empty.");
 	}

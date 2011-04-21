@@ -7,9 +7,9 @@ namespace UsageExample {
 	[Behaviour("Contexts with tear-downs")]
 	public class TearDown : Behaviours {
 		public Scenario tear_downs =
-			Given(() => Context.Of<teardown_context>())
-				.When("I call the create file method", s => s.CreateFile())
-				.Using<values_of_files_to_create>()
+			ProvedBy<values_of_files_to_create>()
+				.Given<FileCreator, teardown_context>()
+				.When("I call the create file method", (s, e) => s.CreateFile())
 				.Then("file should exist", (s, v) => File.Exists(v.FileName).should_be_true())
 				.Then("should tear down for each test case", (s, v) => File.Exists(v.FileName).should_be_true())
 				.Then("these tests would fail if teardown wasn't being called", (s, v) => File.Exists(v.FileName).should_be_true());

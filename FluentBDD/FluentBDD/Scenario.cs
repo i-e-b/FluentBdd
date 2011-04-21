@@ -77,22 +77,6 @@ namespace FluentBDD {
 		}
 		#endregion
 
-		#region USING for IUse/IProvide
-		public ScenarioWithExamples<TSubject, TResult, TExampleSource, TExampleSource> 
-			Using<TExampleSource> ()
-			
-			where TExampleSource : class, IProvide<TExampleSource>, new() {
-
-			return new ScenarioWithExamples<TSubject, TResult, TExampleSource, TExampleSource>(Description, contextSources, scenarioAction);
-		}
-
-		public ScenarioWithExamples<TSubject, TResult, TExampleType, TExampleSource>
-			Using<TExampleType, TExampleSource> ()
-			where TExampleSource : class, TExampleType, IProvide<TExampleType>, new() {
-			return new ScenarioWithExamples<TSubject, TResult, TExampleType, TExampleSource>(Description, contextSources, scenarioAction);
-		}
-		#endregion
-
 		#region THENs
 		public Scenario<TSubject, TResult> Then (string description, Action<TSubject> subjectOnlyTest) {
 			subjectOnlyTests.Add(new Group<string, Action<TSubject>>(description, subjectOnlyTest));
@@ -214,6 +198,12 @@ namespace FluentBDD {
 
 		public ScenarioWithoutAnAction (List<Func<Context<TSubject>>> contextSources) {
 			ContextSources = contextSources;
+		}
+
+		public ScenarioWithoutAnAction<TSubject, TExampleType, TExampleSource> 
+			And<TContext> () where TContext : Context<TSubject>, new()  {
+			ContextSources.Add(() => new TContext());
+			return this;
 		}
 
 		public ScenarioWithExamples<TSubject, TResult, TExampleType, TExampleSource> When<TResult> (string description, Func<TSubject, IUse<TExampleType>, TResult> action) {
