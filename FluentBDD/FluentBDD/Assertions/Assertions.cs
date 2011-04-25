@@ -8,6 +8,7 @@ namespace FluentBDD.Assertions {
 	/// Language-like assertions.
 	/// </summary>
 	public static class Assertions {
+		#region Uniary
 		public static void should_be_ignored(this object anything) {
 			Assert.Ignore("Ignored");
 		}
@@ -19,6 +20,39 @@ namespace FluentBDD.Assertions {
 		public static void should_be_false (this bool condition) {
 			Assert.That(condition, Is.False);
 		}
+
+		public static void should_be_null (this object value) {
+			Assert.That(value, Is.Null);
+		}
+
+		public static void should_not_be_null (this object value) {
+			Assert.That(value, Is.Not.Null);
+		}
+
+		public static void should_be_empty (this string value) {
+			Assert.That(value, Is.Empty);
+		}
+
+		public static void should_not_be_empty (this string value) {
+			Assert.That(value, Is.Not.Empty);
+		}
+
+		public static void should_be_empty (this IEnumerable<object> collection) {
+			Assert.That(collection.Any(), Is.False);
+		}
+
+		public static void should_not_be_empty (this IEnumerable<object> collection) {
+			Assert.That(collection.Any(), Is.True);
+		}
+
+		public static void should_be_instance_of<T> (this object actual) {
+			Assert.That(actual, Is.InstanceOf(typeof(T)));
+		}
+		
+		public static void should_not_be_instance_of<T> (this object actual) {
+			Assert.That(actual, Is.Not.InstanceOf(typeof(T)));
+		}
+		#endregion
 
 		public static void should_be_equal_to (this object actual, object expected) {
 			Assert.That(actual, Is.EqualTo(expected));
@@ -52,40 +86,8 @@ namespace FluentBDD.Assertions {
 			Assert.That(actual, Is.LessThanOrEqualTo(baseline));
 		}
 
-		public static void should_be_null (this object value) {
-			Assert.That(value, Is.Null);
-		}
-
-		public static void should_not_be_null (this object value) {
-			Assert.That(value, Is.Not.Null);
-		}
-
-		public static void should_be_empty (this string value) {
-			Assert.That(value, Is.Empty);
-		}
-
-		public static void should_not_be_empty (this string value) {
-			Assert.That(value, Is.Not.Empty);
-		}
-
-		public static void should_be_empty (this IEnumerable<object> collection) {
-			Assert.That(collection.Any(), Is.False);
-		}
-
-		public static void should_not_be_empty (this IEnumerable<object> collection) {
-			Assert.That(collection.Any(), Is.True);
-		}
-
-		public static void should_be_instance_of<T> (this object actual) {
-			Assert.That(actual, Is.InstanceOf(typeof(T)));
-		}
-
 		public static void should_be_instance_of (this object actual, Type type) {
 			Assert.That(actual, Is.InstanceOf(type));
-		}
-
-		public static void should_not_be_instance_of<T> (this object actual) {
-			Assert.That(actual, Is.Not.InstanceOf(typeof(T)));
 		}
 
 		public static void should_contain (this string actual, string expected) {
