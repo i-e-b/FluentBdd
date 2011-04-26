@@ -8,7 +8,7 @@ namespace FluentBDD {
 	/// <summary>
 	/// Base for assertions. These select the 'actual' values.
 	/// Types mirror those of the source scenario.
-	/// Note that proofs are never part of the 'actual'.
+	/// NB : Proofs are never part of the 'actual', this is intentional.
 	/// </summary>
 	public class SmartAssertionBase<TSubject, TResult, TProofType, TProofSource> where TProofSource : class, TProofType, IProvide<TProofType>, new() {
 		private readonly string description;
@@ -132,9 +132,40 @@ namespace FluentBDD {
 		}
 		#endregion
 		#region enumeration equality
-		
 		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource> should_contain_element {
-			get { return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource>(this, (actual, expected) => {/* . . . */}); }
+			get { return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource>(this, (actual, expected) => Assert.That(((IEnumerable<object>)actual).Contains(expected), Is.True, "should contain element "+expected) ); }
+		}
+		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource> should_not_contain_element {
+			get {
+				return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource>(this, (actual, expected) =>Assert.That(((IEnumerable<object>)actual).Contains(expected), Is.False, "should not contain element " + expected));
+			}
+		}
+		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource> should_contain_match<T>(Func<T, bool> predicate) {
+			return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource>(this, (actual, expected) => 
+				Assert.That(((IEnumerable<T>)actual).Any(predicate), Is.True, "should contain element matching a predicate")
+				
+				); 
+		}
+		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource> should_not_contain_match<T> (Func<T, bool> predicate) {
+			return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource>(this, (actual, expected) =>
+				Assert.That(((IEnumerable<T>)actual).Any(predicate), Is.False, "should not contain element matching a predicate")
+
+				);
+		}
+		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource> should_contain_the_same_elements_as {
+			get {
+				return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource>(this, (actual, expected) =>
+					Assert.That(((IEnumerable<object>)actual).All(((IEnumerable<object>)expected).Contains)
+					&& ((IEnumerable<object>)expected).All(((IEnumerable<object>)actual).Contains), Is.True, actual + " should contain the same elements as " + expected)
+				                                                                                   );
+			}
+		}
+		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource> should_contain_the_same_sequence_as {
+			get {
+				return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource>(this, (actual, expected) =>
+					Assert.That(((IEnumerable<object>)actual).SequenceEqual((IEnumerable<object>)expected), Is.True, actual + " should be the same sequence as " + expected)
+																								   );
+			}
 		}
 		#endregion
 		#endregion
@@ -167,6 +198,10 @@ namespace FluentBDD {
 		public ScenarioWithExamples<TSubject, TResult, TProofType, TProofSource> result_part (Func<TResult, object> selector) {
 			return src.scen.Then(src.description, (s, r, p) => assertion(src.actualSelector(s, r, p), selector(r)));
 		}
+
+		public ScenarioWithExamples<TSubject, TResult, TProofType, TProofSource> proof (Func<TProofType, object> selector) {
+			return src.scen.Then(src.description, (s, r, p) => assertion(src.actualSelector(s, r, p), selector(p)));
+		}
 	}
 
 	/// <summary>
@@ -175,39 +210,6 @@ namespace FluentBDD {
 	public static class SmartAssertionExtensions {
 		public static SmartAssertionBase<S, R, Pt, Ps> Then<S, R, Pt, Ps> (this ScenarioWithExamples<S, R, Pt, Ps> scen, string description) where Ps : class, Pt, IProvide<Pt>, new() {
 			return new SmartAssertionBase<S, R, Pt, Ps>(description, scen);
-		}
-	}
-
-	/********************************************************************************************/
-	/********************************************************************************************/
-	/********************************************************************************************/
-
-	public class test : Behaviours {
-		public Scenario x = ProvedBy<test_proof>()
-			.Given<thing, context>()
-			.When("doing stuff", (s, p) => { })
-			.Then("stuff should happen").subject.should_be_false
-			.Then("other stuff should happen").subject_part(s => s.Booga).should_not_be_null
-			.Then("subject part should equal result").subject_part(s => s.Booga).should_be_equal_to.result
-			.Then("junk").subject_part(s => "Wooga").should_be_case_insensitive_equal_to.value("wOOga");
-	}
-
-	public class thing {
-		public string Booga { get; set; }}
-
-	public class context:Context<thing> {
-		public override void SetupContext() {
-			throw new NotImplementedException();
-		}
-	}
-
-	public class test_proof : IProvide<test_proof> {
-		public test_proof[] Data() {
-			throw new NotImplementedException();
-		}
-
-		public string StringRepresentation() {
-			throw new NotImplementedException();
 		}
 	}
 }

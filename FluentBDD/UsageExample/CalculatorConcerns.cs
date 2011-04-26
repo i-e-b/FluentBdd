@@ -54,13 +54,13 @@ namespace CalculatorConcerns {
 			ProvedBy<values_for_calculator_taking_inputs>()
 				.Given<Calculator, a_calculator_taking_two_inputs>()
 				.When("I press add once", (calculator, e) => press_add_n_times(calculator, 1))
-				.Then("result should be sum of first and second", (calculator, result, values) => result.should_be_equal_to(values.first_plus_second))
-				.Then("readout should be same as result", calculator_readout_should_match_result);
+				.Then("result should be sum of first and second").result.should_be_equal_to.proof(p => p.first_plus_second)
+				.Then("readout should be same as result").subject_part(c => c.Readout()).should_be_equal_to.result;
 
 		public Scenario cant_add_more_than_I_have_inputs_for_with_2_inputs =
 			ProvedBy<values_for_calculator_taking_inputs>()
 				.Given<Calculator, a_calculator_taking_two_inputs>()
-				.When("I press add twice", (calculator,e) => press_add_n_times(calculator, 2))
+				.When("I press add twice", (calculator, e) => press_add_n_times(calculator, 2))
 				.ShouldThrow<InvalidOperationException>()
 				.WithMessage("Stack empty.");
 
@@ -69,15 +69,15 @@ namespace CalculatorConcerns {
 			ProvedBy<values_for_calculator_taking_inputs>()
 				.Given<Calculator, a_calculator_taking_three_inputs>()
 				.When("I press add once", (calculator, e) => press_add_n_times(calculator, 1))
-				.Then("result should be sum of second and third input", (calculator, result, values) => result.should_be_equal_to(values.second_plus_third))
-				.Then("readout should be same as result", calculator_readout_should_match_result);
+				.Then("result should be sum of second and third input").result.should_be_equal_to.proof(p => p.second_plus_third)
+				.Then("readout should be same as result").subject_part(c => c.Readout()).should_be_equal_to.result;
 
 		public Scenario calculator_can_add_three_numbers =
 			ProvedBy<values_for_calculator_taking_inputs>()
 				.Given<Calculator, a_calculator_taking_three_inputs>()
 				.When("I press add twice", (c, e) => press_add_n_times(c, 2))
-				.Then("result should be sum of first, second and third input", (calculator, result, values) => result.should_be_equal_to(values.first_second_plus_third))
-				.Then("readout should be same as result", calculator_readout_should_match_result);
+				.Then("result should be sum of first, second and third input").result.should_be_equal_to.proof(p => p.first_second_plus_third)
+				.Then("readout should be same as result").subject_part(c => c.Readout()).should_be_equal_to.result;
 
 		public Scenario cant_add_more_than_I_have_inputs_for_with_3_inputs =
 			ProvedBy<values_for_calculator_taking_inputs>()
@@ -93,14 +93,14 @@ namespace CalculatorConcerns {
 		public Scenario calculator_can_add_two_numbers =
 			ProvedBy<values_for_calculator_taking_inputs>()
 				.Given<Calculator, a_calculator_taking_two_inputs>()
-				.When("I press subtract once", (c,e) => press_subtract_n_times(c, 1))
-				.Then("result should be difference of first and second", (s, r, v) => r.should_be_equal_to(v.first_minus_second))
-				.Then("readout should be same as result", calculator_readout_should_match_result);
+				.When("I press subtract once", (c, e) => press_subtract_n_times(c, 1))
+				.Then("result should be difference of first and second").result.should_be_equal_to.proof(p => p.first_minus_second)
+				.Then("readout should be same as result").subject_part(c => c.Readout()).should_be_equal_to.result;
 
 		public Scenario cant_add_more_than_I_have_inputs_for_with_2_inputs =
 			ProvedBy<values_for_calculator_taking_inputs>()
 				.Given<Calculator, a_calculator_taking_two_inputs>()
-				.When("I press subtract twice", (c,e) => press_subtract_n_times(c, 2))
+				.When("I press subtract twice", (c, e) => press_subtract_n_times(c, 2))
 				.ShouldThrow<InvalidOperationException>()
 				.WithMessage("Stack empty.");
 
@@ -108,21 +108,21 @@ namespace CalculatorConcerns {
 		public Scenario calculator_can_add_two_of_three_numbers =
 			ProvedBy<values_for_calculator_taking_inputs>()
 				.Given<Calculator, a_calculator_taking_three_inputs>()
-				.When("I press subtract once", (c,e) => press_subtract_n_times(c, 1))
-				.Then("result should be sum of second and third input", (s, r, v) => r.should_be_equal_to(v.second_minus_third))
-				.Then("readout should be same as result", calculator_readout_should_match_result);
+				.When("I press subtract once", (c, e) => press_subtract_n_times(c, 1))
+				.Then("result should be sum of second and third input").result.should_be_equal_to.proof(p => p.second_minus_third)
+				.Then("readout should be same as result").subject_part(c => c.Readout()).should_be_equal_to.result;
 
 		public Scenario calculator_can_add_three_numbers =
 			ProvedBy<values_for_calculator_taking_inputs>()
 				.Given<Calculator, a_calculator_taking_three_inputs>()
-				.When("I press subtract twice", (c,e) => press_subtract_n_times(c, 2))
-				.Then("result should be sum of first, second and third input", (s, r, v) => r.should_be_equal_to(v.first_minus__second_minus_third))
-				.Then("readout should be same as result", calculator_readout_should_match_result);
+				.When("I press subtract twice", (c, e) => press_subtract_n_times(c, 2))
+				.Then("result should be sum of first, second and third input").result.should_be_equal_to.proof(p => p.first_minus__second_minus_third)
+				.Then("readout should be same as result").subject_part(c => c.Readout()).should_be_equal_to.result;
 
 		public Scenario cant_add_more_than_I_have_inputs_for_with_3_inputs =
 			ProvedBy<values_for_calculator_taking_inputs>()
 				.Given<Calculator, a_calculator_taking_three_inputs>()
-				.When("I press subtract three times", (c,e) => press_subtract_n_times(c, 3))
+				.When("I press subtract three times", (c, e) => press_subtract_n_times(c, 3))
 				.ShouldThrow<InvalidOperationException>()
 				.WithMessage("Stack empty.");
 	}
@@ -135,13 +135,13 @@ namespace CalculatorConcerns {
 				.ShouldHaveAttribute<DataContractAttribute>()
 				.ShouldHaveAttribute<SerializableAttribute>()
 				.ShouldHaveFieldWithAttribute<DataMemberAttribute>("stack", m => m.Name == "Stack");
-				
+
 	}
 
 	#region Contexts and Expectations
-	internal class a_calculator_taking_three_inputs: Context<Calculator>, IUse<values_for_calculator_taking_inputs> {
+	internal class a_calculator_taking_three_inputs : Context<Calculator>, IUse<values_for_calculator_taking_inputs> {
 		public values_for_calculator_taking_inputs Values { get; set; }
-		public override void SetupContext() {
+		public override void SetupContext () {
 			Given("a calculator", () => new Calculator())
 				.And("I type in the first, second and third values",
 					 c =>
@@ -165,7 +165,7 @@ namespace CalculatorConcerns {
 					 });
 		}
 	}
-	
+
 	internal class a_calculator : Context<Calculator> {
 		public override void SetupContext () {
 			Given("I have a calculator", () => new Calculator());
@@ -198,8 +198,9 @@ namespace CalculatorConcerns {
 			return "{ " + first + ", " + second + ", " + third + " }";
 		}
 
-		private values_for_calculator_taking_inputs createFor(int fst, int snd, int thd) {
-			return new values_for_calculator_taking_inputs {
+		private values_for_calculator_taking_inputs createFor (int fst, int snd, int thd) {
+			return new values_for_calculator_taking_inputs
+			{
 				first = fst,
 				second = snd,
 				third = thd,
@@ -230,11 +231,6 @@ namespace CalculatorConcerns {
 			}
 			return calculator.Subtract();
 		}
-
-		protected static void calculator_readout_should_match_result (Calculator subject, int result) {
-			subject.Readout().should_be_equal_to(result);
-		}
-		
 	}
 
 	#endregion

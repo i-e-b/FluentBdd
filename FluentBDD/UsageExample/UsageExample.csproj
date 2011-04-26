@@ -65,8 +65,10 @@
     <Compile Include="AdvancedExamples\InvariantMethods.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="CalculatorConcerns.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Implementations\Calculator.cs" />
-    <Compile Include="CalculatorConcerns.cs" />
     <Compile Include="ExpectationsByInterface.cs" />
     <Compile Include="Implementations\GameScorer.cs" />
     <Compile Include="FeatureSpecification.cs" />
