@@ -5,7 +5,7 @@
 		internal Provable() {}
 
 		public ScenarioWithoutAnAction<TSubject, TExampleType, TExampleSource>
-			Given<TSubject, TContext> () where TContext : Context<TSubject>, new() {
+			Given<TSubject, TContext> () where TContext : Context<TSubject>, IUse<TExampleType>, new() {
 			return Behaviours.Given<TSubject,TContext>().Using<TExampleType, TExampleSource>();
 		}
 	}

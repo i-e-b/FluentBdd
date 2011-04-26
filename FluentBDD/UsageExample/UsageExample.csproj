@@ -76,7 +76,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SmartAssertions\SmartAssertions.cs" />
     <Compile Include="TearDown.cs" />
   </ItemGroup>
   <ItemGroup>

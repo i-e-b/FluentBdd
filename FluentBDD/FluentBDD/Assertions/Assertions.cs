@@ -5,7 +5,7 @@ using NUnit.Framework;
 
 namespace FluentBDD.Assertions {
 	/// <summary>
-	/// Language-like assertions.
+	/// Language-like assertions. These are considered legacy and will be removed at some point.
 	/// </summary>
 	public static class Assertions {
 		#region Uniary

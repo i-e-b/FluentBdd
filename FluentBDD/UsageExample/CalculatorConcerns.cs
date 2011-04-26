@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
 using FluentBDD;
-using FluentBDD.Assertions;
 using UsageExample;
 
 namespace CalculatorConcerns {
@@ -37,7 +36,7 @@ namespace CalculatorConcerns {
 		public Scenario when_creating_a_calculator =
 			GivenNoSubject()
 				.When("I create a calculator", with => new Calculator())
-				.Then("I should have a new calculator", (no_subject, calculator) => calculator.should_not_be_null());
+				.Then("I should have a new calculator").result.should_not_be_null;
 
 
 		public Scenario when_creating_an_invalid_calculator =
@@ -101,8 +100,7 @@ namespace CalculatorConcerns {
 			ProvedBy<values_for_calculator_taking_inputs>()
 				.Given<Calculator, a_calculator_taking_two_inputs>()
 				.When("I press subtract twice", (c, e) => press_subtract_n_times(c, 2))
-				.ShouldThrow<InvalidOperationException>()
-				.WithMessage("Stack empty.");
+				.Then("should show error message").should_throw(new InvalidOperationException("Stack empty."));
 
 		// Three inputs
 		public Scenario calculator_can_add_two_of_three_numbers =

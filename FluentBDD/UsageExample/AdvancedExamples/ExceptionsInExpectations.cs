@@ -7,8 +7,20 @@ namespace Advanced.UsageExample {
 		public Scenario a_load_of_different_exceptions =
 			ProvedBy<exception_expectations>()
 				.Given<ExceptionThrowingClass, an_exception_throwing_class>()
-				.When("I cause an exception", (s, e) => s.ThrowException())
-				.ShouldThrow(v => v.ExpectedException);
+				.When("I try to do something", (s, e) => s.ThrowException())
+				.Then("I should not succeed", v => v.ExpectedException);
+	}
+
+	internal class nothing_context: Context<object>, IUse<nothing> {
+		public override void SetupContext() {
+			Given("nothing", () => null);
+		}
+        public nothing Values {get; set; }
+	}
+
+	internal class nothing : IProvide<nothing> {
+		public nothing[] Data() {return new []{new nothing()};}
+		public string StringRepresentation() {return "no proofs";}
 	}
 
 	internal class an_exception_throwing_class : Context<ExceptionThrowingClass>, IUse<exception_expectations> {
