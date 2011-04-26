@@ -27,6 +27,11 @@ namespace FluentBDD {
 			return new SmartAssertion<TSubject, TResult, TProofType, TProofSource>(description, scen, (s, r, v) => selector(r));
 		}
 
+
+		public ScenarioWithExamples<TSubject, TResult, TProofType, TProofSource> check_proof (Action<TProofType> check) {
+			return scen.Then(description, (s, r, p) => check(p));
+		}
+
 		public ScenarioWithExamples<TSubject, TResult, TProofType, TProofSource> should_be_ignored {
 			get { return scen.Then(description, (s, r, p) => Assert.Ignore("Ignored")); }
 		}

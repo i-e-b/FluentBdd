@@ -19,8 +19,8 @@ namespace UsageExample {
 			ProvedBy<values_for_a_calculator_using_math_provider>()
 			.Given<Calculator, a_calculator_that_uses_a_math_provider_interface_and_two_values>()
 				.When("adding inputs", (c,e) => c.Add())
-				.Then("adder interface should be used once", (subject, values) => values.check_adder_was_used_once()) // test method in IProvide values, keeps scenario clean
-				.Then("adder interface should be used and only once!", (s, v) => v.check_adder_was_used_once());
+				.Then("adder interface should be used once").check_proof(p => p.adder_was_used_once()) // test method in IProvide values, keeps scenario clean
+				.Then("adder interface should be used and only once!").check_proof(p => p.adder_was_used_once());
 
 		// Checking two compatible contexts against the same behaviour and the same values
 		// The 'then' tests will appear in different places in the test output, as it is grouped by context.
@@ -178,7 +178,7 @@ namespace UsageExample {
 				return this;
 			}
 
-			public void check_adder_was_used_once () {
+			public void adder_was_used_once () {
 				mock_provider.Verify(m => m.Add(a, b), Times.Once());
 			}
 
