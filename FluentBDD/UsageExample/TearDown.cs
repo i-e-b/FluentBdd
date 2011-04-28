@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using FluentBDD;
-using FluentBDD.Assertions;
 
 namespace UsageExample {
 	[Behaviour("Contexts with tear-downs")]
@@ -10,9 +9,9 @@ namespace UsageExample {
 			ProvedBy<values_of_files_to_create>()
 				.Given<FileCreator, teardown_context>()
 				.When("I call the create file method", (s, e) => s.CreateFile())
-				.Then("file should exist", (s, v) => File.Exists(v.FileName).should_be_true())
-				.Then("should tear down for each test case", (s, v) => File.Exists(v.FileName).should_be_true())
-				.Then("these tests would fail if teardown wasn't being called", (s, v) => File.Exists(v.FileName).should_be_true());
+				.Then("file should exist").check(p => File.Exists(p.FileName)).should_be_true
+				.Then("should tear down for each test case").check(p => File.Exists(p.FileName)).should_be_true
+				.Then("these tests would fail if teardown wasn't being called").check(p => File.Exists(p.FileName)).should_be_true;
 	}
 
 

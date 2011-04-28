@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using FluentBDD.Assertions;
+using NUnit.Framework;
 
 namespace FluentBDD {
 	[EditorBrowsable(EditorBrowsableState.Always)]
@@ -186,19 +186,20 @@ namespace FluentBDD {
 		public Scenario<TSubject, TResult> ShouldHaveAttribute<TAttributeType> () where TAttributeType : Attribute {
 			subjectOnlyTests.Add(new Group<string, Action<TSubject>>(
 			                     	"Should have " + typeof (TAttributeType).Name,
-			                     	subject => typeof (TSubject)
+			                     	subject => Assert.IsNotEmpty(
+												typeof (TSubject)
 			                     	           	.GetCustomAttributes(typeof (TAttributeType), true)
 			                     	           	.Select(attribute => attribute as TAttributeType)
-			                     	           	.ToArray().should_not_be_empty()));
+			                     	           	.ToArray())));
 			return this;
 		}
 
 		public Scenario<TSubject, TResult> ShouldHaveField (string fieldName) {
 			subjectOnlyTests.Add(new Group<string, Action<TSubject>>(
 			                     	"Should have a field named \"" + fieldName + "\"",
-			                     	subject => typeof (TSubject)
-			                     	           	.GetField(fieldName, BindingFlags.FlattenHierarchy | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public)
-			                     	           	.should_not_be_null()
+			                     	subject => Assert.IsNotNull(
+										typeof (TSubject).GetField(fieldName, BindingFlags.FlattenHierarchy | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public)
+			                     	           	)
 			                     	));
 			return this;
 		}
@@ -210,7 +211,8 @@ namespace FluentBDD {
 			                     		var field = typeof(TSubject).GetField(fieldName, BindingFlags.FlattenHierarchy | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
 										if (field == null) throw new ArgumentException("Field not found: "+fieldName);
 			                     		var attribs = field.GetCustomAttributes(typeof (TAttributeType), true).Select(attribute => attribute as TAttributeType);
-			                     		attribs.should_contain(condition);
+
+			                     		Assert.That(attribs.Any(condition), Is.True);
 			                     	}));
 			return this;
 		}

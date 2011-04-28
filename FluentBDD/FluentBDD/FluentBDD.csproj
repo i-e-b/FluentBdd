@@ -58,7 +58,6 @@
     <Compile Include="SubjectBuilder.cs" />
     <Compile Include="Group.cs" />
     <Compile Include="TestClosure.cs" />
-    <Compile Include="Assertions\Assertions.cs" />
     <Compile Include="TreeBuilding\SpecificationTreeBuilder.cs" />
     <Compile Include="TreeBuilding\TreeDictionary.cs" />
   </ItemGroup>

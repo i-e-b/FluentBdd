@@ -1,5 +1,4 @@
 ﻿using FluentBDD;
-using FluentBDD.Assertions;
 
 namespace Advanced.UsageExample {
 	[Behaviour("Invariant method testing",
@@ -11,13 +10,13 @@ namespace Advanced.UsageExample {
 			GivenStaticContextFor<values_for_complex_calculation>()
 				.Using<values_for_complex_calculation>()
 				.When("I calculate the value with a known input", (no_subject, context) => StaticMethods.Calculate(context.Values.input))
-				.Then("I should get the matching output", (s, result, values) => result.should_be_equal_to(values.result));
+				.Then("I should get the matching output").result.should_be_equal_to.proof(p => p.result);
 
 		public Scenario same_using_interfaces_for_expectations =
 			GivenStaticContextFor<ISimpleInOutExpectations>()
 				.Using<ISimpleInOutExpectations, values_for_complex_calculation_using_interface>()
 				.When("I calculate the value with a known input", (no_subject, context) => StaticMethods.Calculate(context.Values.input))
-				.Then("I should get the matching output (using interface)", (s, result, values) => result.should_be_equal_to(values.result));
+				.Then("I should get the matching output (using interface)").result.should_be_equal_to.proof(p => p.result);
 
 	}
 
