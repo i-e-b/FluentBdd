@@ -1,5 +1,4 @@
-﻿using System;
-using FluentBDD.Assertions;
+﻿using FluentBDD.Assertions;
 using NUnit.Framework;
 
 namespace FluentBDD {

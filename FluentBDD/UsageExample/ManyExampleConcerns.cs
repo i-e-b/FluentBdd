@@ -217,7 +217,7 @@ namespace UsageExample {
 			GivenNoSubject()
 				.When("I create a calculator with a null math delegate", c => { new Calculator(null); })
 				.ShouldThrow<ArgumentException>()
-				.WithMessage("An math delegate must be provided");
+				.WithMessage("A math delegate must be provided");
 	}
 
 	[Behaviour("Data Contracts",

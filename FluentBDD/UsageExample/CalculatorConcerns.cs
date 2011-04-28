@@ -42,8 +42,7 @@ namespace CalculatorConcerns {
 		public Scenario when_creating_an_invalid_calculator =
 			GivenNoSubject()
 				.When("I create a calculator with a null math delegate", c => { new Calculator(null); })
-				.ShouldThrow<ArgumentException>()
-				.WithMessage("An math delegate must be provided");
+				.Then("should not be allowed to create calculator").should_throw(new ArgumentException("A math delegate must be provided"));
 	}
 
 	[Behaviour("Addition")]

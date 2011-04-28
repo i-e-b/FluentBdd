@@ -18,34 +18,46 @@ namespace FluentBDD.Assertions {
 			scen = Scen;
 		}
 
+		/// <summary>Test that the scenario's subject matches an expectation</summary>
 		public SmartAssertion<TSubject, TResult, TProofType, TProofSource> subject { get { return new SmartAssertion<TSubject, TResult, TProofType, TProofSource>(description, scen, (s, r, v) => s); } }
+		
+		/// <summary> Select something from the subject to test against an expectation </summary>
 		public SmartAssertion<TSubject, TResult, TProofType, TProofSource> subject_part (Func<TSubject, object> selector) {
 			return new SmartAssertion<TSubject, TResult, TProofType, TProofSource>(description, scen, (s, r, v) => selector(s));
 		}
+		/// <summary> Test that the result returned by the "When" clause matches an expectation </summary>
 		public SmartAssertion<TSubject, TResult, TProofType, TProofSource> result { get { return new SmartAssertion<TSubject, TResult, TProofType, TProofSource>(description, scen, (s, r, v) => r); } }
+		
+		/// <summary> Select something from the result returned by the "When" clause to test against an expectation  </summary>
 		public SmartAssertion<TSubject, TResult, TProofType, TProofSource> result_part (Func<TResult, object> selector) {
 			return new SmartAssertion<TSubject, TResult, TProofType, TProofSource>(description, scen, (s, r, v) => selector(r));
 		}
 
+		/// <summary> Test that the scenario throws an exception of a matching type and message. </summary>
+		/// <param name="ex">An example exception to match against. To ignore the message in tests, pass an example exception with an empty message string</param>
 		public Scenario<TSubject, TResult, TProofType, TProofSource> should_throw (Exception ex) {
 			return scen.Then(description, p => ex);
 		}
 
+		/// <summary> Return a value based on proof values to test against an expectation </summary>
+		/// <param name="selector">A function on the scenario proofs; e.g. ".check(p=>File.Exists(p.fileName)."</param>
 		public SmartAssertion<TSubject, TResult, TProofType, TProofSource> check (Func<TProofType, object> selector) {
 			return new SmartAssertion<TSubject, TResult, TProofType, TProofSource>(description, scen, (s, r, v) => selector(v));
 		}
 
+		/// <summary> Call a method on the scenario proof, which should make it's own assertions </summary>
 		public Scenario<TSubject, TResult, TProofType, TProofSource> check_proof (Action<TProofType> check) {
 			return scen.Then(description, (s, r, p) => check(p));
 		}
 
+		/// <summary> Ignore a single "Then" clause in a scenario </summary>
 		public Scenario<TSubject, TResult, TProofType, TProofSource> should_be_ignored {
 			get { return scen.Then(description, (s, r, p) => Assert.Ignore("Ignored")); }
 		}
 	}
 
 	/// <summary>
-	/// Uniary assertions, and the first halfs of binary assertions
+	/// Uniary assertions, and the "actual" part of binary assertions
 	/// </summary>
 	public class SmartAssertion<TSubject, TResult, TProofType, TProofSource> where TProofSource : class, TProofType, IProvide<TProofType>, new() {
 		internal readonly string description;
@@ -184,7 +196,7 @@ namespace FluentBDD.Assertions {
 	}
 
 	/// <summary>
-	/// Binary assertions' second halfs
+	/// Binary assertions' "expected" parts
 	/// </summary>
 	public class SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource> where TProofSource : class, TProofType, IProvide<TProofType>, new() {
 		private readonly SmartAssertion<TSubject, TResult, TProofType, TProofSource> src;
@@ -195,22 +207,28 @@ namespace FluentBDD.Assertions {
 			this.assertion = assertion;
 		}
 
+		/// <summary> Expect a specific value </summary>
 		public Scenario<TSubject, TResult, TProofType, TProofSource> value (object value) {
 			return src.scen.Then(src.description, (s, r, p) => assertion(src.actualSelector(s, r, p), value));
 		}
+		/// <summary> Expect the scenario's subject object </summary>
 		public Scenario<TSubject, TResult, TProofType, TProofSource> subject {
 			get { return src.scen.Then(src.description, (s, r, p) => assertion(src.actualSelector(s, r, p), s)); }
 		}
+		/// <summary> Select part of the scenario's subject as the test's expectation </summary>
 		public Scenario<TSubject, TResult, TProofType, TProofSource> subject_part (Func<TSubject, object> selector) {
 			return src.scen.Then(src.description, (s, r, p) => assertion(src.actualSelector(s, r, p), selector(s)));
 		}
+		/// <summary> Expect the result returned by the "When" clause </summary>
 		public Scenario<TSubject, TResult, TProofType, TProofSource> result {
 			get { return src.scen.Then(src.description, (s, r, p) => assertion(src.actualSelector(s, r, p), r)); }
 		}
+		/// <summary> Select part of the result returned by the "When" clause as the test's expectation</summary>
 		public Scenario<TSubject, TResult, TProofType, TProofSource> result_part (Func<TResult, object> selector) {
 			return src.scen.Then(src.description, (s, r, p) => assertion(src.actualSelector(s, r, p), selector(r)));
 		}
 
+		/// <summary> Select a value from the scenario's proof as the test's expectation </summary>
 		public Scenario<TSubject, TResult, TProofType, TProofSource> proof (Func<TProofType, object> selector) {
 			return src.scen.Then(src.description, (s, r, p) => assertion(src.actualSelector(s, r, p), selector(p)));
 		}
@@ -218,6 +236,10 @@ namespace FluentBDD.Assertions {
 	#endregion
 
 	#region Assertions for Scenarios without proofs
+	/// <summary>
+	/// Base for assertions. These select the 'actual' values.
+	/// Types mirror those of the source scenario.
+	/// </summary>
 	public class SmartAssertionBase<TSubject, TResult> {
 		private readonly string description;
 		private readonly Scenario<TSubject, TResult> scen;
@@ -226,23 +248,36 @@ namespace FluentBDD.Assertions {
 			scen = Scen;
 		}
 
+		/// <summary>Test that the scenario's subject matches an expectation</summary>
 		public SmartAssertion<TSubject, TResult> subject { get { return new SmartAssertion<TSubject, TResult>(description, scen, (s, r) => s); } }
+		
+		/// <summary> Select something from the subject to test against an expectation </summary>
 		public SmartAssertion<TSubject, TResult> subject_part (Func<TSubject, object> selector) {
 			return new SmartAssertion<TSubject, TResult>(description, scen, (s, r) => selector(s));
 		}
+		/// <summary> Test that the result returned by the "When" clause matches an expectation </summary>
 		public SmartAssertion<TSubject, TResult> result { get { return new SmartAssertion<TSubject, TResult>(description, scen, (s, r) => r); } }
+
+		/// <summary> Select something from the result returned by the "When" clause to test against an expectation  </summary>
 		public SmartAssertion<TSubject, TResult> result_part (Func<TResult, object> selector) {
 			return new SmartAssertion<TSubject, TResult>(description, scen, (s, r) => selector(r));
 		}
 
+		/// <summary> Test that the scenario throws an exception of a matching type and message. </summary>
+		/// <param name="ex">An example exception to match against. To ignore the message in tests, pass an example exception with an empty message string</param>
 		public Scenario<TSubject, TResult> should_throw (Exception ex) {
 			return scen.Then(description, () => ex);
 		}
+
+		/// <summary> Ignore a single "Then" clause in a scenario </summary>
 		public Scenario<TSubject, TResult> should_be_ignored {
 			get { return scen.Then(description, (s, r) => Assert.Ignore("Ignored")); }
 		}
 	}
-	
+
+	/// <summary>
+	/// Uniary assertions, and the "actual" part of binary assertions
+	/// </summary>
 	public class SmartAssertion<TSubject, TResult> {
 		internal readonly string description;
 		internal readonly Scenario<TSubject, TResult> scen;
@@ -378,7 +413,10 @@ namespace FluentBDD.Assertions {
 		#endregion
 		#endregion
 	}
-	
+
+	/// <summary>
+	/// Binary assertions' "expected" parts
+	/// </summary>
 	public class SmartAssertionBinary<TSubject, TResult> {
 		private readonly SmartAssertion<TSubject, TResult> src;
 		private readonly Action<object, object> assertion;
@@ -387,19 +425,24 @@ namespace FluentBDD.Assertions {
 			src = SmartAssertion;
 			this.assertion = assertion;
 		}
-		
+
+		/// <summary> Expect a specific value </summary>
 		public Scenario<TSubject, TResult> value (object value) {
 			return src.scen.Then(src.description, (s, r) => assertion(src.actualSelector(s, r), value));
 		}
+		/// <summary> Expect the scenario's subject object </summary>
 		public Scenario<TSubject, TResult> subject {
 			get { return src.scen.Then(src.description, (s, r) => assertion(src.actualSelector(s, r), s)); }
 		}
+		/// <summary> Select part of the scenario's subject as the test's expectation </summary>
 		public Scenario<TSubject, TResult> subject_part (Func<TSubject, object> selector) {
 			return src.scen.Then(src.description, (s, r) => assertion(src.actualSelector(s, r), selector(s)));
 		}
+		/// <summary> Expect the result returned by the "When" clause </summary>
 		public Scenario<TSubject, TResult> result {
 			get { return src.scen.Then(src.description, (s, r) => assertion(src.actualSelector(s, r), r)); }
 		}
+		/// <summary> Select part of the result returned by the "When" clause as the test's expectation</summary>
 		public Scenario<TSubject, TResult> result_part (Func<TResult, object> selector) {
 			return src.scen.Then(src.description, (s, r) => assertion(src.actualSelector(s, r), selector(r)));
 		}

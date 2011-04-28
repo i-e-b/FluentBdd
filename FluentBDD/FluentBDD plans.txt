@@ -1,15 +1,11 @@
 Fluent BDD
 
-DONE:
- - Move tree building into FluentBDD core (out of NUnit extension) ready for WikiDD
- - Clear out some older syntax? Do we even need "Using<>" anymore?
- - Try implementing 'smart assertions' as a simple big-flat-list like Eldon's, rather than a deep tree.
-   Make work with Lambdas in current Then(), rather than trying to build an assertion abstraction
- - Exception cases with "Then(...).should_throw<T>([message])", with support in FluentBDD core. (for now, is supplying a concrete exception)
- 
-TODO:
+TO DO:
  - Tests to cover all SmartAssertion cases.
  - Clean up usage around proofs (IUse, IProvide are maybes, but all uses of 'examples' and 'values' should move to 'proof')
  - Change tree to be a real pure tree structure. Tests in leafs only. Feature leafs should be list of coverage types.
  - Make a link between Features and their behaviours, extending and cleaning up TestClosure{}
  - Rework slideshow so the separation and composition ideas are more clear, and show a little better what this means in code.
+
+TO CONSIDER:
+ - Wrap all low-level assertions around an interface, and do the NUnit Assert calls in the NUnit extension; remove NUnit dependencies from FluentBDD core.
