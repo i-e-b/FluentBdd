@@ -3,6 +3,7 @@ Fluent BDD
 TO DO:
  - Chase Scenario->Behaviour name through system
  - Tests to cover all SmartAssertion cases.
+ - Fix WHEN lambda to use proof type, not context type.
  - Clean up usage around proofs (IUse, IProvide are maybes, but all uses of 'examples' and 'values' should move to 'proof')
  - Clean up the THEN lambdas, expose only (result) | (result, proof); use SmartAssertion for others
  - Try to make the selection of fields/methods/properties more clear in SA (result_part etc.) -- maybe with result->TheResult; result_part->Result(=>)
