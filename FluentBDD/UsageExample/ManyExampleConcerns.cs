@@ -8,13 +8,13 @@ using System.Runtime.Serialization;
 // The later ones are cleaner, and better represent what you'd expect to write.
 namespace UsageExample {
 
-	[Behaviour("Addition",
+	[Behaviours("Addition",
 		"As a user of a calculator",
 		"To avoid making mistakes",
 		"I want to be told the sum of two numbers")]
 	public class Addition : Behaviours {
 		// checking mocks with the Context->Action->Values->Behaviour pattern
-		public Scenario the_calculator_uses_the_adder_supplied = // the name of the scenario is inconsequential to how the tests are run. Use something instructive
+		public Behaviour the_calculator_uses_the_adder_supplied = // the name of the scenario is inconsequential to how the tests are run. Use something instructive
 			ProvedBy<values_for_a_calculator_using_math_provider>()
 			.Given<Calculator, a_calculator_that_uses_a_math_provider_interface_and_two_values>()
 				.When("adding inputs", (c,e) => c.Add())
@@ -23,7 +23,7 @@ namespace UsageExample {
 
 		// Checking two compatible contexts against the same behaviour and the same values
 		// The 'then' tests will appear in different places in the test output, as it is grouped by context.
-		public Scenario calculators_do_adding =
+		public Behaviour calculators_do_adding =
 			ProvedBy<values_for_a_calculator_using_math_provider>()
 				.Given<Calculator, a_calculator_that_uses_a_math_provider_interface_and_two_values>()
 				.And<a_calculator_that_uses_internal_logic_and_two_values>() // Different context, same subject type.
@@ -32,27 +32,27 @@ namespace UsageExample {
 
 		// if you prefer, you can specify the 'with' case as below. Pay attention to the lack of brackets on 'Context.Of<T>'
 		// syntax is "With<subjectType>(Context.Of<contextType>)"
-		public Scenario alternative_syntax =
+		public Behaviour alternative_syntax =
 			Given<Calculator, a_calculator_taking_two_inputs>().Using<values_for_a_calculator_taking_two_inputs>()
 				.When("Entering another number", (c, e) => c.Press(0))
 				.Then("should have new number in readout").subject_part(s => s.Readout()).should_be_equal_to.value(0);
 
 		// Here's how to leave an inconclusive scenario (useful as a placholder when roughing out behaviours)
-		public Scenario unfinished_scenario =
+		public Behaviour unfinished_scenario =
 			ProvedBy<values_for_a_calculator_taking_two_inputs>()
 				.Given<Calculator, a_calculator_taking_two_inputs>()
 				.When("doing something I haven't defined yet", (c, e) => { })
 				.Then("should result in something I haven't tested yet").should_be_ignored;
 
 		// Here's how to ignore an entire scenario (should it be failing for a good and temporary reason)
-		public Scenario broken_scenario =
+		public Behaviour broken_scenario =
 			ProvedBy<values_for_a_calculator_taking_two_inputs>()
 			.Given<Calculator, a_calculator_taking_two_inputs>()
 				.When("doing something I've broken, but marked as ignored", Ignore.me)
 				.Then("should ignore broken test!", (s,v) => { throw new Exception("I'm broken!"); });
 
 		// this scenario's action ("when") gives NO result, so all the tests ("then") have only the subject. (and values if you request them)
-		public Scenario calculator_readout_reflects_input =
+		public Behaviour calculator_readout_reflects_input =
 			Given<Calculator, a_calculator_that_uses_a_math_provider_interface_and_two_values>()
 				.Using<values_for_a_calculator_using_math_provider>()
 				.When("entering zero into it", (subject, proof) => subject.Press(0))
@@ -60,7 +60,7 @@ namespace UsageExample {
 
 
 		// this scenario's action ("when") gives a result, so all the tests ("then") take it as a param.
-		public Scenario adding_returns_the_sum_of_last_two_numbers =
+		public Behaviour adding_returns_the_sum_of_last_two_numbers =
 			ProvedBy<values_for_a_calculator_using_math_provider>()
 				.Given<Calculator, a_calculator_that_uses_a_math_provider_interface_and_two_values>()
 				.When("adding inputs", (c, e) => c.Add())
@@ -70,14 +70,14 @@ namespace UsageExample {
 
 
 		// this scenario uses the context's values in the test Action.
-		public Scenario using_context_in_test_action =
+		public Behaviour using_context_in_test_action =
 			ProvedBy<values_for_a_calculator_using_math_provider>()
 				.Given<Calculator, a_calculator_that_uses_a_math_provider_interface_and_two_values>()
 				.When("I press 'a' again", (subject, proof) => subject.Press(proof.Values.a))
 				.Then("the screen should show 'a'").subject_part(s => s.Readout()).should_be_equal_to.proof(p => p.a);
 
 		// Testing for exceptions
-		public Scenario pressing_add_without_enough_input_causes_an_exception =
+		public Behaviour pressing_add_without_enough_input_causes_an_exception =
 			ProvedBy<values_for_a_calculator_using_math_provider>()
 			.Given<Calculator, a_calculator_that_uses_a_math_provider_interface_and_two_values>()
 				.When("I press 'add' three times", AddThreeTimes) // method without parenthesis, must return void.
@@ -85,7 +85,7 @@ namespace UsageExample {
 				.WithMessage("Stack empty.");
 
 		// If you don't care about the message, you'll have to say so explicitly.
-		public Scenario ignoring_exception_messages =
+		public Behaviour ignoring_exception_messages =
 			ProvedBy<values_for_a_calculator_using_math_provider>()
 			.Given<Calculator, a_calculator_that_uses_a_math_provider_interface_and_two_values>()
 				.When("I press 'add' three times and ignore the exception message", AddThreeTimes)
@@ -94,33 +94,33 @@ namespace UsageExample {
 
 		
 		// If you want to describe the mode of failure, or the behaviour it indicates, do this:
-		public Scenario described_exceptions =
+		public Behaviour described_exceptions =
 			ProvedBy<values_for_a_calculator_using_math_provider>()
 				.Given<Calculator, a_calculator_that_uses_a_math_provider_interface_and_two_values>()
 				.When("I press 'add' three times", AddThreeTimes)
 				.Then("I should get an error and no result").should_throw(new InvalidOperationException("Stack empty."));
 
 		// To use a described exception but ignore the message, pass an empty string for the message
-		public Scenario described_exceptions_ignoring_message =
+		public Behaviour described_exceptions_ignoring_message =
 			ProvedBy<values_for_a_calculator_using_math_provider>()
 				.Given<Calculator, a_calculator_that_uses_a_math_provider_interface_and_two_values>()
 				.When("I press 'add' three times", AddThreeTimes)
 				.Then("I should get an error and no result, regardless of message").should_throw(new InvalidOperationException(""));
 
 		#region Same context used with different actions. Context will be grouped in output, but actions will be seperate.
-		public Scenario last_item_on_stack_shows =
+		public Behaviour last_item_on_stack_shows =
 			Given<Calculator, a_calculator_taking_three_inputs>()
 				.Using<values_for_a_calculator_taking_three_inputs>()
 				.When("No action is taken", (c, e) => { }) // common pattern for doing nothing
 				.Then("The last input value should be on the screen").subject_part(s => s.Readout()).should_be_equal_to.proof(p => p.c);
 
-		public Scenario adding_once_adds_last_two_items =
+		public Behaviour adding_once_adds_last_two_items =
 			Given<Calculator, a_calculator_taking_three_inputs>()
 				.Using<values_for_a_calculator_taking_three_inputs>()
 				.When("Adding once", (c, e) => c.Add())
 				.Then("Result should be b+c").result.should_be_equal_to.proof(p => p.b_plus_c);
 
-		public Scenario adding_twice_adds_all_three_items =
+		public Behaviour adding_twice_adds_all_three_items =
 			Given<Calculator, a_calculator_taking_three_inputs>()
 				.Using<values_for_a_calculator_taking_three_inputs>()
 				.When("Adding twice", (c, e) => AddTwice(c)) // Feature's method in lambda
@@ -205,22 +205,22 @@ namespace UsageExample {
 
 	// Below are scenarios that don't have subjects to be set up.
 	// Expected to be used mostly for testing new() etc.
-	[Behaviour("Creation")]
+	[Behaviours("Creation")]
 	public class CreatingACalculator : Behaviours {
-		public Scenario when_creating_a_calculator =
+		public Behaviour when_creating_a_calculator =
 			GivenNoSubject()
 				.When("I create a calculator", with => new Calculator())
 				.Then("I should have a new calculator").result.should_not_be_null;
 
 
-		public Scenario when_doing_things_with_exceptions =
+		public Behaviour when_doing_things_with_exceptions =
 			GivenNoSubject()
 				.When("I create a calculator with a null math delegate", c => { new Calculator(null); })
 				.ShouldThrow<ArgumentException>()
 				.WithMessage("A math delegate must be provided");
 	}
 
-	[Behaviour("Data Contracts",
+	[Behaviours("Data Contracts",
 		"As calculator service provider",
 		"To make loads of money, I want to be able to serialise my calculator via SOAP",
 		"For this to work, I need attributes on the calculator and it's fields")]
@@ -231,7 +231,7 @@ namespace UsageExample {
 			}
 		}
 
-		public Scenario calculator_should_have_datacontracts =
+		public Behaviour calculator_should_have_datacontracts =
 			Given<Calculator, a_calculator>()
 				.Verify()
 				.ShouldHaveAttribute<DataContractAttribute>() // subject type must have the named attribute
@@ -245,7 +245,7 @@ namespace UsageExample {
 
 	// Features can inherit from other features.
 	// If the base class isn't decorated with the 'Feature' attribute, it's own tests won't be run.
-	[Behaviour("Inhereted subtraction")]
+	[Behaviours("Inhereted subtraction")]
 	public class OtherSubtraction : DataContracts { }
 
 

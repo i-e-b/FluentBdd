@@ -10,8 +10,8 @@ namespace FluentBddNUnitExtension {
 	[NUnitAddin(Description = "FluentBDD Behaviour/Feature/Scenario test suite builder")]
 	public class ScenarioBuilder : IAddin, ISuiteBuilder {
 		public bool CanBuildFrom(Type type) {
-			return Reflect.HasAttribute(type, typeof(BehaviourAttribute).FullName, false)
-				|| Reflect.HasAttribute(type, typeof(FeatureAttribute).FullName, false);
+			return Reflect.HasAttribute(type, typeof(BehavioursAttribute).FullName, false)
+				|| Reflect.HasAttribute(type, typeof(FeatureSetAttribute).FullName, false);
 		}
 
 		public Test BuildFrom(Type type) {

@@ -51,10 +51,10 @@
     <Compile Include="ScenarioBuilder.cs" />
     <Compile Include="Expectations.cs" />
     <Compile Include="Behaviours.cs" />
-    <Compile Include="BehaviourAttribute.cs" />
+    <Compile Include="BehavioursAttribute.cs" />
     <Compile Include="IBuildTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Scenario.cs" />
+    <Compile Include="Behaviour.cs" />
     <Compile Include="SubjectBuilder.cs" />
     <Compile Include="Group.cs" />
     <Compile Include="TestClosure.cs" />

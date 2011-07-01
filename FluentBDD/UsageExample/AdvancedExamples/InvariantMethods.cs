@@ -1,18 +1,18 @@
 ﻿using FluentBDD;
 
 namespace Advanced.UsageExample {
-	[Behaviour("Invariant method testing",
+	[Behaviours("Invariant method testing",
 		"When testing invariant functions (such as static calculations)",
 		"we can test a set of inputs and outputs as a sanity test of our logic.")]
 	public class InvariantMethods : Behaviours {
 
-		public Scenario complex_calculation_should_work =
+		public Behaviour complex_calculation_should_work =
 			GivenStaticContextFor<values_for_complex_calculation>()
 				.Using<values_for_complex_calculation>()
 				.When("I calculate the value with a known input", (no_subject, context) => StaticMethods.Calculate(context.Values.input))
 				.Then("I should get the matching output").result.should_be_equal_to.proof(p => p.result);
 
-		public Scenario same_using_interfaces_for_expectations =
+		public Behaviour same_using_interfaces_for_expectations =
 			GivenStaticContextFor<ISimpleInOutExpectations>()
 				.Using<ISimpleInOutExpectations, values_for_complex_calculation_using_interface>()
 				.When("I calculate the value with a known input", (no_subject, context) => StaticMethods.Calculate(context.Values.input))

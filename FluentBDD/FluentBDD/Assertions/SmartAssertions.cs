@@ -12,8 +12,8 @@ namespace FluentBDD.Assertions {
 	/// </summary>
 	public class SmartAssertionBase<TSubject, TResult, TProofType, TProofSource> where TProofSource : class, TProofType, IProvide<TProofType>, new() {
 		private readonly string description;
-		private readonly Scenario<TSubject, TResult, TProofType, TProofSource> scen;
-		public SmartAssertionBase (string description, Scenario<TSubject, TResult, TProofType, TProofSource> Scen) {
+		private readonly Behaviour<TSubject, TResult, TProofType, TProofSource> scen;
+		public SmartAssertionBase (string description, Behaviour<TSubject, TResult, TProofType, TProofSource> Scen) {
 			this.description = description;
 			scen = Scen;
 		}
@@ -35,7 +35,7 @@ namespace FluentBDD.Assertions {
 
 		/// <summary> Test that the scenario throws an exception of a matching type and message. </summary>
 		/// <param name="ex">An example exception to match against. To ignore the message in tests, pass an example exception with an empty message string</param>
-		public Scenario<TSubject, TResult, TProofType, TProofSource> should_throw (Exception ex) {
+		public Behaviour<TSubject, TResult, TProofType, TProofSource> should_throw (Exception ex) {
 			return scen.Then(description, p => ex);
 		}
 
@@ -46,12 +46,12 @@ namespace FluentBDD.Assertions {
 		}
 
 		/// <summary> Call a method on the scenario proof, which should make it's own assertions </summary>
-		public Scenario<TSubject, TResult, TProofType, TProofSource> check_proof (Action<TProofType> check) {
+		public Behaviour<TSubject, TResult, TProofType, TProofSource> check_proof (Action<TProofType> check) {
 			return scen.Then(description, (s, r, p) => check(p));
 		}
 
 		/// <summary> Ignore a single "Then" clause in a scenario </summary>
-		public Scenario<TSubject, TResult, TProofType, TProofSource> should_be_ignored {
+		public Behaviour<TSubject, TResult, TProofType, TProofSource> should_be_ignored {
 			get { return scen.Then(description, (s, r, p) => Assert.Ignore("Ignored")); }
 		}
 	}
@@ -61,29 +61,29 @@ namespace FluentBDD.Assertions {
 	/// </summary>
 	public class SmartAssertion<TSubject, TResult, TProofType, TProofSource> where TProofSource : class, TProofType, IProvide<TProofType>, new() {
 		internal readonly string description;
-		internal readonly Scenario<TSubject, TResult, TProofType, TProofSource> scen;
+		internal readonly Behaviour<TSubject, TResult, TProofType, TProofSource> scen;
 		internal readonly Func<TSubject, TResult, TProofType, object> actualSelector;
 
-		public SmartAssertion(string description, Scenario<TSubject, TResult, TProofType, TProofSource> scen, Func<TSubject, TResult, TProofType, object> actualSelector) {
+		public SmartAssertion(string description, Behaviour<TSubject, TResult, TProofType, TProofSource> scen, Func<TSubject, TResult, TProofType, object> actualSelector) {
 			this.description = description;
 			this.scen = scen;
 			this.actualSelector = actualSelector;
 		}
 
 		#region Uniary
-		public Scenario<TSubject, TResult, TProofType, TProofSource> should_be_false {
+		public Behaviour<TSubject, TResult, TProofType, TProofSource> should_be_false {
 			get { return scen.Then(description, (s, r, p) => Assert.IsFalse((bool) actualSelector(s, r, p))); }
 		}
-		public Scenario<TSubject, TResult, TProofType, TProofSource> should_be_true {
+		public Behaviour<TSubject, TResult, TProofType, TProofSource> should_be_true {
 			get { return scen.Then(description, (s, r, p) => Assert.IsTrue((bool) actualSelector(s, r, p))); }
 		}
-		public Scenario<TSubject, TResult, TProofType, TProofSource> should_be_null {
+		public Behaviour<TSubject, TResult, TProofType, TProofSource> should_be_null {
 			get { return scen.Then(description, (s, r, p) => Assert.IsNull(actualSelector(s, r, p))); }
 		}
-		public Scenario<TSubject, TResult, TProofType, TProofSource> should_not_be_null {
+		public Behaviour<TSubject, TResult, TProofType, TProofSource> should_not_be_null {
 			get { return scen.Then(description, (s, r, p) => Assert.IsNotNull(actualSelector(s, r, p))); }
 		}
-		public Scenario<TSubject, TResult, TProofType, TProofSource> should_be_empty {
+		public Behaviour<TSubject, TResult, TProofType, TProofSource> should_be_empty {
 			get {
 				return scen.Then(description, (s, r, p) => {
 				                              	var obj = actualSelector(s, r, p);
@@ -92,7 +92,7 @@ namespace FluentBDD.Assertions {
 				                              });
 			}
 		}
-		public Scenario<TSubject, TResult, TProofType, TProofSource> should_not_be_empty {
+		public Behaviour<TSubject, TResult, TProofType, TProofSource> should_not_be_empty {
 			get {
 				return scen.Then(description, (s, r, p) => {
 				                              	var obj = actualSelector(s, r, p);
@@ -101,10 +101,10 @@ namespace FluentBDD.Assertions {
 				                              });
 			}
 		}
-		public Scenario<TSubject, TResult, TProofType, TProofSource> should_be_instance_of<T> () {
+		public Behaviour<TSubject, TResult, TProofType, TProofSource> should_be_instance_of<T> () {
 			return scen.Then(description, (s, r, p) => Assert.That(actualSelector(s, r, p), Is.InstanceOf(typeof (T))));
 		}
-		public Scenario<TSubject, TResult, TProofType, TProofSource> should_not_be_instance_of<T>() {
+		public Behaviour<TSubject, TResult, TProofType, TProofSource> should_not_be_instance_of<T>() {
 			return scen.Then(description, (s, r, p) => Assert.That(actualSelector(s, r, p), Is.Not.InstanceOf(typeof(T))));
 		}
 		#endregion
@@ -208,28 +208,28 @@ namespace FluentBDD.Assertions {
 		}
 
 		/// <summary> Expect a specific value </summary>
-		public Scenario<TSubject, TResult, TProofType, TProofSource> value (object value) {
+		public Behaviour<TSubject, TResult, TProofType, TProofSource> value (object value) {
 			return src.scen.Then(src.description, (s, r, p) => assertion(src.actualSelector(s, r, p), value));
 		}
 		/// <summary> Expect the scenario's subject object </summary>
-		public Scenario<TSubject, TResult, TProofType, TProofSource> subject {
+		public Behaviour<TSubject, TResult, TProofType, TProofSource> subject {
 			get { return src.scen.Then(src.description, (s, r, p) => assertion(src.actualSelector(s, r, p), s)); }
 		}
 		/// <summary> Select part of the scenario's subject as the test's expectation </summary>
-		public Scenario<TSubject, TResult, TProofType, TProofSource> subject_part (Func<TSubject, object> selector) {
+		public Behaviour<TSubject, TResult, TProofType, TProofSource> subject_part (Func<TSubject, object> selector) {
 			return src.scen.Then(src.description, (s, r, p) => assertion(src.actualSelector(s, r, p), selector(s)));
 		}
 		/// <summary> Expect the result returned by the "When" clause </summary>
-		public Scenario<TSubject, TResult, TProofType, TProofSource> result {
+		public Behaviour<TSubject, TResult, TProofType, TProofSource> result {
 			get { return src.scen.Then(src.description, (s, r, p) => assertion(src.actualSelector(s, r, p), r)); }
 		}
 		/// <summary> Select part of the result returned by the "When" clause as the test's expectation</summary>
-		public Scenario<TSubject, TResult, TProofType, TProofSource> result_part (Func<TResult, object> selector) {
+		public Behaviour<TSubject, TResult, TProofType, TProofSource> result_part (Func<TResult, object> selector) {
 			return src.scen.Then(src.description, (s, r, p) => assertion(src.actualSelector(s, r, p), selector(r)));
 		}
 
 		/// <summary> Select a value from the scenario's proof as the test's expectation </summary>
-		public Scenario<TSubject, TResult, TProofType, TProofSource> proof (Func<TProofType, object> selector) {
+		public Behaviour<TSubject, TResult, TProofType, TProofSource> proof (Func<TProofType, object> selector) {
 			return src.scen.Then(src.description, (s, r, p) => assertion(src.actualSelector(s, r, p), selector(p)));
 		}
 	}
@@ -242,8 +242,8 @@ namespace FluentBDD.Assertions {
 	/// </summary>
 	public class SmartAssertionBase<TSubject, TResult> {
 		private readonly string description;
-		private readonly Scenario<TSubject, TResult> scen;
-		public SmartAssertionBase (string description, Scenario<TSubject, TResult> Scen) {
+		private readonly Behaviour<TSubject, TResult> scen;
+		public SmartAssertionBase (string description, Behaviour<TSubject, TResult> Scen) {
 			this.description = description;
 			scen = Scen;
 		}
@@ -265,12 +265,12 @@ namespace FluentBDD.Assertions {
 
 		/// <summary> Test that the scenario throws an exception of a matching type and message. </summary>
 		/// <param name="ex">An example exception to match against. To ignore the message in tests, pass an example exception with an empty message string</param>
-		public Scenario<TSubject, TResult> should_throw (Exception ex) {
+		public Behaviour<TSubject, TResult> should_throw (Exception ex) {
 			return scen.Then(description, () => ex);
 		}
 
 		/// <summary> Ignore a single "Then" clause in a scenario </summary>
-		public Scenario<TSubject, TResult> should_be_ignored {
+		public Behaviour<TSubject, TResult> should_be_ignored {
 			get { return scen.Then(description, (s, r) => Assert.Ignore("Ignored")); }
 		}
 	}
@@ -280,29 +280,29 @@ namespace FluentBDD.Assertions {
 	/// </summary>
 	public class SmartAssertion<TSubject, TResult> {
 		internal readonly string description;
-		internal readonly Scenario<TSubject, TResult> scen;
+		internal readonly Behaviour<TSubject, TResult> scen;
 		internal readonly Func<TSubject, TResult, object> actualSelector;
 
-		public SmartAssertion(string description, Scenario<TSubject, TResult> scen, Func<TSubject, TResult, object> actualSelector) {
+		public SmartAssertion(string description, Behaviour<TSubject, TResult> scen, Func<TSubject, TResult, object> actualSelector) {
 			this.description = description;
 			this.scen = scen;
 			this.actualSelector = actualSelector;
 		}
 
 		#region Uniary
-		public Scenario<TSubject, TResult> should_be_false {
+		public Behaviour<TSubject, TResult> should_be_false {
 			get { return scen.Then(description, (s, r) => Assert.IsFalse((bool) actualSelector(s, r))); }
 		}
-		public Scenario<TSubject, TResult> should_be_true {
+		public Behaviour<TSubject, TResult> should_be_true {
 			get { return scen.Then(description, (s, r) => Assert.IsTrue((bool) actualSelector(s, r))); }
 		}
-		public Scenario<TSubject, TResult> should_be_null {
+		public Behaviour<TSubject, TResult> should_be_null {
 			get { return scen.Then(description, (s, r) => Assert.IsNull(actualSelector(s, r))); }
 		}
-		public Scenario<TSubject, TResult> should_not_be_null {
+		public Behaviour<TSubject, TResult> should_not_be_null {
 			get { return scen.Then(description, (s, r) => Assert.IsNotNull(actualSelector(s, r))); }
 		}
-		public Scenario<TSubject, TResult> should_be_empty {
+		public Behaviour<TSubject, TResult> should_be_empty {
 			get {
 				return scen.Then(description, (s, r) => {
 				                              	var obj = actualSelector(s, r);
@@ -311,7 +311,7 @@ namespace FluentBDD.Assertions {
 				                              });
 			}
 		}
-		public Scenario<TSubject, TResult> should_not_be_empty {
+		public Behaviour<TSubject, TResult> should_not_be_empty {
 			get {
 				return scen.Then(description, (s, r) => {
 				                              	var obj = actualSelector(s, r);
@@ -320,10 +320,10 @@ namespace FluentBDD.Assertions {
 				                              });
 			}
 		}
-		public Scenario<TSubject, TResult> should_be_instance_of<T> () {
+		public Behaviour<TSubject, TResult> should_be_instance_of<T> () {
 			return scen.Then(description, (s, r) => Assert.That(actualSelector(s, r), Is.InstanceOf(typeof (T))));
 		}
-		public Scenario<TSubject, TResult> should_not_be_instance_of<T>() {
+		public Behaviour<TSubject, TResult> should_not_be_instance_of<T>() {
 			return scen.Then(description, (s, r) => Assert.That(actualSelector(s, r), Is.Not.InstanceOf(typeof(T))));
 		}
 		#endregion
@@ -427,23 +427,23 @@ namespace FluentBDD.Assertions {
 		}
 
 		/// <summary> Expect a specific value </summary>
-		public Scenario<TSubject, TResult> value (object value) {
+		public Behaviour<TSubject, TResult> value (object value) {
 			return src.scen.Then(src.description, (s, r) => assertion(src.actualSelector(s, r), value));
 		}
 		/// <summary> Expect the scenario's subject object </summary>
-		public Scenario<TSubject, TResult> subject {
+		public Behaviour<TSubject, TResult> subject {
 			get { return src.scen.Then(src.description, (s, r) => assertion(src.actualSelector(s, r), s)); }
 		}
 		/// <summary> Select part of the scenario's subject as the test's expectation </summary>
-		public Scenario<TSubject, TResult> subject_part (Func<TSubject, object> selector) {
+		public Behaviour<TSubject, TResult> subject_part (Func<TSubject, object> selector) {
 			return src.scen.Then(src.description, (s, r) => assertion(src.actualSelector(s, r), selector(s)));
 		}
 		/// <summary> Expect the result returned by the "When" clause </summary>
-		public Scenario<TSubject, TResult> result {
+		public Behaviour<TSubject, TResult> result {
 			get { return src.scen.Then(src.description, (s, r) => assertion(src.actualSelector(s, r), r)); }
 		}
 		/// <summary> Select part of the result returned by the "When" clause as the test's expectation</summary>
-		public Scenario<TSubject, TResult> result_part (Func<TResult, object> selector) {
+		public Behaviour<TSubject, TResult> result_part (Func<TResult, object> selector) {
 			return src.scen.Then(src.description, (s, r) => assertion(src.actualSelector(s, r), selector(r)));
 		}
 	}

@@ -12,15 +12,15 @@ using UsageExample;
 
 // The bowling scores example from SpecFlow
 namespace BowlingScores {
-	[Behaviour("Score calculation")]
+	[Behaviours("Score calculation")]
 	class ScoringConcerns : Behaviours {
-		public Scenario scoring_for_a_series_of_games_played = ProvedBy<IGameExpectations, valid_games>()
+		public Behaviour scoring_for_a_series_of_games_played = ProvedBy<IGameExpectations, valid_games>()
 			.Given<GameScorer, that_takes_a_series_of_pin_hits>()
 			.When("I score a valid game", (game_scorer, example) => game_scorer.ScoreGame())
 			.Then("I should get a final score").result.should_be_equal_to.proof(p => p.finalScore);
 
 
-		public Scenario I_shouldnt_be_able_to_bowl_when_the_game_is_over = ProvedBy<IGameExpectations, games_with_too_many_throws>()
+		public Behaviour I_shouldnt_be_able_to_bowl_when_the_game_is_over = ProvedBy<IGameExpectations, games_with_too_many_throws>()
 			.Given<GameScorer, that_takes_a_series_of_pin_hits>()
 			.When("I score an invalid game",		(game_scorer, example) => game_scorer.ScoreGame())
 				// How about this syntax?:

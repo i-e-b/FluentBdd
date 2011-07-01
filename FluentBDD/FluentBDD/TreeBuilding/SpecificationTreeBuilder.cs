@@ -13,9 +13,9 @@ namespace FluentBDD.TreeBuilding {
 		public static TestClosureTree BuildFor (Type containingType) {
 			var sourceInstance = CreateInstanceOf(containingType);
 			IEnumerable<FieldInfo> fields;
-			if (HasAttribute(containingType, typeof(BehaviourAttribute))) {
-				fields = GetFields<Scenario>(containingType);
-			} else if (HasAttribute(containingType, typeof(FeatureAttribute))) {
+			if (HasAttribute(containingType, typeof(BehavioursAttribute))) {
+				fields = GetFields<Behaviour>(containingType);
+			} else if (HasAttribute(containingType, typeof(FeatureSetAttribute))) {
 				fields = GetFields<Feature>(containingType);
 			} else {
 				throw new ArgumentException("Not a recognised specification");
@@ -28,8 +28,8 @@ namespace FluentBDD.TreeBuilding {
 		/// </summary>
 		public static string DescriptionFor (Type fixtureType) {
 			foreach (var attrib in fixtureType.GetCustomAttributes(false)) {
-				if (attrib is BehaviourAttribute) return (attrib as BehaviourAttribute).Description;
-				if (attrib is FeatureAttribute) return (attrib as FeatureAttribute).Description;
+				if (attrib is BehavioursAttribute) return (attrib as BehavioursAttribute).Description;
+				if (attrib is FeatureSetAttribute) return (attrib as FeatureSetAttribute).Description;
 			}
 			return "### Error: not a FluentBDD specification type ###";
 		}

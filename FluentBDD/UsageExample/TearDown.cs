@@ -3,9 +3,9 @@ using System.IO;
 using FluentBDD;
 
 namespace UsageExample {
-	[Behaviour("Contexts with tear-downs")]
+	[Behaviours("Contexts with tear-downs")]
 	public class TearDown : Behaviours {
-		public Scenario tear_downs =
+		public Behaviour tear_downs =
 			ProvedBy<values_of_files_to_create>()
 				.Given<FileCreator, teardown_context>()
 				.When("I call the create file method", (s, e) => s.CreateFile())
