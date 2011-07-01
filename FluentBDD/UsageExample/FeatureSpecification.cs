@@ -10,7 +10,7 @@ namespace CustomerFeatures {
 	/// Specific scenario "CoveredBy"s allow us the ReSharper-drive the tests, but we
 	/// can subsequently remove them to make the behaviours less fragile.
 	/// </summary>
-	[Feature("High level feature behaviour examples")]
+	[FeatureSet("High level feature behaviour examples")]
 	public class FeatureExamples : Feature {
 		public const string Ivor = "bowling alley owner Ivor Biggin";
 		public const string InventCorp = "equipment partner InventCorp";
@@ -70,7 +70,7 @@ namespace CustomerFeatures {
 
 	}
 	
-	[Feature("Drill down")]
+	[FeatureSet("Drill down")]
 	public class drillDown:Feature {
 		public Feature drill_down = 
 			For("Programmers using FluentBDD")
@@ -79,9 +79,9 @@ namespace CustomerFeatures {
 				.CoveredBy<detailFeature>();
 	}
 	
-	[Feature("Detail features")]
+	[FeatureSet("Detail features")]
 	public class detailFeature:Feature {}
-	[Behaviour("Dummy behaviour")]
+	[Behaviours("Dummy behaviour")]
 	public class dummyBehaviour: Behaviours{}
 	
 }

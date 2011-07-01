@@ -2,9 +2,9 @@
 using FluentBDD;
 
 namespace Advanced.UsageExample {
-	[Behaviour("Exceptions in expectations")]
+	[Behaviours("Exceptions in expectations")]
 	class ExceptionsInExpectations : Behaviours {
-		public Scenario a_load_of_different_exceptions =
+		public Behaviour a_load_of_different_exceptions =
 			ProvedBy<exception_expectations>()
 				.Given<ExceptionThrowingClass, an_exception_throwing_class>()
 				.When("I try to do something", (s, e) => s.ThrowException())

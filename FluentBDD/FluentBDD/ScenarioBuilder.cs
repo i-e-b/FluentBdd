@@ -15,30 +15,30 @@ namespace FluentBDD {
 			return this;
 		}
 
-		public Scenario<TSubject, no_result> When (string description, Action<TSubject> action) {
-			return new Scenario<TSubject, no_result>(description, ContextSources, action);
+		public Behaviour<TSubject, no_result> When (string description, Action<TSubject> action) {
+			return new Behaviour<TSubject, no_result>(description, ContextSources, action);
 		}
 
-		public Scenario<TSubject, no_result> When (string description, Action<TSubject, Context<TSubject>> action) {
-			return new Scenario<TSubject, no_result>(description, ContextSources, action);
+		public Behaviour<TSubject, no_result> When (string description, Action<TSubject, Context<TSubject>> action) {
+			return new Behaviour<TSubject, no_result>(description, ContextSources, action);
 		}
 
-		public Scenario<TSubject, TResult> When<TResult> (string description, Func<TSubject, TResult> action) {
-			return new Scenario<TSubject, TResult>(description, ContextSources, action);
+		public Behaviour<TSubject, TResult> When<TResult> (string description, Func<TSubject, TResult> action) {
+			return new Behaviour<TSubject, TResult>(description, ContextSources, action);
 		}
 
-		public Scenario<TSubject, no_result> Verify () {
-			return new Scenario<TSubject, no_result>("inspecting \"" + typeof(TSubject).Name + "\" type",
+		public Behaviour<TSubject, no_result> Verify () {
+			return new Behaviour<TSubject, no_result>("inspecting \"" + typeof(TSubject).Name + "\" type",
 			ContextSources, s => { });
 		}
 
-		public ScenarioWithoutAnAction<TSubject, TExampleType, TExampleSource> Using<TExampleType, TExampleSource> () where TExampleSource : class, TExampleType, IProvide<TExampleType>, new() where TExampleType : class {
-			return new ScenarioWithoutAnAction<TSubject, TExampleType, TExampleSource>(ContextSources);
+		public BehaviourWithoutAnAction<TSubject, TExampleType, TExampleSource> Using<TExampleType, TExampleSource> () where TExampleSource : class, TExampleType, IProvide<TExampleType>, new() where TExampleType : class {
+			return new BehaviourWithoutAnAction<TSubject, TExampleType, TExampleSource>(ContextSources);
 		}
 
-		public ScenarioWithoutAnAction<TSubject, TExampleSource, TExampleSource> Using<TExampleSource> ()
+		public BehaviourWithoutAnAction<TSubject, TExampleSource, TExampleSource> Using<TExampleSource> ()
 			where TExampleSource : class, IProvide<TExampleSource>, new() {
-			return new ScenarioWithoutAnAction<TSubject, TExampleSource, TExampleSource>(ContextSources);
+			return new BehaviourWithoutAnAction<TSubject, TExampleSource, TExampleSource>(ContextSources);
 		}
 	}
 

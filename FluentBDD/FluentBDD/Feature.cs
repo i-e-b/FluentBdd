@@ -6,14 +6,14 @@ using NUnit.Framework;
 
 namespace FluentBDD {
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-	public class FeatureAttribute : Attribute {
-		public FeatureAttribute () { }
+	public class FeatureSetAttribute : Attribute {
+		public FeatureSetAttribute () { }
 
 		/// <summary>
 		/// Feature specification. Will be tested by NUnit.
 		/// </summary>
 		/// <param name="description">Description, as shown in test results</param>
-		public FeatureAttribute (string description) {
+		public FeatureSetAttribute (string description) {
 			Description = description;
 		}
 
@@ -50,8 +50,8 @@ namespace FluentBDD {
 			var isOk = true;
 			var message = "???";
 			foreach (var coveringType in CoveringTypes) {
-				var featureAttribCount = coveringType.GetCustomAttributes(typeof (BehaviourAttribute), false).Length;
-				featureAttribCount += coveringType.GetCustomAttributes(typeof (FeatureAttribute), false).Length;
+				var featureAttribCount = coveringType.GetCustomAttributes(typeof (BehavioursAttribute), false).Length;
+				featureAttribCount += coveringType.GetCustomAttributes(typeof (FeatureSetAttribute), false).Length;
 				
 				if (featureAttribCount == 1) {
 					message = coveringType.FullName + " is a behaviour or feature set [OK]";
@@ -85,7 +85,7 @@ namespace FluentBDD {
 			return this;
 		}
 
-		public Feature CoveredBy<TCoveringType> (params Expression<Func<TCoveringType, Scenario>>[] explicitScenarios) {
+		public Feature CoveredBy<TCoveringType> (params Expression<Func<TCoveringType, Behaviour>>[] explicitScenarios) {
 			CoveringTypes.Add(typeof(TCoveringType));
 			return this;
 		}
@@ -100,7 +100,7 @@ namespace FluentBDD {
 		IBehaviourSpec To (string goal);
 		IBehaviourSpec Should (string solution);
 		Feature CoveredBy<TCoveringType> ();
-		Feature CoveredBy<TCoveringType> (params Expression<Func<TCoveringType, Scenario>>[] explicitScenarios);
+		Feature CoveredBy<TCoveringType> (params Expression<Func<TCoveringType, Behaviour>>[] explicitScenarios);
 		Feature CoverageNotComplete ();
 	}
 

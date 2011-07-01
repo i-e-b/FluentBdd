@@ -4,7 +4,7 @@ using FluentBDD;
 using UsageExample;
 
 namespace CalculatorConcerns {
-	[Feature("Calculator features")]
+	[FeatureSet("Calculator features")]
 	public class CalculatorFeatures : Feature {
 		public Feature creation =
 			For("Calculator users")
@@ -31,31 +31,31 @@ namespace CalculatorConcerns {
 				.CoveredBy<DataContracts>();
 	}
 
-	[Behaviour("Calculator Creation")]
+	[Behaviours("Calculator Creation")]
 	public class Creation : Behaviours {
-		public Scenario when_creating_a_calculator =
+		public Behaviour when_creating_a_calculator =
 			GivenNoSubject()
 				.When("I create a calculator", with => new Calculator())
 				.Then("I should have a new calculator").result.should_not_be_null;
 
 
-		public Scenario when_creating_an_invalid_calculator =
+		public Behaviour when_creating_an_invalid_calculator =
 			GivenNoSubject()
 				.When("I create a calculator with a null math delegate", c => { new Calculator(null); })
 				.Then("should not be allowed to create calculator").should_throw(new ArgumentException("A math delegate must be provided"));
 	}
 
-	[Behaviour("Addition")]
+	[Behaviours("Addition")]
 	public class Addition : common_calculator_concerns {
 		// Two inputs
-		public Scenario calculator_can_add_two_numbers =
+		public Behaviour calculator_can_add_two_numbers =
 			ProvedBy<values_for_calculator_taking_inputs>()
 				.Given<Calculator, a_calculator_taking_two_inputs>()
 				.When("I press add once", (calculator, e) => press_add_n_times(calculator, 1))
 				.Then("result should be sum of first and second").result.should_be_equal_to.proof(p => p.first_plus_second)
 				.Then("readout should be same as result").subject_part(c => c.Readout()).should_be_equal_to.result;
 
-		public Scenario cant_add_more_than_I_have_inputs_for_with_2_inputs =
+		public Behaviour cant_add_more_than_I_have_inputs_for_with_2_inputs =
 			ProvedBy<values_for_calculator_taking_inputs>()
 				.Given<Calculator, a_calculator_taking_two_inputs>()
 				.When("I press add twice", (calculator, e) => press_add_n_times(calculator, 2))
@@ -63,21 +63,21 @@ namespace CalculatorConcerns {
 				.WithMessage("Stack empty.");
 
 		// Three inputs
-		public Scenario calculator_can_add_two_of_three_numbers =
+		public Behaviour calculator_can_add_two_of_three_numbers =
 			ProvedBy<values_for_calculator_taking_inputs>()
 				.Given<Calculator, a_calculator_taking_three_inputs>()
 				.When("I press add once", (calculator, e) => press_add_n_times(calculator, 1))
 				.Then("result should be sum of second and third input").result.should_be_equal_to.proof(p => p.second_plus_third)
 				.Then("readout should be same as result").subject_part(c => c.Readout()).should_be_equal_to.result;
 
-		public Scenario calculator_can_add_three_numbers =
+		public Behaviour calculator_can_add_three_numbers =
 			ProvedBy<values_for_calculator_taking_inputs>()
 				.Given<Calculator, a_calculator_taking_three_inputs>()
 				.When("I press add twice", (c, e) => press_add_n_times(c, 2))
 				.Then("result should be sum of first, second and third input").result.should_be_equal_to.proof(p => p.first_second_plus_third)
 				.Then("readout should be same as result").subject_part(c => c.Readout()).should_be_equal_to.result;
 
-		public Scenario cant_add_more_than_I_have_inputs_for_with_3_inputs =
+		public Behaviour cant_add_more_than_I_have_inputs_for_with_3_inputs =
 			ProvedBy<values_for_calculator_taking_inputs>()
 				.Given<Calculator, a_calculator_taking_three_inputs>()
 				.When("I press add three times", (calculator, e) => press_add_n_times(calculator, 3))
@@ -85,38 +85,38 @@ namespace CalculatorConcerns {
 				.WithMessage("Stack empty.");
 	}
 
-	[Behaviour("Subtraction")]
+	[Behaviours("Subtraction")]
 	public class Subtraction : common_calculator_concerns {
 		// Two inputs
-		public Scenario calculator_can_add_two_numbers =
+		public Behaviour calculator_can_add_two_numbers =
 			ProvedBy<values_for_calculator_taking_inputs>()
 				.Given<Calculator, a_calculator_taking_two_inputs>()
 				.When("I press subtract once", (c, e) => press_subtract_n_times(c, 1))
 				.Then("result should be difference of first and second").result.should_be_equal_to.proof(p => p.first_minus_second)
 				.Then("readout should be same as result").subject_part(c => c.Readout()).should_be_equal_to.result;
 
-		public Scenario cant_add_more_than_I_have_inputs_for_with_2_inputs =
+		public Behaviour cant_add_more_than_I_have_inputs_for_with_2_inputs =
 			ProvedBy<values_for_calculator_taking_inputs>()
 				.Given<Calculator, a_calculator_taking_two_inputs>()
 				.When("I press subtract twice", (c, e) => press_subtract_n_times(c, 2))
 				.Then("should show error message").should_throw(new InvalidOperationException("Stack empty."));
 
 		// Three inputs
-		public Scenario calculator_can_add_two_of_three_numbers =
+		public Behaviour calculator_can_add_two_of_three_numbers =
 			ProvedBy<values_for_calculator_taking_inputs>()
 				.Given<Calculator, a_calculator_taking_three_inputs>()
 				.When("I press subtract once", (c, e) => press_subtract_n_times(c, 1))
 				.Then("result should be sum of second and third input").result.should_be_equal_to.proof(p => p.second_minus_third)
 				.Then("readout should be same as result").subject_part(c => c.Readout()).should_be_equal_to.result;
 
-		public Scenario calculator_can_add_three_numbers =
+		public Behaviour calculator_can_add_three_numbers =
 			ProvedBy<values_for_calculator_taking_inputs>()
 				.Given<Calculator, a_calculator_taking_three_inputs>()
 				.When("I press subtract twice", (c, e) => press_subtract_n_times(c, 2))
 				.Then("result should be sum of first, second and third input").result.should_be_equal_to.proof(p => p.first_minus__second_minus_third)
 				.Then("readout should be same as result").subject_part(c => c.Readout()).should_be_equal_to.result;
 
-		public Scenario cant_add_more_than_I_have_inputs_for_with_3_inputs =
+		public Behaviour cant_add_more_than_I_have_inputs_for_with_3_inputs =
 			ProvedBy<values_for_calculator_taking_inputs>()
 				.Given<Calculator, a_calculator_taking_three_inputs>()
 				.When("I press subtract three times", (c, e) => press_subtract_n_times(c, 3))
@@ -124,9 +124,9 @@ namespace CalculatorConcerns {
 				.WithMessage("Stack empty.");
 	}
 
-	[Behaviour("Data Contracts")]
+	[Behaviours("Data Contracts")]
 	public class DataContracts : Behaviours {
-		public Scenario calculator_should_have_datacontracts =
+		public Behaviour calculator_should_have_datacontracts =
 			Given<Calculator, a_calculator>()
 				.Verify()
 				.ShouldHaveAttribute<DataContractAttribute>()

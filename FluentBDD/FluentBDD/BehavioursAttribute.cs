@@ -2,14 +2,14 @@
 
 namespace FluentBDD {
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-	public class BehaviourAttribute : Attribute {
-		public BehaviourAttribute() {}
+	public class BehavioursAttribute : Attribute {
+		public BehavioursAttribute() {}
 
 		/// <summary>
 		/// Feature specification. Will be tested by NUnit.
 		/// </summary>
 		/// <param name="description">Description, as shown in test results</param>
-		public BehaviourAttribute (string description) {
+		public BehavioursAttribute (string description) {
 			Description = description;
 		}
 
@@ -18,7 +18,7 @@ namespace FluentBDD {
 		/// </summary>
 		/// <param name="description">Description, as shown in test results</param>
 		/// <param name="info">Textual info (ignored)</param>
-		public BehaviourAttribute (string description, params string[] info) {
+		public BehavioursAttribute (string description, params string[] info) {
 			Description = description;
 			Info = info;
 		}

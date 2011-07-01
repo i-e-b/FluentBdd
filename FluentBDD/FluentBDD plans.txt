@@ -1,11 +1,14 @@
 Fluent BDD
 
 TO DO:
+ - Chase Scenario->Behaviour name through system
  - Tests to cover all SmartAssertion cases.
  - Clean up usage around proofs (IUse, IProvide are maybes, but all uses of 'examples' and 'values' should move to 'proof')
- - Change tree to be a real pure tree structure. Tests in leafs only. Feature leafs should be list of coverage types.
- - Make a link between Features and their behaviours, extending and cleaning up TestClosure{}
+ - Clean up the THEN lambdas, expose only (result) | (result, proof); use SmartAssertion for others
+ - Try to make the selection of fields/methods/properties more clear in SA (result_part etc.) -- maybe with result->TheResult; result_part->Result(=>)
  - Rework slideshow so the separation and composition ideas are more clear, and show a little better what this means in code.
 
 TO CONSIDER:
  - Wrap all low-level assertions around an interface, and do the NUnit Assert calls in the NUnit extension; remove NUnit dependencies from FluentBDD core.
+ - Change tree to be a real pure tree structure. Tests in leafs only. Feature leafs should be list of coverage types.
+ - Make a link between Features and their behaviours, extending and cleaning up TestClosure{}
