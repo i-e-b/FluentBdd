@@ -19,19 +19,10 @@ namespace FluentBDD.Assertions {
 		}
 
 		/// <summary>Test that the scenario's subject matches an expectation</summary>
-		public SmartAssertion<TSubject, TResult, TProofType, TProofSource> subject { get { return new SmartAssertion<TSubject, TResult, TProofType, TProofSource>(description, scen, (s, r, v) => s); } }
-		
-		/// <summary> Select something from the subject to test against an expectation </summary>
-		public SmartAssertion<TSubject, TResult, TProofType, TProofSource> subject_part (Func<TSubject, object> selector) {
-			return new SmartAssertion<TSubject, TResult, TProofType, TProofSource>(description, scen, (s, r, v) => selector(s));
-		}
+		public SmartAssertion<TSubject, TResult, TProofType, TProofSource, TSubject> Subject { get { return new SmartAssertion<TSubject, TResult, TProofType, TProofSource, TSubject>(description, scen, (s, r, v) => s); } }
+
 		/// <summary> Test that the result returned by the "When" clause matches an expectation </summary>
-		public SmartAssertion<TSubject, TResult, TProofType, TProofSource> result { get { return new SmartAssertion<TSubject, TResult, TProofType, TProofSource>(description, scen, (s, r, v) => r); } }
-		
-		/// <summary> Select something from the result returned by the "When" clause to test against an expectation  </summary>
-		public SmartAssertion<TSubject, TResult, TProofType, TProofSource> result_part (Func<TResult, object> selector) {
-			return new SmartAssertion<TSubject, TResult, TProofType, TProofSource>(description, scen, (s, r, v) => selector(r));
-		}
+		public SmartAssertion<TSubject, TResult, TProofType, TProofSource, TResult> Result { get { return new SmartAssertion<TSubject, TResult, TProofType, TProofSource, TResult>(description, scen, (s, r, v) => r); } }
 
 		/// <summary> Test that the scenario throws an exception of a matching type and message. </summary>
 		/// <param name="ex">An example exception to match against. To ignore the message in tests, pass an example exception with an empty message string</param>
@@ -39,10 +30,17 @@ namespace FluentBDD.Assertions {
 			return scen.Then(description, p => ex);
 		}
 
+
+		/// <summary> Test that the scenario throws an exception of a matching type and message from proofs. </summary>
+		/// <param name="ex">An example exception to match against. To ignore the message in tests, pass an example exception with an empty message string</param>
+		public Behaviour<TSubject, TResult, TProofType, TProofSource> should_throw (Func<TProofType,Exception> ex) {
+			return scen.Then(description, ex);
+		}
+
 		/// <summary> Return a value based on proof values to test against an expectation </summary>
 		/// <param name="selector">A function on the scenario proofs; e.g. ".check(p=>File.Exists(p.fileName)."</param>
-		public SmartAssertion<TSubject, TResult, TProofType, TProofSource> check (Func<TProofType, object> selector) {
-			return new SmartAssertion<TSubject, TResult, TProofType, TProofSource>(description, scen, (s, r, v) => selector(v));
+		public SmartAssertion<TSubject, TResult, TProofType, TProofSource, TProofType> check (Func<TProofType, object> selector) {
+			return new SmartAssertion<TSubject, TResult, TProofType, TProofSource, TProofType>(description, scen, (s, r, v) => selector(v));
 		}
 
 		/// <summary> Call a method on the scenario proof, which should make it's own assertions </summary>
@@ -59,7 +57,7 @@ namespace FluentBDD.Assertions {
 	/// <summary>
 	/// Uniary assertions, and the "actual" part of binary assertions
 	/// </summary>
-	public class SmartAssertion<TSubject, TResult, TProofType, TProofSource> where TProofSource : class, TProofType, IProvide<TProofType>, new() {
+	public class SmartAssertion<TSubject, TResult, TProofType, TProofSource, TSelectorType> where TProofSource : class, TProofType, IProvide<TProofType>, new() {
 		internal readonly string description;
 		internal readonly Behaviour<TSubject, TResult, TProofType, TProofSource> scen;
 		internal readonly Func<TSubject, TResult, TProofType, object> actualSelector;
@@ -68,6 +66,21 @@ namespace FluentBDD.Assertions {
 			this.description = description;
 			this.scen = scen;
 			this.actualSelector = actualSelector;
+		}
+
+		public SmartAssertion<TSubject, TResult, TProofType, TProofSource, TSelectorType> this[Func<TSelectorType, object> selector] {
+			get {
+				return new SmartAssertion<TSubject, TResult, TProofType, TProofSource, TSelectorType>
+					(description, scen, (s, r, v) => {
+					                    	object o;
+											if (typeof(TSubject) == typeof(TSelectorType)) o = s;
+											else if (typeof(TResult) == typeof(TSelectorType)) o = r;
+											else if (typeof(TProofType) == typeof(TSelectorType)) o = v;
+											else throw new ArgumentException("Sub selector type didn't match subject, result or proofs");
+					                    	return selector((TSelectorType)o);
+					                    }
+					);
+			}
 		}
 
 		#region Uniary
@@ -111,82 +124,82 @@ namespace FluentBDD.Assertions {
 
 		#region Binary
 		#region object equality
-		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource> should_be_equal_to {
-			get { return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource>(this, (actual, expected)=> Assert.AreEqual(expected, actual));}
+		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType> should_be_equal_to {
+			get { return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType>(this, (actual, expected) => Assert.AreEqual(expected, actual)); }
 		}
-		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource> should_not_be_equal_to {
-			get { return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource>(this, (actual, expected)=> Assert.AreNotEqual(expected, actual));}
+		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType> should_not_be_equal_to {
+			get { return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType>(this, (actual, expected) => Assert.AreNotEqual(expected, actual)); }
 		}
-		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource> should_be_same_as {
-			get { return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource>(this, (actual, expected)=> Assert.AreSame(expected, actual));}
+		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType> should_be_same_as {
+			get { return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType>(this, (actual, expected) => Assert.AreSame(expected, actual)); }
 		}
-		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource> should_not_be_same_as {
-			get { return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource>(this, (actual, expected)=> Assert.AreNotSame(expected, actual));}
+		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType> should_not_be_same_as {
+			get { return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType>(this, (actual, expected) => Assert.AreNotSame(expected, actual)); }
 		}
 		#endregion
 		#region numerical equality
-		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource> should_be_greater_than {
-			get { return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource>(this, (actual, expected)=> Assert.That(actual, Is.GreaterThan(expected)));}
+		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType> should_be_greater_than {
+			get { return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType>(this, (actual, expected) => Assert.That(actual, Is.GreaterThan(expected))); }
 		}
-		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource> should_be_greater_than_or_equal_to {
-			get { return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource>(this, (actual, expected)=> Assert.That(actual, Is.GreaterThanOrEqualTo(expected)));}
+		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType> should_be_greater_than_or_equal_to {
+			get { return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType>(this, (actual, expected) => Assert.That(actual, Is.GreaterThanOrEqualTo(expected))); }
 		}
-		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource> should_be_less_than {
-			get { return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource>(this, (actual, expected)=> Assert.That(actual, Is.LessThan(expected)));}
+		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType> should_be_less_than {
+			get { return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType>(this, (actual, expected) => Assert.That(actual, Is.LessThan(expected))); }
 		}
-		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource> should_be_less_than_or_equal_to {
-			get { return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource>(this, (actual, expected)=> Assert.That(actual, Is.LessThanOrEqualTo(expected)));}
+		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType> should_be_less_than_or_equal_to {
+			get { return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType>(this, (actual, expected) => Assert.That(actual, Is.LessThanOrEqualTo(expected))); }
 		}
 		#endregion
 		#region string equality
-		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource> should_contain_substring {
+		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType> should_contain_substring {
 			get {
-				return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource>(this, (actual, expected) =>Assert.That(actual, Is.StringContaining((string)expected)));
+				return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType>(this, (actual, expected) => Assert.That(actual, Is.StringContaining((string)expected)));
 			}
 		}
-		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource> should_not_contain_substring {
+		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType> should_not_contain_substring {
 			get {
-				return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource>(this, (actual, expected) =>Assert.That(actual, Is.Not.StringContaining((string)expected)));
+				return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType>(this, (actual, expected) => Assert.That(actual, Is.Not.StringContaining((string)expected)));
 			}
 		}
-		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource> should_be_case_insensitive_equal_to {
+		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType> should_be_case_insensitive_equal_to {
 			get {
-				return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource>(this, (actual, expected) =>Assert.That(actual, Is.EqualTo(expected).IgnoreCase));
+				return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType>(this, (actual, expected) => Assert.That(actual, Is.EqualTo(expected).IgnoreCase));
 			}
 		}
 		#endregion
 		#region enumeration equality
-		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource> should_contain_element {
-			get { return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource>(this, (actual, expected) => Assert.That(((IEnumerable<object>)actual).Contains(expected), Is.True, "should contain element "+expected) ); }
+		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType> should_contain_element {
+			get { return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType>(this, (actual, expected) => Assert.That(((IEnumerable<object>)actual).Contains(expected), Is.True, "should contain element " + expected)); }
 		}
-		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource> should_not_contain_element {
+		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType> should_not_contain_element {
 			get {
-				return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource>(this, (actual, expected) =>Assert.That(((IEnumerable<object>)actual).Contains(expected), Is.False, "should not contain element " + expected));
+				return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType>(this, (actual, expected) => Assert.That(((IEnumerable<object>)actual).Contains(expected), Is.False, "should not contain element " + expected));
 			}
 		}
-		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource> should_contain_match<T>(Func<T, bool> predicate) {
-			return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource>(this, (actual, expected) => 
+		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType> should_contain_match<T> (Func<T, bool> predicate) {
+			return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType>(this, (actual, expected) => 
 				Assert.That(((IEnumerable<T>)actual).Any(predicate), Is.True, "should contain element matching a predicate")
 				
 				); 
 		}
-		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource> should_not_contain_match<T> (Func<T, bool> predicate) {
-			return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource>(this, (actual, expected) =>
+		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType> should_not_contain_match<T> (Func<T, bool> predicate) {
+			return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType>(this, (actual, expected) =>
 				Assert.That(((IEnumerable<T>)actual).Any(predicate), Is.False, "should not contain element matching a predicate")
 
 				);
 		}
-		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource> should_contain_the_same_elements_as {
+		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType> should_contain_the_same_elements_as {
 			get {
-				return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource>(this, (actual, expected) =>
+				return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType>(this, (actual, expected) =>
 					Assert.That(((IEnumerable<object>)actual).All(((IEnumerable<object>)expected).Contains)
 					&& ((IEnumerable<object>)expected).All(((IEnumerable<object>)actual).Contains), Is.True, actual + " should contain the same elements as " + expected)
 				                                                                                   );
 			}
 		}
-		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource> should_contain_the_same_sequence_as {
+		public SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType> should_contain_the_same_sequence_as {
 			get {
-				return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource>(this, (actual, expected) =>
+				return new SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType>(this, (actual, expected) =>
 					Assert.That(((IEnumerable<object>)actual).SequenceEqual((IEnumerable<object>)expected), Is.True, actual + " should be the same sequence as " + expected)
 																								   );
 			}
@@ -198,11 +211,11 @@ namespace FluentBDD.Assertions {
 	/// <summary>
 	/// Binary assertions' "expected" parts
 	/// </summary>
-	public class SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource> where TProofSource : class, TProofType, IProvide<TProofType>, new() {
-		private readonly SmartAssertion<TSubject, TResult, TProofType, TProofSource> src;
+	public class SmartAssertionBinary<TSubject, TResult, TProofType, TProofSource, TSelectorType> where TProofSource : class, TProofType, IProvide<TProofType>, new() {
+		private readonly SmartAssertion<TSubject, TResult, TProofType, TProofSource, TSelectorType> src;
 		private readonly Action<object, object> assertion;
 
-		public SmartAssertionBinary(SmartAssertion<TSubject, TResult, TProofType, TProofSource> SmartAssertion, Action<object, object> assertion) {
+		public SmartAssertionBinary (SmartAssertion<TSubject, TResult, TProofType, TProofSource, TSelectorType> SmartAssertion, Action<object, object> assertion) {
 			src = SmartAssertion;
 			this.assertion = assertion;
 		}

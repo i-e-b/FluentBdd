@@ -8,7 +8,7 @@ namespace Advanced.UsageExample {
 			ProvedBy<exception_expectations>()
 				.Given<ExceptionThrowingClass, an_exception_throwing_class>()
 				.When("I try to do something", (s, e) => s.ThrowException())
-				.Then("I should not succeed", v => v.ExpectedException);
+				.Then("I should not succeed").should_throw(v => v.ExpectedException);
 	}
 
 	internal class nothing_context: Context<object>, IUse<nothing> {

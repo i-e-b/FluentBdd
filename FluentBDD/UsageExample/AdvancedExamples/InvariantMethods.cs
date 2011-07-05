@@ -9,14 +9,14 @@ namespace Advanced.UsageExample {
 		public Behaviour complex_calculation_should_work =
 			GivenStaticContextFor<values_for_complex_calculation>()
 				.Using<values_for_complex_calculation>()
-				.When("I calculate the value with a known input", (no_subject, context) => StaticMethods.Calculate(context.Values.input))
-				.Then("I should get the matching output").result.should_be_equal_to.proof(p => p.result);
+				.When("I calculate the value with a known input", (no_subject, proof) => StaticMethods.Calculate(proof.input))
+				.Then("I should get the matching output").Result.should_be_equal_to.proof(p => p.result);
 
 		public Behaviour same_using_interfaces_for_expectations =
 			GivenStaticContextFor<ISimpleInOutExpectations>()
 				.Using<ISimpleInOutExpectations, values_for_complex_calculation_using_interface>()
-				.When("I calculate the value with a known input", (no_subject, context) => StaticMethods.Calculate(context.Values.input))
-				.Then("I should get the matching output (using interface)").result.should_be_equal_to.proof(p => p.result);
+				.When("I calculate the value with a known input", (no_subject, proof) => StaticMethods.Calculate(proof.input))
+				.Then("I should get the matching output (using interface)").Result.should_be_equal_to.proof(p => p.result);
 
 	}
 

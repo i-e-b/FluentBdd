@@ -43,7 +43,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assertions\SmartAssertionExtensions.cs" />
+    <Compile Include="IgnoreMe.cs" />
     <Compile Include="Assertions\SmartAssertions.cs" />
     <Compile Include="Feature.cs" />
     <Compile Include="Context.cs" />

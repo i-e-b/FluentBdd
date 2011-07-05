@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using FluentBDD.Assertions;
 using NUnit.Framework;
 
 namespace FluentBDD {
@@ -83,14 +84,13 @@ namespace FluentBDD {
 		#endregion
 
 		#region THENs
-		public Behaviour<TSubject, TResult> Then (string description, Action<TSubject> subjectOnlyTest) {
-			subjectOnlyTests.Add(new Group<string, Action<TSubject>>(description, subjectOnlyTest));
+		internal Behaviour<TSubject, TResult> Then (string description, Action<TSubject, TResult> subjectAndResultTest) {
+			subjectAndResultTests.Add(new Group<string, Action<TSubject, TResult>>(description, subjectAndResultTest));
 			return this;
 		}
 
-		public Behaviour<TSubject, TResult> Then (string description, Action<TSubject, TResult> subjectAndResultTest) {
-			subjectAndResultTests.Add(new Group<string, Action<TSubject, TResult>>(description, subjectAndResultTest));
-			return this;
+		public SmartAssertionBase<TSubject, TResult> Then (string description) {
+			return new SmartAssertionBase<TSubject, TResult>(description, this);
 		}
 		#endregion
 
@@ -113,8 +113,8 @@ namespace FluentBDD {
 			return this;
 		}
 
-		
-		public Behaviour<TSubject, TResult> Then(string description, Func<Exception> sampleExceptionSource) {
+
+		internal Behaviour<TSubject, TResult> Then (string description, Func<Exception> sampleExceptionSource) {
 			exceptionTests
 				.Add(new Group<string, Func<Exception>>(
 				     	description,
@@ -237,12 +237,12 @@ namespace FluentBDD {
 			return this;
 		}
 
-		public Behaviour<TSubject, TResult, TExampleType, TExampleSource> When<TResult> (string description, Func<TSubject, IUse<TExampleType>, TResult> action) {
-			return new Behaviour<TSubject, TResult, TExampleType, TExampleSource>(description, ContextSources, (subject, context) => action(subject, (IUse<TExampleType>)context ));
+		public Behaviour<TSubject, TResult, TExampleType, TExampleSource> When<TResult> (string description, Func<TSubject, TExampleType, TResult> action) {
+			return new Behaviour<TSubject, TResult, TExampleType, TExampleSource>(description, ContextSources, (subject, context) => action(subject,((IUse<TExampleType>)context).Values ));
 		}
 
-		public Behaviour<TSubject, no_result, TExampleType, TExampleSource> When (string description, Action<TSubject, IUse<TExampleType>> action) {
-			return new Behaviour<TSubject, no_result, TExampleType, TExampleSource>(description, ContextSources, (subject, context) => action(subject, (IUse<TExampleType>)context));
+		public Behaviour<TSubject, no_result, TExampleType, TExampleSource> When (string description, Action<TSubject, TExampleType> action) {
+			return new Behaviour<TSubject, no_result, TExampleType, TExampleSource>(description, ContextSources, (subject, context) => action(subject, ((IUse<TExampleType>)context).Values));
 		}
 	}
 
@@ -281,9 +281,8 @@ namespace FluentBDD {
 			return this;
 		}
 
-		public Behaviour<TSubject, TResult, TExampleType, TExampleSource> Then (string description, Action<TSubject, TExampleSource> subjectAndExampleTest) {
-			subjectAndExampleTests.Add(new Group<string, Action<TSubject, TExampleSource>>(description, subjectAndExampleTest));
-			return this;
+		new public SmartAssertionBase<TSubject, TResult, TExampleType, TExampleSource> Then (string description) {
+			return new SmartAssertionBase<TSubject, TResult, TExampleType, TExampleSource>(description, this);
 		}
 		#endregion
 
@@ -306,7 +305,7 @@ namespace FluentBDD {
 			return this;
 		}
 
-		public Behaviour<TSubject, TResult, TExampleType, TExampleSource> Then(string description, Func<TExampleType, Exception> sampleExceptionSource) {
+		internal Behaviour<TSubject, TResult, TExampleType, TExampleSource> Then(string description, Func<TExampleType, Exception> sampleExceptionSource) {
 			specificExceptionTests
 				.Add(new Group<string, Func<TExampleType, Exception>>(
 				     	description,
