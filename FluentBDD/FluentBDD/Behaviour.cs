@@ -230,9 +230,12 @@ namespace FluentBDD {
 		public BehaviourWithoutAnAction (List<Func<Context<TSubject>>> contextSources) {
 			ContextSources = contextSources;
 		}
-
+		
+		/// <summary>
+		/// Add another context which shares the same subject and behaviour as the first.
+		/// </summary>
 		public BehaviourWithoutAnAction<TSubject, TExampleType, TExampleSource> 
-			And<TContext> () where TContext : Context<TSubject>, new()  {
+			AlsoGiven<TContext> () where TContext : Context<TSubject>, new()  {
 			ContextSources.Add(() => new TContext());
 			return this;
 		}

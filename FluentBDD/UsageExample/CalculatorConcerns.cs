@@ -36,7 +36,7 @@ namespace CalculatorConcerns {
 		public Behaviour when_creating_a_calculator =
 			GivenNoSubject()
 				.When("I create a calculator", with => new Calculator())
-				.Then("I should have a new calculator").result.should_not_be_null;
+				.Then("I should have a new calculator").Result.should_not_be_null;
 
 
 		public Behaviour when_creating_an_invalid_calculator =
@@ -52,8 +52,8 @@ namespace CalculatorConcerns {
 			ProvedBy<values_for_calculator_taking_inputs>()
 				.Given<Calculator, a_calculator_taking_two_inputs>()
 				.When("I press add once", (calculator, e) => press_add_n_times(calculator, 1))
-				.Then("result should be sum of first and second").Result.should_be_equal_to.proof(p => p.first_plus_second)
-				.Then("readout should be same as result").Subject[c => c.Readout()].should_be_equal_to.result;
+				.Then("result should be sum of first and second").Result.should_be_equal_to.Proof(p => p.first_plus_second)
+				.Then("readout should be same as result").Subject[c => c.Readout()].should_be_equal_to.TheResult;
 
 		public Behaviour cant_add_more_than_I_have_inputs_for_with_2_inputs =
 			ProvedBy<values_for_calculator_taking_inputs>()
@@ -67,15 +67,15 @@ namespace CalculatorConcerns {
 			ProvedBy<values_for_calculator_taking_inputs>()
 				.Given<Calculator, a_calculator_taking_three_inputs>()
 				.When("I press add once", (calculator, e) => press_add_n_times(calculator, 1))
-				.Then("result should be sum of second and third input").Result.should_be_equal_to.proof(p => p.second_plus_third)
-				.Then("readout should be same as result").Subject[c => c.Readout()].should_be_equal_to.result;
+				.Then("result should be sum of second and third input").Result.should_be_equal_to.Proof(p => p.second_plus_third)
+				.Then("readout should be same as result").Subject[c => c.Readout()].should_be_equal_to.TheResult;
 
 		public Behaviour calculator_can_add_three_numbers =
 			ProvedBy<values_for_calculator_taking_inputs>()
 				.Given<Calculator, a_calculator_taking_three_inputs>()
 				.When("I press add twice", (c, e) => press_add_n_times(c, 2))
-				.Then("result should be sum of first, second and third input").Result.should_be_equal_to.proof(p => p.first_second_plus_third)
-				.Then("readout should be same as result").Subject[c => c.Readout()].should_be_equal_to.result;
+				.Then("result should be sum of first, second and third input").Result.should_be_equal_to.Proof(p => p.first_second_plus_third)
+				.Then("readout should be same as result").Subject[c => c.Readout()].should_be_equal_to.TheResult;
 
 		public Behaviour cant_add_more_than_I_have_inputs_for_with_3_inputs =
 			ProvedBy<values_for_calculator_taking_inputs>()
@@ -92,8 +92,8 @@ namespace CalculatorConcerns {
 			ProvedBy<values_for_calculator_taking_inputs>()
 				.Given<Calculator, a_calculator_taking_two_inputs>()
 				.When("I press subtract once", (c, e) => press_subtract_n_times(c, 1))
-				.Then("result should be difference of first and second").Result.should_be_equal_to.proof(p => p.first_minus_second)
-				.Then("readout should be same as result").Subject[c => c.Readout()].should_be_equal_to.result;
+				.Then("result should be difference of first and second").Result.should_be_equal_to.Proof(p => p.first_minus_second)
+				.Then("readout should be same as result").Subject[c => c.Readout()].should_be_equal_to.TheResult;
 
 		public Behaviour cant_add_more_than_I_have_inputs_for_with_2_inputs =
 			ProvedBy<values_for_calculator_taking_inputs>()
@@ -106,15 +106,15 @@ namespace CalculatorConcerns {
 			ProvedBy<values_for_calculator_taking_inputs>()
 				.Given<Calculator, a_calculator_taking_three_inputs>()
 				.When("I press subtract once", (c, e) => press_subtract_n_times(c, 1))
-				.Then("result should be sum of second and third input").Result.should_be_equal_to.proof(p => p.second_minus_third)
-				.Then("readout should be same as result").Subject[c => c.Readout()].should_be_equal_to.result;
+				.Then("result should be sum of second and third input").Result.should_be_equal_to.Proof(p => p.second_minus_third)
+				.Then("readout should be same as result").Subject[c => c.Readout()].should_be_equal_to.TheResult;
 
 		public Behaviour calculator_can_add_three_numbers =
 			ProvedBy<values_for_calculator_taking_inputs>()
 				.Given<Calculator, a_calculator_taking_three_inputs>()
 				.When("I press subtract twice", (c, e) => press_subtract_n_times(c, 2))
-				.Then("result should be sum of first, second and third input").Result.should_be_equal_to.proof(p => p.first_minus__second_minus_third)
-				.Then("readout should be same as result").Subject[c => c.Readout()].should_be_equal_to.result;
+				.Then("result should be sum of first, second and third input").Result.should_be_equal_to.Proof(p => p.first_minus__second_minus_third)
+				.Then("readout should be same as result").Subject[c => c.Readout()].should_be_equal_to.TheResult;
 
 		public Behaviour cant_add_more_than_I_have_inputs_for_with_3_inputs =
 			ProvedBy<values_for_calculator_taking_inputs>()

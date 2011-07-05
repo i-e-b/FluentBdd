@@ -1,9 +1,5 @@
 Fluent BDD
 
-IN PROGRESS:
- - Clean up the THEN lambdas, expose only one lambda type; use SmartAssertion for others (in progress)
- - Try to make the selection of fields/methods/properties more clear in SA (result_part etc.) -- maybe with result->TheResult; result_part->Result(=>)
-
 TO DO:
  - Chase Scenario->Behaviour name through system
  - Tests to cover all SmartAssertion cases.
@@ -14,3 +10,4 @@ TO CONSIDER:
  - Wrap all low-level assertions around an interface, and do the NUnit Assert calls in the NUnit extension; remove NUnit dependencies from FluentBDD core.
  - Change tree to be a real pure tree structure. Tests in leafs only. Feature leafs should be list of coverage types.
  - Make a link between Features and their behaviours, extending and cleaning up TestClosure{}
+ - Try to do the neat indexer naming trick on expected values as done with actual values in SmartAssertions

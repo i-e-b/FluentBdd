@@ -26,16 +26,16 @@ namespace UsageExample {
 		public Behaviour calculators_do_adding =
 			ProvedBy<values_for_a_calculator_using_math_provider>()
 				.Given<Calculator, a_calculator_that_uses_a_math_provider_interface_and_two_values>()
-				.And<a_calculator_that_uses_internal_logic_and_two_values>() // Different context, same subject type.
+				.AlsoGiven<a_calculator_that_uses_internal_logic_and_two_values>() // Different context, same subject type.
 				.When("adding inputs", (c, e) => c.Add())
-				.Then("should add the inputs (using two contexts!)").Result.should_be_equal_to.proof(p => p.a_plus_b);
+				.Then("should add the inputs (using two contexts!)").Result.should_be_equal_to.Proof(p => p.a_plus_b);
 
 		// if you prefer, you can specify the 'with' case as below. Pay attention to the lack of brackets on 'Context.Of<T>'
 		// syntax is "With<subjectType>(Context.Of<contextType>)"
 		public Behaviour alternative_syntax =
 			Given<Calculator, a_calculator_taking_two_inputs>().Using<values_for_a_calculator_taking_two_inputs>()
 				.When("Entering another number", (c, e) => c.Press(0))
-				.Then("should have new number in readout").Subject[s => s.Readout()].should_be_equal_to.value(0);
+				.Then("should have new number in readout").Subject[s => s.Readout()].should_be_equal_to.the_value(0);
 
 		// Here's how to leave an inconclusive scenario (useful as a placholder when roughing out behaviours)
 		public Behaviour unfinished_scenario =
@@ -56,7 +56,7 @@ namespace UsageExample {
 			Given<Calculator, a_calculator_that_uses_a_math_provider_interface_and_two_values>()
 				.Using<values_for_a_calculator_using_math_provider>()
 				.When("entering zero into it", (subject, proof) => subject.Press(0))
-				.Then("the screen should show zero").Subject[s => s.Readout()].should_be_equal_to.value(0);
+				.Then("the screen should show zero").Subject[s => s.Readout()].should_be_equal_to.the_value(0);
 
 
 		// this scenario's action ("when") gives a result, so all the tests ("then") take it as a param.
@@ -64,8 +64,8 @@ namespace UsageExample {
 			ProvedBy<values_for_a_calculator_using_math_provider>()
 				.Given<Calculator, a_calculator_that_uses_a_math_provider_interface_and_two_values>()
 				.When("adding inputs", (c, e) => c.Add())
-				.Then("the result should be the sum of inputs").Result.should_be_equal_to.value(3)
-				.Then("the screen should show the result").Subject[s => s.Readout()].should_be_equal_to.result;
+				.Then("the result should be the sum of inputs").Result.should_be_equal_to.the_value(3)
+				.Then("the screen should show the result").Subject[s => s.Readout()].should_be_equal_to.TheResult;
 
 
 
@@ -74,7 +74,7 @@ namespace UsageExample {
 			ProvedBy<values_for_a_calculator_using_math_provider>()
 				.Given<Calculator, a_calculator_that_uses_a_math_provider_interface_and_two_values>()
 				.When("I press 'a' again", (subject, proof) => subject.Press(proof.a))
-				.Then("the screen should show 'a'").Subject[s => s.Readout()].should_be_equal_to.proof(p => p.a);
+				.Then("the screen should show 'a'").Subject[s => s.Readout()].should_be_equal_to.Proof(p => p.a);
 
 		// Testing for exceptions
 		public Behaviour pressing_add_without_enough_input_causes_an_exception =
@@ -112,19 +112,19 @@ namespace UsageExample {
 			Given<Calculator, a_calculator_taking_three_inputs>()
 				.Using<values_for_a_calculator_taking_three_inputs>()
 				.When("No action is taken", (c, e) => { }) // common pattern for doing nothing
-				.Then("The last input value should be on the screen").Subject[s => s.Readout()].should_be_equal_to.proof(p => p.c);
+				.Then("The last input value should be on the screen").Subject[s => s.Readout()].should_be_equal_to.Proof(p => p.c);
 
 		public Behaviour adding_once_adds_last_two_items =
 			Given<Calculator, a_calculator_taking_three_inputs>()
 				.Using<values_for_a_calculator_taking_three_inputs>()
 				.When("Adding once", (c, e) => c.Add())
-				.Then("Result should be b+c").Result.should_be_equal_to.proof(p => p.b_plus_c);
+				.Then("Result should be b+c").Result.should_be_equal_to.Proof(p => p.b_plus_c);
 
 		public Behaviour adding_twice_adds_all_three_items =
 			Given<Calculator, a_calculator_taking_three_inputs>()
 				.Using<values_for_a_calculator_taking_three_inputs>()
 				.When("Adding twice", (c, e) => AddTwice(c)) // Feature's method in lambda
-				.Then("Result should be a+b+c").Result.should_be_equal_to.proof(p => p.a_plus_b_plus_c);
+				.Then("Result should be a+b+c").Result.should_be_equal_to.Proof(p => p.a_plus_b_plus_c);
 		#endregion
 
 		// more complex 'when' actions can be rolled out into static methods to keep scenarios clean.
@@ -210,7 +210,7 @@ namespace UsageExample {
 		public Behaviour when_creating_a_calculator =
 			GivenNoSubject()
 				.When("I create a calculator", with => new Calculator())
-				.Then("I should have a new calculator").result.should_not_be_null;
+				.Then("I should have a new calculator").Result.should_not_be_null;
 
 
 		public Behaviour when_doing_things_with_exceptions =
