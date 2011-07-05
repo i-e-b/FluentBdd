@@ -224,7 +224,7 @@ namespace FluentBDD {
 	}
 
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public class BehaviourWithoutAnAction<TSubject, TExampleType, TExampleSource> : Behaviour where TExampleSource : class, TExampleType, IProvide<TExampleType>, new() {
+	public class BehaviourWithoutAnAction<TSubject, TProofType, TProofSource> : Behaviour where TProofSource : class, TProofType, IProvide<TProofType>, new() {
 		protected readonly List<Func<Context<TSubject>>> ContextSources;
 
 		public BehaviourWithoutAnAction (List<Func<Context<TSubject>>> contextSources) {
@@ -234,34 +234,34 @@ namespace FluentBDD {
 		/// <summary>
 		/// Add another context which shares the same subject and behaviour as the first.
 		/// </summary>
-		public BehaviourWithoutAnAction<TSubject, TExampleType, TExampleSource> 
+		public BehaviourWithoutAnAction<TSubject, TProofType, TProofSource> 
 			AlsoGiven<TContext> () where TContext : Context<TSubject>, new()  {
 			ContextSources.Add(() => new TContext());
 			return this;
 		}
 
-		public Behaviour<TSubject, TResult, TExampleType, TExampleSource> When<TResult> (string description, Func<TSubject, TExampleType, TResult> action) {
-			return new Behaviour<TSubject, TResult, TExampleType, TExampleSource>(description, ContextSources, (subject, context) => action(subject,((IUse<TExampleType>)context).Values ));
+		public Behaviour<TSubject, TResult, TProofType, TProofSource> When<TResult> (string description, Func<TSubject, TProofType, TResult> action) {
+			return new Behaviour<TSubject, TResult, TProofType, TProofSource>(description, ContextSources, (subject, context) => action(subject,((IUse<TProofType>)context).Values ));
 		}
 
-		public Behaviour<TSubject, no_result, TExampleType, TExampleSource> When (string description, Action<TSubject, TExampleType> action) {
-			return new Behaviour<TSubject, no_result, TExampleType, TExampleSource>(description, ContextSources, (subject, context) => action(subject, ((IUse<TExampleType>)context).Values));
+		public Behaviour<TSubject, no_result, TProofType, TProofSource> When (string description, Action<TSubject, TProofType> action) {
+			return new Behaviour<TSubject, no_result, TProofType, TProofSource>(description, ContextSources, (subject, context) => action(subject, ((IUse<TProofType>)context).Values));
 		}
 	}
 
 	[EditorBrowsable(EditorBrowsableState.Never)]
-	public class Behaviour<TSubject, TResult, TExampleType, TExampleSource> : Behaviour<TSubject, TResult>, ITakeMessage, IBuildTests where TExampleSource : class, TExampleType, IProvide<TExampleType>, new() {
+	public class Behaviour<TSubject, TResult, TProofType, TProofSource> : Behaviour<TSubject, TResult>, ITakeMessage, IBuildTests where TProofSource : class, TProofType, IProvide<TProofType>, new() {
 
-		internal readonly List<Group<string, Action<TSubject, TResult, TExampleSource>>> subjectAndResultAndExampleTests;
-		internal readonly List<Group<string, Action<TSubject, TExampleSource>>> subjectAndExampleTests;
-		internal readonly List<Group<string, Func<TExampleType, Exception>>> specificExceptionTests;
+		internal readonly List<Group<string, Action<TSubject, TResult, TProofSource>>> subjectAndResultWithProofsTests;
+		internal readonly List<Group<string, Action<TSubject, TProofSource>>> subjectWithProofsTests;
+		internal readonly List<Group<string, Func<TProofType, Exception>>> specificExceptionTests;
 
 		#region CTORs
 		public Behaviour (string description, IEnumerable<Func<Context<TSubject>>> contextSources, Action<TSubject, Context<TSubject>> action)
 			: base(description, contextSources, action) {
-			subjectAndResultAndExampleTests = new List<Group<string, Action<TSubject, TResult, TExampleSource>>>();
-			subjectAndExampleTests = new List<Group<string, Action<TSubject, TExampleSource>>>();
-			specificExceptionTests = new List<Group<string, Func<TExampleType, Exception>>>();
+			subjectAndResultWithProofsTests = new List<Group<string, Action<TSubject, TResult, TProofSource>>>();
+			subjectWithProofsTests = new List<Group<string, Action<TSubject, TProofSource>>>();
+			specificExceptionTests = new List<Group<string, Func<TProofType, Exception>>>();
 
 			expectedExceptionType = null;
 			expectedExceptionMessage = null;
@@ -269,9 +269,9 @@ namespace FluentBDD {
 
 		public Behaviour (string description, IEnumerable<Func<Context<TSubject>>> contextSources, Func<TSubject, Context<TSubject>, TResult> action)
 			: base(description, contextSources, action) {
-			subjectAndResultAndExampleTests = new List<Group<string, Action<TSubject, TResult, TExampleSource>>>();
-			subjectAndExampleTests = new List<Group<string, Action<TSubject, TExampleSource>>>();
-			specificExceptionTests = new List<Group<string, Func<TExampleType, Exception>>>();
+			subjectAndResultWithProofsTests = new List<Group<string, Action<TSubject, TResult, TProofSource>>>();
+			subjectWithProofsTests = new List<Group<string, Action<TSubject, TProofSource>>>();
+			specificExceptionTests = new List<Group<string, Func<TProofType, Exception>>>();
 
 			expectedExceptionType = null;
 			expectedExceptionMessage = null;
@@ -279,27 +279,27 @@ namespace FluentBDD {
 		#endregion
 
 		#region THENs
-		public Behaviour<TSubject, TResult, TExampleType, TExampleSource> Then (string description, Action<TSubject, TResult, TExampleSource> subjectAndResultAndExampleTest) {
-			subjectAndResultAndExampleTests.Add(new Group<string, Action<TSubject, TResult, TExampleSource>>(description, subjectAndResultAndExampleTest));
+		public Behaviour<TSubject, TResult, TProofType, TProofSource> Then (string description, Action<TSubject, TResult, TProofSource> subjectAndResultWithProofsTest) {
+			subjectAndResultWithProofsTests.Add(new Group<string, Action<TSubject, TResult, TProofSource>>(description, subjectAndResultWithProofsTest));
 			return this;
 		}
 
-		new public SmartAssertionBase<TSubject, TResult, TExampleType, TExampleSource> Then (string description) {
-			return new SmartAssertionBase<TSubject, TResult, TExampleType, TExampleSource>(description, this);
+		new public SmartAssertionBase<TSubject, TResult, TProofType, TProofSource> Then (string description) {
+			return new SmartAssertionBase<TSubject, TResult, TProofType, TProofSource>(description, this);
 		}
 		#endregion
 
 		#region Exception cases
 		public override ITakeMessage ShouldThrow<TException> () {
 			expectedExceptionType = typeof(TException);
-			subjectAndExampleTests.Insert(0, new Group<string, Action<TSubject, TExampleSource>>(
+			subjectWithProofsTests.Insert(0, new Group<string, Action<TSubject, TProofSource>>(
 				"should throw " + expectedExceptionType.Name, (s, e) => { }));
 			return this;
 		}
 
 		Behaviour ITakeMessage.WithMessage (string expectedMessage) {
 			expectedExceptionMessage = expectedMessage;
-			subjectAndExampleTests.Insert(0, new Group<string, Action<TSubject, TExampleSource>>(
+			subjectWithProofsTests.Insert(0, new Group<string, Action<TSubject, TProofSource>>(
 				"should have exception message \"" + expectedExceptionMessage + "\"", (s, e) => { }));
 			return this;
 		}
@@ -308,18 +308,18 @@ namespace FluentBDD {
 			return this;
 		}
 
-		internal Behaviour<TSubject, TResult, TExampleType, TExampleSource> Then(string description, Func<TExampleType, Exception> sampleExceptionSource) {
+		internal Behaviour<TSubject, TResult, TProofType, TProofSource> Then(string description, Func<TProofType, Exception> sampleExceptionSource) {
 			specificExceptionTests
-				.Add(new Group<string, Func<TExampleType, Exception>>(
+				.Add(new Group<string, Func<TProofType, Exception>>(
 				     	description,
 				     	sampleExceptionSource
 				     	));
 			return this;
 		}
 		
-		public Behaviour<TSubject, TResult, TExampleType, TExampleSource> ShouldThrowException(Func<TExampleType, Exception> sampleExceptionSource) {
+		public Behaviour<TSubject, TResult, TProofType, TProofSource> ShouldThrowException(Func<TProofType, Exception> sampleExceptionSource) {
 			specificExceptionTests
-				.Add(new Group<string, Func<TExampleType, Exception>>(
+				.Add(new Group<string, Func<TProofType, Exception>>(
 				     	"should throw exception",
 				     	sampleExceptionSource
 				     	));
@@ -327,30 +327,30 @@ namespace FluentBDD {
 		}
 		#endregion
 
-		#region Test closure building. Don't bother looking until you've comprehended the simpler versions without examples.
+		#region Test closure building. Don't bother looking until you've comprehended the simpler versions without proofs.
 		/// <summary>
-		/// Build a subject for each combination of context and examples.
+		/// Build a subject for each combination of context and proof.
 		/// </summary>
-		private IEnumerable<Group<Func<Context<TSubject>>, IProvide<TExampleType>>> BuildSubjectsWithExamples () {
-			var exampleData = new TExampleSource().Data();
+		private IEnumerable<Group<Func<Context<TSubject>>, IProvide<TProofType>>> BuildSubjectsWithProofs () {
+			var proofData = new TProofSource().Data();
 			foreach (var contextSource in contextSources) {
 				var context = contextSource();
-				if (context is IUse<TExampleType>) {
-					for (int exampleIndex = 0; exampleIndex < exampleData.Length; exampleIndex++) {
-						var example = exampleData[exampleIndex];
-						int index = exampleIndex;
+				if (context is IUse<TProofType>) {
+					for (int proofIndex = 0; proofIndex < proofData.Length; proofIndex++) {
+						var proof = proofData[proofIndex];
+						int index = proofIndex;
 						Func<Context<TSubject>> source = contextSource;
-						yield return new Group<Func<Context<TSubject>>, IProvide<TExampleType>>(
+						yield return new Group<Func<Context<TSubject>>, IProvide<TProofType>>(
 							() => {
-								var closureExample = new TExampleSource().Data()[index];
+								var values = new TProofSource().Data()[index];
 								var fresh_context = source();
-								((IUse<TExampleType>)fresh_context).Values = closureExample;
+								((IUse<TProofType>)fresh_context).Values = values;
 								return fresh_context;
 							},
-							example as IProvide<TExampleType>);
+							proof as IProvide<TProofType>);
 					}
 				} else {
-					throw new InvalidOperationException("Expected " + context.GetType().FullName + " to implement IUse<" + typeof (TExampleType).Name + ">, but could not cast it.");
+					throw new InvalidOperationException("Expected " + context.GetType().FullName + " to implement IUse<" + typeof (TProofType).Name + ">, but could not cast it.");
 				}
 			}
 			yield break;
@@ -361,7 +361,7 @@ namespace FluentBDD {
 
 			//1
 			testClosures.AddRange(from test in subjectOnlyTests
-								  from tuple in BuildSubjectsWithExamples()
+								  from tuple in BuildSubjectsWithProofs()
 			                      select new TestClosure(
 									"Given " + GetLambdaBuilderDescription(tuple.A),
 									"When " + Description, "Then " + test.A,
@@ -376,11 +376,11 @@ namespace FluentBDD {
 
 			//2
 			testClosures.AddRange(from test in subjectAndResultTests
-								  from tuple in BuildSubjectsWithExamples()
+								  from tuple in BuildSubjectsWithProofs()
 								  select new TestClosure(
 									"Given " + GetLambdaBuilderDescription(tuple.A),
 									"When " + Description, "Then " + test.A, 
-									" with " + tuple._2<TExampleSource>().StringRepresentation(),
+									" with " + tuple._2<TProofSource>().StringRepresentation(),
 									() => {
 										var context = GetContext(tuple);
 										var subject = context.SetupAndReturnContextBuilder().Build();
@@ -389,43 +389,43 @@ namespace FluentBDD {
 									() => GetContext(tuple).TearDown()));
 
 			//3
-			testClosures.AddRange(from test in subjectAndResultAndExampleTests
-								  from tuple in BuildSubjectsWithExamples()
+			testClosures.AddRange(from test in subjectAndResultWithProofsTests
+								  from tuple in BuildSubjectsWithProofs()
 								  select new TestClosure(
 									"Given " + GetLambdaBuilderDescription(tuple.A),
 									"When " + Description, "Then " + test.A, 
-									" with " + tuple._2<TExampleSource>().StringRepresentation(),
+									" with " + tuple._2<TProofSource>().StringRepresentation(),
 									() =>
 									{
 										var context = GetContext(tuple);
 										var subject = context.SetupAndReturnContextBuilder().Build();
-										var example = ((IUse<TExampleType>)context).Values;
+										var values = ((IUse<TProofType>)context).Values;
 			                      		var result = behaviourAction(subject, context);
-										test.B(subject, result, example as TExampleSource);
+										test.B(subject, result, values as TProofSource);
 									}, () => expectedExceptionType, () => expectedExceptionMessage,
 									() => GetContext(tuple).TearDown()));
 
 			
 			//4
-			testClosures.AddRange(from test in subjectAndExampleTests
-			                      from tuple in BuildSubjectsWithExamples()
+			testClosures.AddRange(from test in subjectWithProofsTests
+			                      from tuple in BuildSubjectsWithProofs()
 								  select new TestClosure(
 									"Given " + GetLambdaBuilderDescription(tuple.A),
 									"When " + Description, "Then " + test.A,
-									" with " + tuple._2<TExampleSource>().StringRepresentation(),
+									" with " + tuple._2<TProofSource>().StringRepresentation(),
 									() =>
 									{
 										var context = GetContext(tuple);
 										var subject = context.SetupAndReturnContextBuilder().Build();
-										var example = ((IUse<TExampleType>)context).Values;
+										var values = ((IUse<TProofType>)context).Values;
 			                      		behaviourAction(subject, context);
-										test.B(subject, example as TExampleSource);
+										test.B(subject, values as TProofSource);
 									}, () => expectedExceptionType, () => expectedExceptionMessage,
 									() => GetContext(tuple).TearDown()));
 
 			//5: Tests for exceptions matching an example exception
 			testClosures.AddRange(from test in specificExceptionTests
-								  from tuple in BuildSubjectsWithExamples()
+								  from tuple in BuildSubjectsWithProofs()
 			                      select new TestClosure(
 									"Given " + GetLambdaBuilderDescription(tuple.A),
 									"When " + Description, "Then " + test.A,
@@ -434,9 +434,9 @@ namespace FluentBDD {
 									{
 										var context = GetContext(tuple);
 										var subject = context.SetupAndReturnContextBuilder().Build();
-										var example = ((IUse<TExampleType>)context).Values;
+										var values = ((IUse<TProofType>)context).Values;
 			                      		behaviourAction(subject, context);
-										test.B(example as TExampleSource);
+										test.B(values as TProofSource);
 			                      	},
 			                      	() => GetExceptionResultType(tuple, test),
 			                      	() => GetExceptionMessage(tuple, test),
@@ -447,26 +447,26 @@ namespace FluentBDD {
 			return testClosures;
 		}
 
-		private Context<TSubject> GetContext(Group<Func<Context<TSubject>>, IProvide<TExampleType>> tuple) {
+		private Context<TSubject> GetContext(Group<Func<Context<TSubject>>, IProvide<TProofType>> tuple) {
 			return tuple._1<Func<Context<TSubject>>>().Invoke();
 		}
-		private Exception GetException(Group<Func<Context<TSubject>>, IProvide<TExampleType>> tuple, Group<string, Func<TExampleType, Exception>> test) {
+		private Exception GetException(Group<Func<Context<TSubject>>, IProvide<TProofType>> tuple, Group<string, Func<TProofType, Exception>> test) {
 			var context = tuple._1<Func<Context<TSubject>>>().Invoke();
-			var example = ((IUse<TExampleType>)context).Values;
-			return test.B(example as TExampleSource);	
+			var values = ((IUse<TProofType>)context).Values;
+			return test.B(values as TProofSource);	
 		}
-		private Type GetExceptionResultType (Group<Func<Context<TSubject>>, IProvide<TExampleType>> tuple, Group<string, Func<TExampleType, Exception>> test) {
+		private Type GetExceptionResultType (Group<Func<Context<TSubject>>, IProvide<TProofType>> tuple, Group<string, Func<TProofType, Exception>> test) {
 			return GetException(tuple, test).GetType();
 		}
-		private string GetExceptionMessage (Group<Func<Context<TSubject>>, IProvide<TExampleType>> tuple, Group<string, Func<TExampleType, Exception>> test) {
+		private string GetExceptionMessage (Group<Func<Context<TSubject>>, IProvide<TProofType>> tuple, Group<string, Func<TProofType, Exception>> test) {
 			var message = GetException(tuple, test).Message;
 			if (string.IsNullOrEmpty(message)) return null;
 			return message;
 		}
-		private string GetWithExceptionName (Group<Func<Context<TSubject>>, IProvide<TExampleType>> tuple, Group<string, Func<TExampleType, Exception>> test) {
+		private string GetWithExceptionName (Group<Func<Context<TSubject>>, IProvide<TProofType>> tuple, Group<string, Func<TProofType, Exception>> test) {
 			var exception = GetException(tuple, test);
-			if (string.IsNullOrEmpty(exception.Message)) return "With exception of type " + exception.GetType() + ", ignoring message, with " + tuple._2<TExampleSource>().StringRepresentation();
-			return "With exception of type " + exception.GetType() + " and message \"" + exception.Message + "\", with " + tuple._2<TExampleSource>().StringRepresentation();
+			if (string.IsNullOrEmpty(exception.Message)) return "With exception of type " + exception.GetType() + ", ignoring message, with " + tuple._2<TProofSource>().StringRepresentation();
+			return "With exception of type " + exception.GetType() + " and message \"" + exception.Message + "\", with " + tuple._2<TProofSource>().StringRepresentation();
 		}
 
 		private string GetLambdaBuilderDescription (Func<Context<TSubject>> builderFunc) {

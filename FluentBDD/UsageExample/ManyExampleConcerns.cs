@@ -13,7 +13,7 @@ namespace UsageExample {
 		"To avoid making mistakes",
 		"I want to be told the sum of two numbers")]
 	public class Addition : Behaviours {
-		// checking mocks with the Context->Action->Values->Behaviour pattern
+		// checking mocks with the Proof->Context->Action->Behaviour pattern
 		public Behaviour the_calculator_uses_the_adder_supplied = // the name of the behaviour is inconsequential to how the tests are run. Use something instructive
 			ProvedBy<values_for_a_calculator_using_math_provider>()
 			.Given<Calculator, a_calculator_that_uses_a_math_provider_interface_and_two_values>()
@@ -30,7 +30,7 @@ namespace UsageExample {
 				.When("adding inputs", (c, e) => c.Add())
 				.Then("should add the inputs (using two contexts!)").Result.should_be_equal_to.Proof(p => p.a_plus_b);
 
-		// if you prefer, you can specify the 'with' case as below. Pay attention to the lack of brackets on 'Context.Of<T>'
+		// if you prefer, you can specify the 'using' case as below. Pay attention to the lack of brackets on 'Context.Of<T>'
 		// syntax is "With<subjectType>(Context.Of<contextType>)"
 		public Behaviour alternative_syntax =
 			Given<Calculator, a_calculator_taking_two_inputs>().Using<values_for_a_calculator_taking_two_inputs>()

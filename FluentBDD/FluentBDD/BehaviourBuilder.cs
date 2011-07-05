@@ -32,13 +32,13 @@ namespace FluentBDD {
 			ContextSources, s => { });
 		}
 
-		public BehaviourWithoutAnAction<TSubject, TExampleType, TExampleSource> Using<TExampleType, TExampleSource> () where TExampleSource : class, TExampleType, IProvide<TExampleType>, new() where TExampleType : class {
-			return new BehaviourWithoutAnAction<TSubject, TExampleType, TExampleSource>(ContextSources);
+		public BehaviourWithoutAnAction<TSubject, TProofType, TProofSource> Using<TProofType, TProofSource> () where TProofSource : class, TProofType, IProvide<TProofType>, new() where TProofType : class {
+			return new BehaviourWithoutAnAction<TSubject, TProofType, TProofSource>(ContextSources);
 		}
 
-		public BehaviourWithoutAnAction<TSubject, TExampleSource, TExampleSource> Using<TExampleSource> ()
-			where TExampleSource : class, IProvide<TExampleSource>, new() {
-			return new BehaviourWithoutAnAction<TSubject, TExampleSource, TExampleSource>(ContextSources);
+		public BehaviourWithoutAnAction<TSubject, TProofSource, TProofSource> Using<TProofSource> ()
+			where TProofSource : class, IProvide<TProofSource>, new() {
+			return new BehaviourWithoutAnAction<TSubject, TProofSource, TProofSource>(ContextSources);
 		}
 	}
 

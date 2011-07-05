@@ -14,24 +14,22 @@ using UsageExample;
 namespace BowlingScores {
 	[Behaviours("Score calculation")]
 	class ScoringConcerns : Behaviours {
-		public Behaviour scoring_for_a_series_of_games_played = ProvedBy<IGameExpectations, valid_games>()
+		public Behaviour scoring_for_a_series_of_games_played = ProvedBy<IGameValues, valid_games>()
 			.Given<GameScorer, that_takes_a_series_of_pin_hits>()
-			.When("I score a valid game", (game_scorer, example) => game_scorer.ScoreGame())
+			.When("I score a valid game", (game_scorer, values) => game_scorer.ScoreGame())
 			.Then("I should get a final score").Result.should_be_equal_to.Proof(p => p.finalScore);
 
 
-		public Behaviour I_shouldnt_be_able_to_bowl_when_the_game_is_over = ProvedBy<IGameExpectations, games_with_too_many_throws>()
+		public Behaviour I_shouldnt_be_able_to_bowl_when_the_game_is_over = ProvedBy<IGameValues, games_with_too_many_throws>()
 			.Given<GameScorer, that_takes_a_series_of_pin_hits>()
-			.When("I score an invalid game",		(game_scorer, example) => game_scorer.ScoreGame())
-				// How about this syntax?:
-				//.Then("Should not score game", new ArgumentException("Too many throws"));
+			.When("I score an invalid game",		(game_scorer, values) => game_scorer.ScoreGame())
 			.ShouldThrow<ArgumentException>()
 			.WithMessage("Too many throws");
 	}
 
-	// this context takes IGameExpectations as it's values, so can take many providers
-	internal class that_takes_a_series_of_pin_hits : Context<GameScorer>, IUse<IGameExpectations> {
-		public IGameExpectations Values { get; set; }
+	// this context takes IGameValues as it's values, so can take many providers
+	internal class that_takes_a_series_of_pin_hits : Context<GameScorer>, IUse<IGameValues> {
+		public IGameValues Values { get; set; }
 
 		public override void SetupContext () {
 			Given("I have a 10-pin bowling game scorer", () => new GameScorer())
@@ -45,7 +43,7 @@ namespace BowlingScores {
 	}
 
 	// the bare essentials for the context
-	internal interface IGameExpectations {
+	internal interface IGameValues {
 		int finalScore { get; }
 		string nickName { get; }
 		int[] pinHits { get; }
@@ -53,7 +51,7 @@ namespace BowlingScores {
 	}
 
 	// one provider of values/expectations
-	internal class valid_games : IGameExpectations, IProvide<IGameExpectations> {
+	internal class valid_games : IGameValues, IProvide<IGameValues> {
 		public int finalScore { get; set; }
 		public string nickName { get; set; }
 		public int[] pinHits { get; set; }
@@ -79,7 +77,7 @@ namespace BowlingScores {
 			}
 		};
 
-		public IGameExpectations[] Data () { return values; }
+		public IGameValues[] Data () { return values; }
 
 		public string StringRepresentation () {
 			return nickName + ", final score = " + finalScore + " for pin hits " + pinHits.Aggregate("", (a, b) => a + ", " + b).Substring(1);
@@ -87,7 +85,7 @@ namespace BowlingScores {
 	}
 
 	// a different, but compatible provider of values/expectations
-	internal class games_with_too_many_throws : IGameExpectations, IProvide<IGameExpectations> {
+	internal class games_with_too_many_throws : IGameValues, IProvide<IGameValues> {
 		public int finalScore { get; set; }
 		public string nickName { get; set; }
 		public int[] pinHits { get; set; }
@@ -98,7 +96,7 @@ namespace BowlingScores {
 			}
 		};
 
-		public IGameExpectations[] Data () { return values; }
+		public IGameValues[] Data () { return values; }
 
 		public string StringRepresentation () {
 			return nickName + ", final score = " + finalScore + " for pin hits " + pinHits.Aggregate("", (a, b) => a + ", " + b).Substring(1);

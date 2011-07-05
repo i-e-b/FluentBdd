@@ -1,12 +1,12 @@
 ﻿namespace FluentBDD {
-	public class Provable<TExampleType, TExampleSource>
-		where TExampleSource : class, TExampleType, IProvide<TExampleType>, new()
-		where TExampleType : class {
+	public class Provable<TProofType, TProofSource>
+		where TProofSource : class, TProofType, IProvide<TProofType>, new()
+		where TProofType : class {
 		internal Provable() {}
 
-		public BehaviourWithoutAnAction<TSubject, TExampleType, TExampleSource>
-			Given<TSubject, TContext> () where TContext : Context<TSubject>, IUse<TExampleType>, new() {
-			return Behaviours.Given<TSubject,TContext>().Using<TExampleType, TExampleSource>();
+		public BehaviourWithoutAnAction<TSubject, TProofType, TProofSource>
+			Given<TSubject, TContext> () where TContext : Context<TSubject>, IUse<TProofType>, new() {
+			return Behaviours.Given<TSubject,TContext>().Using<TProofType, TProofSource>();
 		}
 	}
 }

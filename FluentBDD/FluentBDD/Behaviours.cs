@@ -20,15 +20,15 @@ namespace FluentBDD {
 			}
 		}
 
-		public static Provable<TExampleType, TExampleSource> ProvedBy<TExampleType, TExampleSource> ()
-			where TExampleSource : class, TExampleType, IProvide<TExampleType>, new()
-			where TExampleType : class {
-			return new Provable<TExampleType, TExampleSource>();
+		public static Provable<TProofType, TProofSource> ProvedBy<TProofType, TProofSource> ()
+			where TProofSource : class, TProofType, IProvide<TProofType>, new()
+			where TProofType : class {
+			return new Provable<TProofType, TProofSource>();
 		}
 
-		public static Provable<TExampleSource, TExampleSource> ProvedBy<TExampleSource> ()
-			where TExampleSource : class, IProvide<TExampleSource>, new()  {
-			return new Provable<TExampleSource, TExampleSource>();
+		public static Provable<TProofSource, TProofSource> ProvedBy<TProofSource> ()
+			where TProofSource : class, IProvide<TProofSource>, new()  {
+			return new Provable<TProofSource, TProofSource>();
 		}
 
 		public static BehaviourBuilder<no_subject> GivenNoSubject () {
