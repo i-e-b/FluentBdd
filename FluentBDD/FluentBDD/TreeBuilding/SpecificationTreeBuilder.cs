@@ -20,7 +20,7 @@ namespace FluentBDD.TreeBuilding {
 			} else {
 				throw new ArgumentException("Not a recognised specification");
 			}
-			return BuildScenarioTree(fields, sourceInstance);
+			return BuildBehaviourTree(fields, sourceInstance);
 		}
 
 		/// <summary>
@@ -49,10 +49,10 @@ namespace FluentBDD.TreeBuilding {
 			return type.GetConstructor(new Type[] { }).Invoke(new object[] { });
 		}
 
-		private static TestClosureTree BuildScenarioTree (IEnumerable<FieldInfo> scenarioFields, object featureInstance) {
+		private static TestClosureTree BuildBehaviourTree (IEnumerable<FieldInfo> behaviourFields, object featureInstance) {
 			var tree = new TestClosureTree();
-			foreach (var scenarioField in scenarioFields) {
-				var tests = GetTestClosures(scenarioField, featureInstance);
+			foreach (var behaviourField in behaviourFields) {
+				var tests = GetTestClosures(behaviourField, featureInstance);
 				foreach (var test in tests) {
 					var given = FixName(test.Given);
 

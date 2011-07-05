@@ -4,10 +4,10 @@ using System.Linq;
 using NUnit.Framework;
 
 namespace FluentBDD.Assertions {
-	#region Assertions for Scenarios with proofs
+	#region Assertions for Behaviours with proofs
 	/// <summary>
 	/// Base for assertions. These select the 'actual' values.
-	/// Types mirror those of the source scenario.
+	/// Types mirror those of the source behaviour.
 	/// NB : Proofs are never part of the 'actual', this is intentional.
 	/// </summary>
 	public class SmartAssertionBase<TSubject, TResult, TProofType, TProofSource> where TProofSource : class, TProofType, IProvide<TProofType>, new() {
@@ -18,37 +18,37 @@ namespace FluentBDD.Assertions {
 			scen = Scen;
 		}
 
-		/// <summary>Test that the scenario's subject matches an expectation</summary>
+		/// <summary>Test that the behaviour's subject matches an expectation</summary>
 		public SmartAssertion<TSubject, TResult, TProofType, TProofSource, TSubject> Subject { get { return new SmartAssertion<TSubject, TResult, TProofType, TProofSource, TSubject>(description, scen, (s, r, v) => s); } }
 
 		/// <summary> Test that the result returned by the "When" clause matches an expectation </summary>
 		public SmartAssertion<TSubject, TResult, TProofType, TProofSource, TResult> Result { get { return new SmartAssertion<TSubject, TResult, TProofType, TProofSource, TResult>(description, scen, (s, r, v) => r); } }
 
-		/// <summary> Test that the scenario throws an exception of a matching type and message. </summary>
+		/// <summary> Test that the behaviour throws an exception of a matching type and message. </summary>
 		/// <param name="ex">An example exception to match against. To ignore the message in tests, pass an example exception with an empty message string</param>
 		public Behaviour<TSubject, TResult, TProofType, TProofSource> should_throw (Exception ex) {
 			return scen.Then(description, p => ex);
 		}
 
 
-		/// <summary> Test that the scenario throws an exception of a matching type and message from proofs. </summary>
+		/// <summary> Test that the behaviour throws an exception of a matching type and message from proofs. </summary>
 		/// <param name="ex">An example exception to match against. To ignore the message in tests, pass an example exception with an empty message string</param>
 		public Behaviour<TSubject, TResult, TProofType, TProofSource> should_throw (Func<TProofType,Exception> ex) {
 			return scen.Then(description, ex);
 		}
 
 		/// <summary> Return a value based on proof values to test against an expectation </summary>
-		/// <param name="selector">A function on the scenario proofs; e.g. ".check(p=>File.Exists(p.fileName)."</param>
+		/// <param name="selector">A function on the behaviour proofs; e.g. ".check(p=>File.Exists(p.fileName)."</param>
 		public SmartAssertion<TSubject, TResult, TProofType, TProofSource, TProofType> check (Func<TProofType, object> selector) {
 			return new SmartAssertion<TSubject, TResult, TProofType, TProofSource, TProofType>(description, scen, (s, r, v) => selector(v));
 		}
 
-		/// <summary> Call a method on the scenario proof, which should make it's own assertions </summary>
+		/// <summary> Call a method on the behaviour proof, which should make it's own assertions </summary>
 		public Behaviour<TSubject, TResult, TProofType, TProofSource> check_proof (Action<TProofType> check) {
 			return scen.Then(description, (s, r, p) => check(p));
 		}
 
-		/// <summary> Ignore a single "Then" clause in a scenario </summary>
+		/// <summary> Ignore a single "Then" clause in a behaviour </summary>
 		public Behaviour<TSubject, TResult, TProofType, TProofSource> should_be_ignored {
 			get { return scen.Then(description, (s, r, p) => Assert.Ignore("Ignored")); }
 		}
@@ -224,11 +224,11 @@ namespace FluentBDD.Assertions {
 		public Behaviour<TSubject, TResult, TProofType, TProofSource> the_value (object value) {
 			return src.scen.Then(src.description, (s, r, p) => assertion(src.actualSelector(s, r, p), value));
 		}
-		/// <summary> Expect the scenario's subject object </summary>
+		/// <summary> Expect the behaviour's subject object </summary>
 		public Behaviour<TSubject, TResult, TProofType, TProofSource> TheSubject {
 			get { return src.scen.Then(src.description, (s, r, p) => assertion(src.actualSelector(s, r, p), s)); }
 		}
-		/// <summary> Select part of the scenario's subject as the test's expectation </summary>
+		/// <summary> Select part of the behaviour's subject as the test's expectation </summary>
 		public Behaviour<TSubject, TResult, TProofType, TProofSource> Subject (Func<TSubject, object> selector) {
 			return src.scen.Then(src.description, (s, r, p) => assertion(src.actualSelector(s, r, p), selector(s)));
 		}
@@ -241,17 +241,17 @@ namespace FluentBDD.Assertions {
 			return src.scen.Then(src.description, (s, r, p) => assertion(src.actualSelector(s, r, p), selector(r)));
 		}
 
-		/// <summary> Select a value from the scenario's proof as the test's expectation </summary>
+		/// <summary> Select a value from the behaviour's proof as the test's expectation </summary>
 		public Behaviour<TSubject, TResult, TProofType, TProofSource> Proof (Func<TProofType, object> selector) {
 			return src.scen.Then(src.description, (s, r, p) => assertion(src.actualSelector(s, r, p), selector(p)));
 		}
 	}
 	#endregion
 
-	#region Assertions for Scenarios without proofs
+	#region Assertions for Behaviours without proofs
 	/// <summary>
 	/// Base for assertions. These select the 'actual' values.
-	/// Types mirror those of the source scenario.
+	/// Types mirror those of the source behaviour.
 	/// </summary>
 	public class SmartAssertionBase<TSubject, TResult> {
 		private readonly string description;
@@ -261,7 +261,7 @@ namespace FluentBDD.Assertions {
 			scen = Scen;
 		}
 
-		/// <summary>Test that the scenario's subject matches an expectation</summary>
+		/// <summary>Test that the behaviour's subject matches an expectation</summary>
 		public SmartAssertion<TSubject, TResult, TSubject> Subject { get { return new SmartAssertion<TSubject, TResult, TSubject>(description, scen, (s, r) => s); } }
 		
 		/*/// <summary> Select something from the subject to test against an expectation </summary>
@@ -276,13 +276,13 @@ namespace FluentBDD.Assertions {
 			return new SmartAssertion<TSubject, TResult>(description, scen, (s, r) => selector(r));
 		}*/
 
-		/// <summary> Test that the scenario throws an exception of a matching type and message. </summary>
+		/// <summary> Test that the behaviour throws an exception of a matching type and message. </summary>
 		/// <param name="ex">An example exception to match against. To ignore the message in tests, pass an example exception with an empty message string</param>
 		public Behaviour<TSubject, TResult> should_throw (Exception ex) {
 			return scen.Then(description, () => ex);
 		}
 
-		/// <summary> Ignore a single "Then" clause in a scenario </summary>
+		/// <summary> Ignore a single "Then" clause in a behaviour </summary>
 		public Behaviour<TSubject, TResult> should_be_ignored {
 			get { return scen.Then(description, (s, r) => Assert.Ignore("Ignored")); }
 		}
@@ -458,11 +458,11 @@ namespace FluentBDD.Assertions {
 		public Behaviour<TSubject, TResult> the_value (object value) {
 			return src.scen.Then(src.description, (s, r) => assertion(src.actualSelector(s, r), value));
 		}
-		/// <summary> Expect the scenario's subject object </summary>
+		/// <summary> Expect the behaviour's subject object </summary>
 		public Behaviour<TSubject, TResult> TheSubject {
 			get { return src.scen.Then(src.description, (s, r) => assertion(src.actualSelector(s, r), s)); }
 		}
-		/// <summary> Select part of the scenario's subject as the test's expectation </summary>
+		/// <summary> Select part of the behaviour's subject as the test's expectation </summary>
 		public Behaviour<TSubject, TResult> Subject (Func<TSubject, object> selector) {
 			return src.scen.Then(src.description, (s, r) => assertion(src.actualSelector(s, r), selector(s)));
 		}

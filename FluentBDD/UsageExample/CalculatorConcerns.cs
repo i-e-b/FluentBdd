@@ -211,7 +211,7 @@ namespace CalculatorConcerns {
 		}
 	}
 
-	/// <summary> A few methods that help keep scenarios clean </summary>
+	/// <summary> A few methods that help keep behaviours clean </summary>
 	public class common_calculator_concerns : Behaviours {
 		protected static int press_add_n_times (Calculator calculator, int n) {
 			if (n < 1) throw new ArgumentException("n must be gte 1");

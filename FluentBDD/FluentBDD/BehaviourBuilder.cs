@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace FluentBDD {
-	public class ScenarioBuilder<TSubject> {
+	public class BehaviourBuilder<TSubject> {
 		protected readonly List<Func<Context<TSubject>>> ContextSources;
 
-		public ScenarioBuilder(Func<Context<TSubject>> firstContext) {
+		public BehaviourBuilder(Func<Context<TSubject>> firstContext) {
 			ContextSources = new List<Func<Context<TSubject>>> {firstContext};
 		}
 
-		public ScenarioBuilder<TSubject> And (Func<Context<TSubject>> contextProvider) {
+		public BehaviourBuilder<TSubject> And (Func<Context<TSubject>> contextProvider) {
 			ContextSources.Add(contextProvider);
 			return this;
 		}

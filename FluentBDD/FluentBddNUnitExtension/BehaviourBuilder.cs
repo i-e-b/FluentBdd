@@ -7,8 +7,8 @@ namespace FluentBddNUnitExtension {
 	/// <summary>
 	/// Add-in interface: NUnit uses this for installation and binding.
 	/// </summary>
-	[NUnitAddin(Description = "FluentBDD Behaviour/Feature/Scenario test suite builder")]
-	public class ScenarioBuilder : IAddin, ISuiteBuilder {
+	[NUnitAddin(Description = "FluentBDD Feature/Behaviour test suite builder")]
+	public class BehaviourBuilder : IAddin, ISuiteBuilder {
 		public bool CanBuildFrom(Type type) {
 			return Reflect.HasAttribute(type, typeof(BehavioursAttribute).FullName, false)
 				|| Reflect.HasAttribute(type, typeof(FeatureSetAttribute).FullName, false);

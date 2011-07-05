@@ -18,7 +18,7 @@ namespace FluentBDD {
 	public class Behaviour<TSubject, TResult> : Behaviour, ITakeMessage, IBuildTests {
 		protected readonly string Description;
 		protected readonly IEnumerable<Func<Context<TSubject>>> contextSources;
-		protected readonly Func<TSubject, Context<TSubject>, TResult> scenarioAction;
+		protected readonly Func<TSubject, Context<TSubject>, TResult> behaviourAction;
 
 		internal readonly List<Group<string, Action<TSubject>>> subjectOnlyTests;
 		internal readonly List<Group<string, Action<TSubject, TResult>>> subjectAndResultTests;
@@ -35,7 +35,7 @@ namespace FluentBDD {
 
 			Description = description;
 			this.contextSources = contextSources;
-			scenarioAction = (subject, context) =>
+			behaviourAction = (subject, context) =>
 			{
 				action(subject);
 				return default(TResult);
@@ -49,7 +49,7 @@ namespace FluentBDD {
 
 			Description = description;
 			this.contextSources = contextSources;
-			scenarioAction = (subject, context) =>
+			behaviourAction = (subject, context) =>
 			{
 				action(subject, context);
 				return default(TResult);
@@ -63,7 +63,7 @@ namespace FluentBDD {
 
 			Description = description;
 			this.contextSources = contextSources;
-			scenarioAction = (subject, context) =>
+			behaviourAction = (subject, context) =>
 			{
 				return action(subject);
 			};
@@ -76,7 +76,7 @@ namespace FluentBDD {
 
 			Description = description;
 			this.contextSources = contextSources;
-			scenarioAction = (subject, context) =>
+			behaviourAction = (subject, context) =>
 			{
 				return action(subject, context);
 			};
@@ -145,7 +145,7 @@ namespace FluentBDD {
 			                      	() => {
 			                      		var context = contextSource();
 										var subject = context.SetupAndReturnContextBuilder().Build();
-			                      		scenarioAction(subject, context);
+			                      		behaviourAction(subject, context);
 			                      		test.B(subject);
 									}, () => expectedExceptionType, () => expectedExceptionMessage,
 									() => contextSource().TearDown()
@@ -160,7 +160,7 @@ namespace FluentBDD {
 									() => {
 										var context = contextSource();
 										var subject = context.SetupAndReturnContextBuilder().Build();
-										test.B(subject, scenarioAction(subject, context));
+										test.B(subject, behaviourAction(subject, context));
 									}, () => expectedExceptionType, () => expectedExceptionMessage,
 									() => contextSource().TearDown()));
 
@@ -174,7 +174,7 @@ namespace FluentBDD {
 									() => {
 										var context = contextSource();
 										var subject = context.SetupAndReturnContextBuilder().Build();
-										scenarioAction(subject, context);
+										behaviourAction(subject, context);
 									}, () => test.B().GetType(), () => test.B().Message,
 									() => contextSource().TearDown()));
 
@@ -369,7 +369,7 @@ namespace FluentBDD {
 									{
 										var context = GetContext(tuple);
 										var subject = context.SetupAndReturnContextBuilder().Build();
-			                      		scenarioAction(subject, context);
+			                      		behaviourAction(subject, context);
 			                      		test.B(subject);
 			                      	}, () => expectedExceptionType, () => expectedExceptionMessage,
 									() => GetContext(tuple).TearDown()));
@@ -384,7 +384,7 @@ namespace FluentBDD {
 									() => {
 										var context = GetContext(tuple);
 										var subject = context.SetupAndReturnContextBuilder().Build();
-			                      		test.B(subject, scenarioAction(subject, context));
+			                      		test.B(subject, behaviourAction(subject, context));
 									}, () => expectedExceptionType, () => expectedExceptionMessage,
 									() => GetContext(tuple).TearDown()));
 
@@ -400,7 +400,7 @@ namespace FluentBDD {
 										var context = GetContext(tuple);
 										var subject = context.SetupAndReturnContextBuilder().Build();
 										var example = ((IUse<TExampleType>)context).Values;
-			                      		var result = scenarioAction(subject, context);
+			                      		var result = behaviourAction(subject, context);
 										test.B(subject, result, example as TExampleSource);
 									}, () => expectedExceptionType, () => expectedExceptionMessage,
 									() => GetContext(tuple).TearDown()));
@@ -418,7 +418,7 @@ namespace FluentBDD {
 										var context = GetContext(tuple);
 										var subject = context.SetupAndReturnContextBuilder().Build();
 										var example = ((IUse<TExampleType>)context).Values;
-			                      		scenarioAction(subject, context);
+			                      		behaviourAction(subject, context);
 										test.B(subject, example as TExampleSource);
 									}, () => expectedExceptionType, () => expectedExceptionMessage,
 									() => GetContext(tuple).TearDown()));
@@ -435,7 +435,7 @@ namespace FluentBDD {
 										var context = GetContext(tuple);
 										var subject = context.SetupAndReturnContextBuilder().Build();
 										var example = ((IUse<TExampleType>)context).Values;
-			                      		scenarioAction(subject, context);
+			                      		behaviourAction(subject, context);
 										test.B(example as TExampleSource);
 			                      	},
 			                      	() => GetExceptionResultType(tuple, test),

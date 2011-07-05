@@ -52,7 +52,7 @@ namespace FluentBddNUnitExtension {
 
 		private void TestNonExceptionCondition(TestResult result) {
 			if (! TestShouldThrowException()) result.Success();
-			else result.Failure("The scenario did not throw an exception", "");
+			else result.Failure("The behaviour did not throw an exception", "");
 		}
 
 		private void TestExceptionCondition(TestResult result, Exception ex) {

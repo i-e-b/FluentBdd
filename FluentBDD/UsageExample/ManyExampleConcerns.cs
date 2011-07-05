@@ -14,11 +14,11 @@ namespace UsageExample {
 		"I want to be told the sum of two numbers")]
 	public class Addition : Behaviours {
 		// checking mocks with the Context->Action->Values->Behaviour pattern
-		public Behaviour the_calculator_uses_the_adder_supplied = // the name of the scenario is inconsequential to how the tests are run. Use something instructive
+		public Behaviour the_calculator_uses_the_adder_supplied = // the name of the behaviour is inconsequential to how the tests are run. Use something instructive
 			ProvedBy<values_for_a_calculator_using_math_provider>()
 			.Given<Calculator, a_calculator_that_uses_a_math_provider_interface_and_two_values>()
 				.When("adding inputs", (c,e) => c.Add())
-				.Then("adder interface should be used once").check_proof(p => p.adder_was_used_once()) // test method in IProvide values, keeps scenario clean
+				.Then("adder interface should be used once").check_proof(p => p.adder_was_used_once()) // test method in IProvide values, keeps behaviour clean
 				.Then("adder interface should be used and only once!").check_proof(p => p.adder_was_used_once());
 
 		// Checking two compatible contexts against the same behaviour and the same values
@@ -37,21 +37,21 @@ namespace UsageExample {
 				.When("Entering another number", (c, e) => c.Press(0))
 				.Then("should have new number in readout").Subject[s => s.Readout()].should_be_equal_to.the_value(0);
 
-		// Here's how to leave an inconclusive scenario (useful as a placholder when roughing out behaviours)
-		public Behaviour unfinished_scenario =
+		// Here's how to leave an inconclusive behaviour (useful as a placholder when roughing out behaviours)
+		public Behaviour unfinished_behaviour =
 			ProvedBy<values_for_a_calculator_taking_two_inputs>()
 				.Given<Calculator, a_calculator_taking_two_inputs>()
 				.When("doing something I haven't defined yet", (c, e) => { })
 				.Then("should result in something I haven't tested yet").should_be_ignored;
 
-		// Here's how to ignore an entire scenario (should it be failing for a good and temporary reason)
-		public Behaviour broken_scenario =
+		// Here's how to ignore an entire behaviour (should it be failing for a good and temporary reason)
+		public Behaviour broken_behaviour =
 			ProvedBy<values_for_a_calculator_taking_two_inputs>()
 			.Given<Calculator, a_calculator_taking_two_inputs>()
 				.When("doing something I've broken, but marked as ignored", Ignore.me)
 				.Then("should ignore broken test!", (subject, result, values) => { throw new Exception("I'm broken!"); });
 
-		// this scenario's action ("when") gives NO result, so all the tests ("then") have only the subject. (and values if you request them)
+		// this behaviour's action ("when") gives NO result, so all the tests ("then") have only the subject. (and values if you request them)
 		public Behaviour calculator_readout_reflects_input =
 			Given<Calculator, a_calculator_that_uses_a_math_provider_interface_and_two_values>()
 				.Using<values_for_a_calculator_using_math_provider>()
@@ -59,7 +59,7 @@ namespace UsageExample {
 				.Then("the screen should show zero").Subject[s => s.Readout()].should_be_equal_to.the_value(0);
 
 
-		// this scenario's action ("when") gives a result, so all the tests ("then") take it as a param.
+		// this behaviour's action ("when") gives a result, so all the tests ("then") take it as a param.
 		public Behaviour adding_returns_the_sum_of_last_two_numbers =
 			ProvedBy<values_for_a_calculator_using_math_provider>()
 				.Given<Calculator, a_calculator_that_uses_a_math_provider_interface_and_two_values>()
@@ -69,7 +69,7 @@ namespace UsageExample {
 
 
 
-		// this scenario uses the context's values in the test Action.
+		// this behaviour uses the context's values in the test Action.
 		public Behaviour using_context_in_test_action =
 			ProvedBy<values_for_a_calculator_using_math_provider>()
 				.Given<Calculator, a_calculator_that_uses_a_math_provider_interface_and_two_values>()
@@ -127,7 +127,7 @@ namespace UsageExample {
 				.Then("Result should be a+b+c").Result.should_be_equal_to.Proof(p => p.a_plus_b_plus_c);
 		#endregion
 
-		// more complex 'when' actions can be rolled out into static methods to keep scenarios clean.
+		// more complex 'when' actions can be rolled out into static methods to keep behaviours clean.
 		private static void AddThreeTimes (Calculator c, object values) { // method takes the subject as it's only parameter, so can be passed directly
 			c.Add(); c.Add(); c.Add();
 		}
@@ -137,13 +137,13 @@ namespace UsageExample {
 
 
 		#region Contexts
-		// Contexts provide the subject for a scenario. They are a way to 
+		// Contexts provide the subject for a behaviour. They are a way to 
 		// combine creation, setup and value injection without needing to
 		// specify any behaviour or any specific concrete values.
 
 
 		// These classes don't need to be embedded in 'Addition', nor do they need to be marked internal.
-		// You can use any accessible class of type Context<T> for a scenario.
+		// You can use any accessible class of type Context<T> for a behaviour.
 		// Making them internal and embedded keeps things tidy.
 		internal class a_calculator_that_uses_a_math_provider_interface_and_two_values : Context<Calculator>, IUse<values_for_a_calculator_using_math_provider> {
 			public values_for_a_calculator_using_math_provider Values { get; set; }
@@ -165,7 +165,7 @@ namespace UsageExample {
 		}
 
 
-		// Expectations for scenarios -- values for input and output, tests around mocks.
+		// Expectations for behaviours -- values for input and output, tests around mocks.
 		// These help to keep contexts and behaviour specs nice and clean.
 		// These can be re-used by any context that implements the matching IUse<>
 		internal class values_for_a_calculator_using_math_provider : IProvide<values_for_a_calculator_using_math_provider> {
@@ -203,7 +203,7 @@ namespace UsageExample {
 	}
 
 
-	// Below are scenarios that don't have subjects to be set up.
+	// Below are behaviours that don't have subjects to be set up.
 	// Expected to be used mostly for testing new() etc.
 	[Behaviours("Creation")]
 	public class CreatingACalculator : Behaviours {

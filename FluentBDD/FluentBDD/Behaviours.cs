@@ -31,21 +31,21 @@ namespace FluentBDD {
 			return new Provable<TExampleSource, TExampleSource>();
 		}
 
-		public static ScenarioBuilder<no_subject> GivenNoSubject () {
+		public static BehaviourBuilder<no_subject> GivenNoSubject () {
 			return Given<no_subject, no_subject>();
 		}
 
-		public static ScenarioBuilder<no_subject> GivenStaticContextFor<T> () {
+		public static BehaviourBuilder<no_subject> GivenStaticContextFor<T> () {
 			return Given<no_subject, static_context<T>>();
 		}
 
-		public static ScenarioBuilder<TSubject> Given<TSubject, TContext> () where TContext : Context<TSubject>, new() {
-			return new ScenarioBuilder<TSubject>(() => new TContext());
+		public static BehaviourBuilder<TSubject> Given<TSubject, TContext> () where TContext : Context<TSubject>, new() {
+			return new BehaviourBuilder<TSubject>(() => new TContext());
 
 		}
 
-		public static ScenarioBuilder<TSubject> Given<TSubject> (Func<Context<TSubject>> contextProvider) {
-			return new ScenarioBuilder<TSubject>(contextProvider);
+		public static BehaviourBuilder<TSubject> Given<TSubject> (Func<Context<TSubject>> contextProvider) {
+			return new BehaviourBuilder<TSubject>(contextProvider);
 		}
 	}
 }

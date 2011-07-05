@@ -1,7 +1,6 @@
 Fluent BDD
 
 TO DO:
- - Chase Scenario->Behaviour name through system
  - Tests to cover all SmartAssertion cases.
  - Clean up usage around proofs (IUse, IProvide are maybes, but all uses of 'examples' and 'values' should move to 'proof')
  - Rework slideshow so the separation and composition ideas are more clear, and show a little better what this means in code.

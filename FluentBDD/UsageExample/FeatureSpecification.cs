@@ -4,10 +4,10 @@ namespace CustomerFeatures {
 
 	/// <summary>
 	/// This layout doesn't do any production code testing, but allows us to map out
-	/// the features and scenarios we intend to write.
+	/// the features and behaviours we intend to write.
 	/// These behaviours DO result in NUnit tests.
 	/// 
-	/// Specific scenario "CoveredBy"s allow us the ReSharper-drive the tests, but we
+	/// Specific behaviour "CoveredBy"s allow us the ReSharper-drive the tests, but we
 	/// can subsequently remove them to make the behaviours less fragile.
 	/// </summary>
 	[FeatureSet("High level feature behaviour examples")]
@@ -17,11 +17,11 @@ namespace CustomerFeatures {
 		
 
 		/// <summary>
-		/// A behaviour with specific scenarios required for the test to pass.
-		/// Each scenario inside each "CoveredBy" is a unit test.
-		/// Fails unless given type is a 'Feature' and the expressions given are Scenario types.
+		/// A behaviour with specific behaviours required for the test to pass.
+		/// Each behaviour inside each "CoveredBy" is a unit test.
+		/// Fails unless given type is a 'Feature' and the expressions given are Behaviour types.
 		/// 
-		/// This is the way you'd start to write your scenarios outside-in.
+		/// This is the way you'd start to write your behaviours outside-in.
 		/// </summary>
 		public Feature very_specific_behaviour =
 			For(Ivor)
@@ -33,7 +33,7 @@ namespace CustomerFeatures {
 
 		/// <summary>
 		/// A behaviour in place. Describes stakeholders and purpose,
-		/// with a test of coverage. Fails unless given type is a 'Feature' with at least one scenario.
+		/// with a test of coverage. Fails unless given type is a 'Feature' with at least one behaviour.
 		/// 
 		/// This is the way you'd leave the behaviour once the features are green (this cleanup to be done as part of the refactor cycle)
 		/// </summary>

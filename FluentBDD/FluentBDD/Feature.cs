@@ -85,7 +85,7 @@ namespace FluentBDD {
 			return this;
 		}
 
-		public Feature CoveredBy<TCoveringType> (params Expression<Func<TCoveringType, Behaviour>>[] explicitScenarios) {
+		public Feature CoveredBy<TCoveringType> (params Expression<Func<TCoveringType, Behaviour>>[] explicitBehaviours) {
 			CoveringTypes.Add(typeof(TCoveringType));
 			return this;
 		}
@@ -100,7 +100,7 @@ namespace FluentBDD {
 		IBehaviourSpec To (string goal);
 		IBehaviourSpec Should (string solution);
 		Feature CoveredBy<TCoveringType> ();
-		Feature CoveredBy<TCoveringType> (params Expression<Func<TCoveringType, Behaviour>>[] explicitScenarios);
+		Feature CoveredBy<TCoveringType> (params Expression<Func<TCoveringType, Behaviour>>[] explicitBehaviours);
 		Feature CoverageNotComplete ();
 	}
 
