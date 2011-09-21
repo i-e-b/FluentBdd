@@ -1,0 +1,8 @@
+TODO
+====
+ - Try to remove plugin dependency:
+   - Change inheretance to include a test case, which builds test trees from classes' fields
+ 
+ - Reduce noise introduced by 'Provable'
+   - Superclasses are abstract and take a proof type
+   - Maybe remove interface type proofs?
