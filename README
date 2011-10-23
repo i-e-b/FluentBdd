@@ -2,9 +2,7 @@ FluentBDD
 =========
 A framework and NUnit extension for writing BDD-style behaviours in a fluent manner, resulting in unit tests.
 
-Given the increasing popularity of tools which can't use NUnit plugins, FluentBDD is on hiatus
-while I think about a plugin-free alternative. It's still an interesting example of taking NUnit 
-to the extreme. I look forward to NUnit re-introducing proper test-suite support.
+I plan to move this framework over to Gallio, as pure NUnit is a bit too restrictive.
 
 FluentBDD NUnit Extension
 =========================

@@ -6,3 +6,4 @@ TODO
  - Reduce noise introduced by 'Provable'
    - Superclasses are abstract and take a proof type
    - Maybe remove interface type proofs?
+   - Remove all the provable interface stuff and just go Dynamic?
