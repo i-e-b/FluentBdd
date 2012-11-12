@@ -1,11 +1,13 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentBddNUnitExtension", "FluentBddNUnitExtension\FluentBddNUnitExtension.csproj", "{59009D6D-7CA2-4931-85E9-5CC697B7FF4C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentBDD", "FluentBDD\FluentBDD.csproj", "{66FF01DA-561A-459B-9CD7-DE3016744971}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsageExample", "UsageExample\UsageExample.csproj", "{824B804A-66BD-4492-A035-FE59B83A0469}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spikes", "Spikes\Spikes.csproj", "{1419FEA4-E7D4-4D2B-A8A2-29857B21E8C3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,6 +27,10 @@ Global
 		{824B804A-66BD-4492-A035-FE59B83A0469}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{824B804A-66BD-4492-A035-FE59B83A0469}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{824B804A-66BD-4492-A035-FE59B83A0469}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1419FEA4-E7D4-4D2B-A8A2-29857B21E8C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1419FEA4-E7D4-4D2B-A8A2-29857B21E8C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1419FEA4-E7D4-4D2B-A8A2-29857B21E8C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1419FEA4-E7D4-4D2B-A8A2-29857B21E8C3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
